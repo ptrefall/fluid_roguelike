@@ -5,6 +5,7 @@ namespace Fluid.Roguelike.Dungeon
     {
         DungeonDepth,
         PlayerNeedsSpawnPoint,
+        RepeatCount,
     }
 
     public enum DungeonRoomShape

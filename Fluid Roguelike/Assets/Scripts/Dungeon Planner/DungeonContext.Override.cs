@@ -10,11 +10,11 @@ namespace Fluid.Roguelike.Dungeon
     public partial class DungeonContext : BaseContext
     {
         public override IFactory Factory { get; set; } = new DefaultFactory();
-        public override List<string> MTRDebug { get; set; }
-        public override List<string> LastMTRDebug { get; set; }
-        public override bool DebugMTR { get; } = false;
-        public override Stack<string> DecompositionLog { get; set; }
-        public override bool LogDecomposition { get; } = false;
+        public override List<string> MTRDebug { get; set; } = new List<string>();
+        public override List<string> LastMTRDebug { get; set; } = new List<string>();
+        public override bool DebugMTR { get; } = true;
+        public override Stack<string> DecompositionLog { get; set; } = new Stack<string>();
+        public override bool LogDecomposition { get; } = true;
 
         public override byte[] WorldState { get; } = new byte[Enum.GetValues(typeof(DungeonWorldState)).Length];
 

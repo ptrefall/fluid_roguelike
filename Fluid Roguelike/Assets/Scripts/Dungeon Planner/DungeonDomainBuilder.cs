@@ -81,16 +81,9 @@ namespace Fluid.Roguelike.Dungeon
                         Theme = context.CurrentTheme,
                     };
 
-                    var lastRoom = context.LastRoomMeta;
-                    if (lastRoom != null)
-                    {
-                        var validExits = GetValidExits(context);
-                        if ((validExits == null || validExits.Count == 0) && !allowOverlap)
-                        {
-                            // What to do?
-                            return TaskStatus.Failure;
-                        }
-
+                    var parentRoom = TryGetParentRoom(context, allowOverlap, out var validExits);
+                    if (parentRoom != null)
+                    { 
                         var direction = context.CurrentBuilderDirection;
                         if (validExits.Contains(direction) == false && !allowOverlap)
                         {
@@ -113,36 +106,40 @@ namespace Fluid.Roguelike.Dungeon
                         {
                             case BuilderDirection.North:
                                 {
-                                    room.X = lastRoom.X;
-                                    room.Y = lastRoom.Y - 1;
+                                    room.X = parentRoom.X;
+                                    room.Y = parentRoom.Y - 1;
                                 } break;
                             case BuilderDirection.East:
                                 {
-                                    room.X = lastRoom.X + 1;
-                                    room.Y = lastRoom.Y;
+                                    room.X = parentRoom.X + 1;
+                                    room.Y = parentRoom.Y;
                                 } break;
                             case BuilderDirection.South:
                                 {
-                                    room.X = lastRoom.X;
-                                    room.Y = lastRoom.Y + 1;
+                                    room.X = parentRoom.X;
+                                    room.Y = parentRoom.Y + 1;
                                 } break;
                             case BuilderDirection.West:
                                 {
-                                    room.X = lastRoom.X - 1;
-                                    room.Y = lastRoom.Y;
+                                    room.X = parentRoom.X - 1;
+                                    room.Y = parentRoom.Y;
                                 } break;
                         }
 
-                        Debug.Log($"Spawn room[{room.Id}] ([{room.X},{room.Y}], {room.Shape}:{room.Width}x{room.Height}:{room.Theme}) to the {direction} of room[{lastRoom.Id}]\n");
+                        Debug.Log($"Spawn room[{room.Id}] ([{room.X},{room.Y}], {room.Shape}:{room.Width}x{room.Height}:{room.Theme}) to the {direction} of room[{parentRoom.Id}]\n");
                     }
                     else
                     {
                         Debug.Log($"Spawn first room[{room.Id}] ([{room.X},{room.Y}], {room.Shape}:{room.Width}x{room.Height}:{room.Theme})\n");
                     }
 
-                    IsOccupied.Add(new Tuple<int, int>(room.X, room.Y), true);
+                    if (IsOccupied.ContainsKey(new Tuple<int, int>(room.X, room.Y)) == false)
+                    {
+                        IsOccupied.Add(new Tuple<int, int>(room.X, room.Y), true);
+                    }
 
-                    context.LastRoomMeta = room;
+                    context.RoomStack.Push(room);
+                    context.AllRooms.Add(room);
                     return TaskStatus.Success;
                 });
             }
@@ -150,17 +147,55 @@ namespace Fluid.Roguelike.Dungeon
             return this;
         }
 
-        private List<BuilderDirection> GetValidExits(DungeonContext context)
+        private DungeonRoomMeta TryGetParentRoom(DungeonContext context, bool allowOverlap, out List<BuilderDirection> validExits)
+        {
+            validExits = null;
+            if (context.RoomStack == null || context.RoomStack.Count == 0)
+                return null;
+
+            var room = context.RoomStack.Peek();
+            while (room != null)
+            {
+                validExits = GetValidExits(context, room);
+                if ((validExits == null || validExits.Count == 0) && !allowOverlap)
+                {
+                    // What to do?
+                    context.RoomStack.Pop();
+                    if (context.RoomStack.Count == 0)
+                        break;
+
+                    room = context.RoomStack.Peek();
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if ((validExits == null || validExits.Count == 0) && allowOverlap)
+            {
+                if(validExits == null)
+                    validExits = new List<BuilderDirection>();
+
+                validExits.Add(BuilderDirection.North);
+                validExits.Add(BuilderDirection.East);
+                validExits.Add(BuilderDirection.South);
+                validExits.Add(BuilderDirection.West);
+            }
+
+            return room;
+        }
+
+        private List<BuilderDirection> GetValidExits(DungeonContext context, DungeonRoomMeta r)
         {
             var result = context.Factory.CreateList<BuilderDirection>();
             result.Clear();
 
-            var r = context.LastRoomMeta;
-            if(IsOccupied.ContainsKey(new Tuple<int, int>(r.X,r.Y+1)) == false)
+            if(IsOccupied.ContainsKey(new Tuple<int, int>(r.X,r.Y-1)) == false)
                 result.Add(BuilderDirection.North);
-            if (IsOccupied.ContainsKey(new Tuple<int, int>(r.X + 1, r.Y)) == false)
+            if (IsOccupied.ContainsKey(new Tuple<int, int>(r.X+1, r.Y)) == false)
                 result.Add(BuilderDirection.East);
-            if (IsOccupied.ContainsKey(new Tuple<int, int>(r.X, r.Y-1)) == false)
+            if (IsOccupied.ContainsKey(new Tuple<int, int>(r.X, r.Y+1)) == false)
                 result.Add(BuilderDirection.South);
             if (IsOccupied.ContainsKey(new Tuple<int, int>(r.X-1, r.Y)) == false)
                 result.Add(BuilderDirection.West);
@@ -178,13 +213,20 @@ namespace Fluid.Roguelike.Dungeon
                         context => context.HasState(DungeonWorldState.PlayerNeedsSpawnPoint));
                     Do((context) =>
                     {
-                        Debug.Log($"Spawn player in room {context.LastRoomMeta?.Id ?? 0}\n");
-                        var playerSpawn = new DungeonSpawnPlayerMeta
+                        var parentRoom = context.RoomStack.Peek();
+                        if (parentRoom != null)
                         {
-                            SpawnRoom = context.LastRoomMeta,
-                        };
-                        context.PlayerSpawnMeta = playerSpawn;
-                        return TaskStatus.Success;
+                            Debug.Log($"Spawn player in room {parentRoom.Id}\n");
+                            var playerSpawn = new DungeonSpawnPlayerMeta
+                            {
+                                SpawnRoom = parentRoom,
+                            };
+                            context.PlayerSpawnMeta = playerSpawn;
+                            return TaskStatus.Success;
+                        }
+
+                        Debug.Log($"Error! Can't spawn player in the void!\n");
+                        return TaskStatus.Failure;
                     });
                 }
                 End();
@@ -196,6 +238,29 @@ namespace Fluid.Roguelike.Dungeon
         public DungeonDomainBuilder Optionally()
         {
             return this.AlwaysSucceedSelect<DungeonDomainBuilder, DungeonContext>("Optionally");
+        }
+
+        public DungeonDomainBuilder Repeat(int count)
+        {
+            Sequence("Repeat");
+            {
+                Action("Set repeat count");
+                {
+                    Do((context => TaskStatus.Success));
+                    Effect("Set repeat count", EffectType.PlanAndExecute,
+                        (context, type) => context.SetState(DungeonWorldState.RepeatCount, count, type));
+                }
+                End();
+                this.Repeat<DungeonDomainBuilder, DungeonContext>("Repeat", (uint) DungeonWorldState.RepeatCount);
+            }
+            return this;
+        }
+
+        public DungeonDomainBuilder EndRepeat()
+        {
+            End();
+            End();
+            return this;
         }
 
         // ------------------------------------------- BUILDER PREFABS
@@ -213,6 +278,11 @@ namespace Fluid.Roguelike.Dungeon
                     }
                     SpawnRoom(8, 8, DungeonRoomShape.Random, false);
                     SpawnRoom(4, 6, DungeonRoomShape.Random, false);
+                    Repeat(10);
+                    {
+                        SpawnRoom(4, 12, DungeonRoomShape.Random, false);
+                    }
+                    EndRepeat();
                 }
             }
             End();
@@ -232,6 +302,11 @@ namespace Fluid.Roguelike.Dungeon
                     }
                     SpawnRoom(4, 8, DungeonRoomShape.Random, false);
                     SpawnRoom(8, 12, DungeonRoomShape.Random, false);
+                    Repeat(10);
+                    {
+                        SpawnRoom(4, 12, DungeonRoomShape.Random, false);
+                    }
+                    EndRepeat();
                 }
             }
             End();

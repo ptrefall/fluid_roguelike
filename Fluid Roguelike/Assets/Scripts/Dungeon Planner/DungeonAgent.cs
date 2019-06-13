@@ -14,18 +14,22 @@ namespace Fluid.Roguelike.Dungeon
         private DungeonContext _context;
         private Domain<DungeonContext> _domain;
 
-        private void Start()
+        public DungeonContext Context => _context;
+
+        private void Awake()
         {
             _context = new DungeonContext();
             _context.Init();
 
             _domain = _domainDefinition.Create();
-            Generate(0);
         }
 
         public bool Generate(int dungeonDepth)
         {
             _context.SetState(DungeonWorldState.DungeonDepth, dungeonDepth, EffectType.Permanent);
+            _context.RoomStack.Clear();
+            _context.AllRooms.Clear();
+            _context.PlayerSpawnMeta = null;
 
             var status = _domain.FindPlan(_context, out var plan);
             if(status == DecompositionStatus.Succeeded)
