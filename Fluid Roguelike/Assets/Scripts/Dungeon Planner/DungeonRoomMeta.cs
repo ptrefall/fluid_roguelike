@@ -9,6 +9,8 @@ namespace Fluid.Roguelike.Dungeon
         public int Height { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public int CenterX { get; set; }
+        public int CenterY { get; set; }
         public DungeonRoomShape Shape { get; set; }
         public DungeonTheme Theme { get; set; }
         public int Id { get; }

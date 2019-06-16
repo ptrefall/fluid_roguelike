@@ -78,6 +78,8 @@ namespace Fluid.Roguelike.Dungeon
                         Shape = shape,
                         X = 0,
                         Y = 0,
+                        CenterX = 0,
+                        CenterY = 0,
                         Theme = context.CurrentTheme,
                     };
 
@@ -102,27 +104,40 @@ namespace Fluid.Roguelike.Dungeon
                             }
                         }
 
+                        var halfWidth = width / 2;
+                        var halfHeight = height / 2;
+                        var parentHalfWidth = parentRoom.Width / 2;
+                        var parentHalfHeight = parentRoom.Height / 2;
+
                         switch (direction)
                         {
                             case BuilderDirection.North:
                                 {
                                     room.X = parentRoom.X;
                                     room.Y = parentRoom.Y - 1;
+                                    room.CenterX = parentRoom.CenterX;
+                                    room.CenterY = parentRoom.CenterY - parentHalfHeight - halfHeight;
                                 } break;
                             case BuilderDirection.East:
                                 {
                                     room.X = parentRoom.X + 1;
                                     room.Y = parentRoom.Y;
+                                    room.CenterX = parentRoom.CenterX + parentHalfWidth + halfWidth;
+                                    room.CenterY = parentRoom.CenterY;
                                 } break;
                             case BuilderDirection.South:
                                 {
                                     room.X = parentRoom.X;
                                     room.Y = parentRoom.Y + 1;
+                                    room.CenterX = parentRoom.CenterX;
+                                    room.CenterY = parentRoom.CenterY + parentHalfHeight + halfHeight;
                                 } break;
                             case BuilderDirection.West:
                                 {
                                     room.X = parentRoom.X - 1;
                                     room.Y = parentRoom.Y;
+                                    room.CenterX = parentRoom.CenterX - parentHalfWidth - halfWidth;
+                                    room.CenterY = parentRoom.CenterY;
                                 } break;
                         }
 

@@ -6,6 +6,8 @@ namespace Fluid.Roguelike.Dungeon
     {
         [SerializeField] private SpriteRenderer _groundLayer;
 
+        public SpriteRenderer GroundLayer => _groundLayer;
+
         public void Setup(Sprite ground)
         {
             _groundLayer.sprite = ground;

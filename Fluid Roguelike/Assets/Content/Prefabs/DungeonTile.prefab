@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4832091237232324797
+--- !u!1 &6149240035081922582
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,36 +8,36 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1505189294222129031}
-  - component: {fileID: 768986152790958692}
+  - component: {fileID: 9173820225234438847}
+  - component: {fileID: 2899625386781900644}
   m_Layer: 0
-  m_Name: RoomTile
+  m_Name: View
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1505189294222129031
+--- !u!4 &9173820225234438847
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4832091237232324797}
+  m_GameObject: {fileID: 6149240035081922582}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 2431574886455065142}
+  m_Father: {fileID: 4838267666865120809}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &768986152790958692
+--- !u!212 &2899625386781900644
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4832091237232324797}
+  m_GameObject: {fileID: 6149240035081922582}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -68,8 +68,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -3714409817710726143, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
-    type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -77,10 +76,10 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &5220204773022579916
+--- !u!1 &8203076348681961694
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -88,48 +87,40 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2431574886455065142}
-  - component: {fileID: 2339689353353514637}
+  - component: {fileID: 4838267666865120809}
+  - component: {fileID: 4840452425015892830}
   m_Layer: 0
-  m_Name: DungeonRoom
+  m_Name: DungeonTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2431574886455065142
+--- !u!4 &4838267666865120809
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5220204773022579916}
+  m_GameObject: {fileID: 8203076348681961694}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1505189294222129031}
+  - {fileID: 9173820225234438847}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2339689353353514637
+--- !u!114 &4840452425015892830
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5220204773022579916}
+  m_GameObject: {fileID: 8203076348681961694}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ad690f7f0af0f3408e3f30850bbec9c, type: 3}
+  m_Script: {fileID: 11500000, guid: 82666558f890c4b419e148e80ec75b0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _roomTile: {fileID: 768986152790958692}
-  _tilePrefab: {fileID: 4840452425015892830, guid: 85294b30f50d00b4dadec24daa10e489,
-    type: 3}
-  _caveSprite: {fileID: 6898460269864436913, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
-    type: 3}
-  _forestSprite: {fileID: 4855184231590579541, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
-    type: 3}
-  _noneSprite: {fileID: -3714409817710726143, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
-    type: 3}
+  _groundLayer: {fileID: 2899625386781900644}

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
 
 namespace Fluid.Roguelike.Dungeon
@@ -11,8 +10,9 @@ namespace Fluid.Roguelike.Dungeon
         [SerializeField] private DungeonRoom _dungeonRoomPrefab;
 
         public Dictionary<Tuple<int, int>, DungeonTile> Tiles { get; } = new Dictionary<Tuple<int, int>, DungeonTile>();
+        public Dictionary<Tuple<int, int>, int> ValueMap { get; } = new Dictionary<Tuple<int, int>, int>();
 
-        public void Start()
+        private void Start()
         {
             _agent.Generate(0);
             foreach (var meta in _agent.Context.AllRooms)
@@ -21,6 +21,19 @@ namespace Fluid.Roguelike.Dungeon
                 room.SetMeta(meta);
                 room.GenerateTiles(this);
             }
+        }
+
+        private void OnDrawGizmos()
+        {
+#if UNITY_EDITOR
+            if (ValueMap != null)
+            {
+                foreach (var value in ValueMap)
+                {
+                    UnityEditor.Handles.Label(new Vector3(value.Key.Item1, value.Key.Item2, 0), value.Value.ToString());
+                }
+            }
+#endif
         }
     }
 }
