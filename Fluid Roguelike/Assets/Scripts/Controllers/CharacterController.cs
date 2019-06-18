@@ -18,7 +18,27 @@ namespace Fluid.Roguelike
 
         protected void Move(MoveDirection dir)
         {
+            if (_character == null)
+                return;
 
+            Vector3 move = Vector3.zero;
+            switch(dir)
+            {
+                case MoveDirection.N:
+                    move.y += 1;
+                    break;
+                case MoveDirection.E:
+                    move.x += 1;
+                    break;
+                case MoveDirection.S:
+                    move.y -= 1;
+                    break;
+                case MoveDirection.W:
+                    move.x -= 1;
+                    break;
+            }
+
+            _character.Translate(move);
         }
     }
 }
