@@ -127,9 +127,4 @@ MonoBehaviour:
   _roomTile: {fileID: 768986152790958692}
   _tilePrefab: {fileID: 4840452425015892830, guid: 85294b30f50d00b4dadec24daa10e489,
     type: 3}
-  _caveSprite: {fileID: 6898460269864436913, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
-    type: 3}
-  _forestSprite: {fileID: 4855184231590579541, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
-    type: 3}
-  _noneSprite: {fileID: -3714409817710726143, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
-    type: 3}
+  _sprites: {fileID: 11400000, guid: 46a1b0775b64e024aa79914db5bd1874, type: 2}

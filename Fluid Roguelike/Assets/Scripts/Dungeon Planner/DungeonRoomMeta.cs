@@ -16,6 +16,7 @@ namespace Fluid.Roguelike.Dungeon
         public int Id { get; }
 
         public List<DungeonRoomConnectionMeta> Connections { get; } = new List<DungeonRoomConnectionMeta>();
+        public List<DungeonRoomDecorationMeta> DecorationMeta { get; } = new List<DungeonRoomDecorationMeta>();
 
         public DungeonRoomMeta()
         {

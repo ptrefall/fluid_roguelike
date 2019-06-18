@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Sprite Database Manager
+  m_EditorClassIdentifier: Assembly-CSharp:Fluid.Roguelike.Database:SpriteDatabaseManager
+  _dbs:
+  - Theme: 5
+    Database: {fileID: 11400000, guid: 455df635a5f36494583461b7195d5dc8, type: 2}
+  - Theme: 0
+    Database: {fileID: 11400000, guid: 99380de7db50faf4dbf13b413d485959, type: 2}

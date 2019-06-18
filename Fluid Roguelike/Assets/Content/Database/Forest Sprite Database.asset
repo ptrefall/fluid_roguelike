@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0b5c4bf69d705743b514565bb7c4a91, type: 3}
+  m_Name: Forest Sprite Database
+  m_EditorClassIdentifier: 
+  _db:
+  - Theme: 0
+    Index: 1
+    Sprites:
+    - Sprite: {fileID: 8589081340543278931, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+        type: 3}
+      Weight: 100
+    EdgeSprites: []
+    BorderSprites: []
+  - Theme: 0
+    Index: 2
+    Sprites:
+    - Sprite: {fileID: 4855184231590579541, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+        type: 3}
+      Weight: 100
+    EdgeSprites: []
+    BorderSprites: []

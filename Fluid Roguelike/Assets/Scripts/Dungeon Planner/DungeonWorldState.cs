@@ -32,5 +32,6 @@ namespace Fluid.Roguelike.Dungeon
         East,
         South,
         West,
+        Portal,
     }
 }

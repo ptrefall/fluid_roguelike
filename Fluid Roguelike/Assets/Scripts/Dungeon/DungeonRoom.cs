@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using Fluid.Roguelike.Database;
+using UnityEngine;
 
 namespace Fluid.Roguelike.Dungeon
 {
@@ -6,9 +8,7 @@ namespace Fluid.Roguelike.Dungeon
     {
         [SerializeField] private SpriteRenderer _roomTile;
         [SerializeField] private DungeonTile _tilePrefab;
-        [SerializeField] private Sprite _caveSprite;
-        [SerializeField] private Sprite _forestSprite;
-        [SerializeField] private Sprite _noneSprite;
+        [SerializeField] private SpriteDatabaseManager _sprites;
         private DungeonRoomMeta _meta;
 
         public void SetMeta(DungeonRoomMeta meta)
@@ -17,7 +17,7 @@ namespace Fluid.Roguelike.Dungeon
             transform.position = new Vector3(_meta.CenterX, _meta.CenterY);
             if (_roomTile != null)
             {
-                SetSprite(_roomTile);
+                SetSprite(_roomTile, DungeonTile.Index.WorldMap, false, false);
 
                 //_roomTile.size = new Vector2(_meta.Width, _meta.Height);
                 //_roomTile.transform.localScale = new Vector3(_meta.Width, _meta.Height, 1);
@@ -36,88 +36,35 @@ namespace Fluid.Roguelike.Dungeon
             {
                 for(var dy = -halfHeight; dy <= halfHeight; dy++)
                 {
-                    if (dx == -halfWidth || dx == halfWidth || dy == -halfHeight || dy == halfHeight)
-                        continue;
-
                     var x = _meta.CenterX + dx;
                     var y = _meta.CenterY + dy;
-                    var key = new System.Tuple<int, int>(x, y);
+                    var key = new Tuple<int, int>(x, y);
                     if (dungeon.Tiles.ContainsKey(key))
                     {
                         continue;
                     }
 
-                    if (dungeon.ValueMap.ContainsKey(key))
+                    if (dx == -halfWidth || dx == halfWidth || dy == -halfHeight || dy == halfHeight)
                     {
-                        if (dungeon.ValueMap[key] == 1)
+                        if (dungeon.ValueMap.ContainsKey(key))
                         {
-                            if(Random.value < 0.25f)
-                            {
-                                continue;
-                            }
+                            dungeon.ValueMap[key] = (int) DungeonTile.Index.Wall;
                         }
-                        else if (dungeon.ValueMap[key] < 1)
+                        else
                         {
-                            if (Random.value < 0.5f)
-                            {
-                                continue;
-                            }
+                            dungeon.ValueMap.Add(key, (int) DungeonTile.Index.Wall);
                         }
-                        else if (dungeon.ValueMap[key] > 1)
-                        {
-                            if (Random.value < 0.05f)
-                            {
-                                continue;
-                            }
-                        }
-
-                        dungeon.ValueMap[key] += Random.Range(2, 4);
                     }
                     else
                     {
-                        if (Random.value < 0.05f)
+                        if (dungeon.ValueMap.ContainsKey(key))
                         {
-                            continue;
+                            dungeon.ValueMap[key] = (int)DungeonTile.Index.Floor;
                         }
-
-                        dungeon.ValueMap.Add(key, Random.Range(2, 4));
-                    }
-                    NeighbourValueIncrement(dungeon, key, BuilderDirection.North, Random.Range(0, 3));
-                    NeighbourValueIncrement(dungeon, key, BuilderDirection.East, Random.Range(0, 3));
-                    NeighbourValueIncrement(dungeon, key, BuilderDirection.South, Random.Range(0, 3));
-                    NeighbourValueIncrement(dungeon, key, BuilderDirection.West, Random.Range(0, 3));
-                }
-            }
-
-            for (var dx = -halfWidth; dx < halfWidth; dx++)
-            {
-                for (var dy = -halfHeight; dy < halfHeight; dy++)
-                {
-                    var x = _meta.CenterX + dx;
-                    var y = _meta.CenterY + dy;
-                    var key = new System.Tuple<int, int>(x, y);
-
-                    if (dungeon.Tiles.ContainsKey(key))
-                    {
-                        continue;
-                    }
-                    if (dungeon.ValueMap.ContainsKey(key) == false)
-                    {
-                        continue;
-                    }
-
-                    var value = dungeon.ValueMap[key];
-                    if (value <= 0)
-                    {
-                        continue;
-                    }
-
-                    if (value > 3 || Random.value > 0.05f * value)
-                    {
-                        NeighbourValueIncrement(dungeon, key, BuilderDirection.North, -Random.Range(0, 3));
-                        NeighbourValueIncrement(dungeon, key, BuilderDirection.East, -Random.Range(0, 3));
-                        NeighbourValueIncrement(dungeon, key, BuilderDirection.South, -Random.Range(0, 3));
-                        NeighbourValueIncrement(dungeon, key, BuilderDirection.West, -Random.Range(0, 3));
+                        else
+                        {
+                            dungeon.ValueMap.Add(key, (int)DungeonTile.Index.Floor);
+                        }
                     }
                 }
             }
@@ -140,7 +87,7 @@ namespace Fluid.Roguelike.Dungeon
                     }
 
                     var value = dungeon.ValueMap[key];
-                    if (value <= 0)
+                    if (value <= (int) DungeonTile.Index.Void)
                     {
                         continue;
                     }
@@ -148,56 +95,50 @@ namespace Fluid.Roguelike.Dungeon
                     var tile = GameObject.Instantiate(_tilePrefab, transform, true);
                     tile.transform.position = new Vector3(x, y, 0);
                     dungeon.Tiles.Add(key, tile);
-                    SetSprite(tile.GroundLayer);
+
+                    SetSprite(tile.GroundLayer, (DungeonTile.Index) value, IsEdge(dungeon, key), IsBorder(dungeon, key));
                 }
             }
         }
 
-        private void NeighbourValueIncrement(Dungeon dungeon, System.Tuple<int, int> center, BuilderDirection dir, int value)
-        {
-            System.Tuple<int, int> key;
-            switch(dir)
-            {
-                case BuilderDirection.North:
-                    key = new System.Tuple<int, int>(center.Item1, center.Item2 - 1);
-                    break;
-                case BuilderDirection.East:
-                    key = new System.Tuple<int, int>(center.Item1, center.Item2 - 1);
-                    break;
-                case BuilderDirection.South:
-                    key = new System.Tuple<int, int>(center.Item1, center.Item2 - 1);
-                    break;
-                case BuilderDirection.West:
-                    key = new System.Tuple<int, int>(center.Item1, center.Item2 - 1);
-                    break;
-                default:
-                    return;
-            }
+        private bool IsEdge(Dungeon dungeon, Tuple<int, int> key)
+        { 
+            if (dungeon.ValueMap.ContainsKey(key) == false)
+                return false;
 
-            if(dungeon.ValueMap.ContainsKey(key))
-            {
-                dungeon.ValueMap[key] += value;
-            }
-            else
-            {
-                dungeon.ValueMap.Add(key, value);
-            }
+            var value = dungeon.ValueMap[key];
+            var southKey = new Tuple<int, int>(key.Item1, key.Item2 + 1);
+            if (dungeon.ValueMap.ContainsKey(southKey) == false)
+                return true;
+
+            var southValue = dungeon.ValueMap[southKey];
+            if (southValue != value)
+                return true;
+
+            return false;
         }
 
-        private void SetSprite(SpriteRenderer tileView)
+        private bool IsBorder(Dungeon dungeon, Tuple<int, int> key)
         {
-            switch (_meta.Theme)
-            {
-                case DungeonTheme.Cave:
-                    tileView.sprite = _caveSprite;
-                    break;
-                case DungeonTheme.Forest:
-                    tileView.sprite = _forestSprite;
-                    break;
-                default:
-                    tileView.sprite = _noneSprite;
-                    break;
-            }
+            if (dungeon.ValueMap.ContainsKey(key) == false)
+                return false;
+
+            var value = dungeon.ValueMap[key];
+            var  northKey = new Tuple<int, int>(key.Item1, key.Item2 - 1);
+            if (dungeon.ValueMap.ContainsKey(northKey) == false)
+                return true;
+
+            var northValue = dungeon.ValueMap[northKey];
+            if (northValue != value)
+                return true;
+
+            return false;
+        }
+
+        private void SetSprite(SpriteRenderer tileView, DungeonTile.Index tileIndex, bool isEdge, bool isBorder)
+        {
+            var sprite = _sprites.Find(_meta.Theme, tileIndex, isEdge, isBorder);
+            tileView.sprite = sprite;
         }
     }
 }

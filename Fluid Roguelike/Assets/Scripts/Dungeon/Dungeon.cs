@@ -31,7 +31,7 @@ namespace Fluid.Roguelike.Dungeon
 
         private void Update()
         {
-            _playerController.Tick();
+            _playerController?.Tick();
         }
 
         private void OnDrawGizmos()
