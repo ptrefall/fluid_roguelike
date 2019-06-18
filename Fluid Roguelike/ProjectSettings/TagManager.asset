@@ -41,3 +41,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ground
+    uniqueID: 1907725743
+    locked: 0
+  - name: Decals
+    uniqueID: 3624224179
+    locked: 0
+  - name: Character
+    uniqueID: 2858928811
+    locked: 0
+  - name: FX
+    uniqueID: 3026290175
+    locked: 0

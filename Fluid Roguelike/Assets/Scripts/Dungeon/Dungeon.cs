@@ -8,6 +8,9 @@ namespace Fluid.Roguelike.Dungeon
     {
         [SerializeField] private DungeonAgent _agent;
         [SerializeField] private DungeonRoom _dungeonRoomPrefab;
+        [SerializeField] private Transform _playerCharacter;
+
+        private PlayerController _playerController;
 
         public Dictionary<Tuple<int, int>, DungeonTile> Tiles { get; } = new Dictionary<Tuple<int, int>, DungeonTile>();
         public Dictionary<Tuple<int, int>, int> ValueMap { get; } = new Dictionary<Tuple<int, int>, int>();
@@ -21,6 +24,14 @@ namespace Fluid.Roguelike.Dungeon
                 room.SetMeta(meta);
                 room.GenerateTiles(this);
             }
+
+            _playerController = new PlayerController();
+            _playerController.Set(_playerCharacter);
+        }
+
+        private void Update()
+        {
+            _playerController.Tick();
         }
 
         private void OnDrawGizmos()
