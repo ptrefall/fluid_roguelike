@@ -15,8 +15,8 @@ namespace Fluid.Roguelike.Dungeon
             return new DungeonDomainBuilder(_dungeonName, _decorations)
                 .Sequence("First level")
                     .IsAtDepth(0)
-                    .CreateTheCave()
                     .CreateTheForest()
+                    .CreateTheCave()
                 .End()
                 .Build();
         }

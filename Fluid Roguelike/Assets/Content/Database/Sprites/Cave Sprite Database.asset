@@ -36,3 +36,11 @@ MonoBehaviour:
     EdgeSprites: []
     BorderSprites: []
     Color: {r: 1, g: 1, b: 1, a: 1}
+  - Index: 3
+    Sprites:
+    - Sprite: {fileID: -2507981798156704182, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+        type: 3}
+      Weight: 100
+    EdgeSprites: []
+    BorderSprites: []
+    Color: {r: 1, g: 1, b: 1, a: 1}

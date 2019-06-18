@@ -29,6 +29,6 @@ namespace Fluid.Roguelike.Dungeon
     {
         public DungeonRoomMeta From { get; set; }
         public DungeonRoomMeta To { get; set; }
-        public BuilderDirection Direction { get; }
+        public BuilderDirection Direction { get; set; }
     }
 }

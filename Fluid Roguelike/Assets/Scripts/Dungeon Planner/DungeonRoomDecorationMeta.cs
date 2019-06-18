@@ -7,7 +7,7 @@ namespace Fluid.Roguelike.Dungeon
 {
     public class DungeonRoomDecorationMeta
     {
-        public Dictionary<Tuple<int, int>, int> ValueMap { get; } = new Dictionary<Tuple<int, int>, int>();
+        public Dictionary<Tuple<int, int>, Dungeon.MapValue> ValueMap { get; } = new Dictionary<Tuple<int, int>, Dungeon.MapValue>();
 
         /// <summary>
         /// Generate a value map from a double array.
@@ -15,28 +15,33 @@ namespace Fluid.Roguelike.Dungeon
         /// Dimension 1 is read as Row
         /// </summary>
         /// <param name="valueMap"></param>
-        public void Generate(int[,] valueMap)
+        public void Generate(DungeonTheme theme, int[,] valueMap)
         {
             for (var x = 0; x < valueMap.GetLength(0); x++)
             {
                 for (var y = 0; y < valueMap.GetLength(1); y++)
                 {
                     var key = new Tuple<int, int>(x, y);
-                    ValueMap.Add(key, valueMap[y,x]);
+                    ValueMap.Add(key, new Dungeon.MapValue
+                    {
+                        Theme = theme,
+                        Index = (DungeonTile.Index)valueMap[y, x],
+                        IsSpecial = true,
+                    });
                 }
             }
         }
 
-        public void Generate(string textFilePath)
+        public void Generate(DungeonTheme theme, string textFilePath)
         {
             var textAsset = Resources.Load<TextAsset>(textFilePath);
             if (textAsset == null)
                 return;
 
-            Generate(textAsset);
+            Generate(theme, textAsset);
         }
 
-        public void Generate(TextAsset textAsset)
+        public void Generate(DungeonTheme theme, TextAsset textAsset)
         {
             if (textAsset == null)
                 return;
@@ -52,7 +57,12 @@ namespace Fluid.Roguelike.Dungeon
                     foreach (var tile in split)
                     {
                         var key = new Tuple<int, int>(x, y);
-                        ValueMap.Add(key, Convert.ToInt32(tile));
+                        ValueMap.Add(key, new Dungeon.MapValue
+                        {
+                            Theme = theme,
+                            Index = (DungeonTile.Index)Convert.ToInt32(tile),
+                            IsSpecial = true,
+                        });
                         x++;
                     }
 

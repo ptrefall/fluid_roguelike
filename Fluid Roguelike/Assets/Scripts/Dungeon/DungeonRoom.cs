@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Fluid.Roguelike.Database;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -12,42 +13,49 @@ namespace Fluid.Roguelike.Dungeon
         [SerializeField] private SpriteDatabaseManager _sprites;
         private DungeonRoomMeta _meta;
 
+        public DungeonRoomMeta Meta => _meta;
+
         public void SetMeta(DungeonRoomMeta meta)
         {
             _meta = meta;
             transform.position = new Vector3(_meta.CenterX, _meta.CenterY);
             if (_roomTile != null)
             {
-                SetSprite(_roomTile, DungeonTile.Index.WorldMap, false, false);
+                SetSprite(_roomTile, new Dungeon.MapValue { Theme = _meta.Theme, Index = DungeonTile.Index.WorldMap  }, false, false);
 
                 //_roomTile.size = new Vector2(_meta.Width, _meta.Height);
                 //_roomTile.transform.localScale = new Vector3(_meta.Width, _meta.Height, 1);
             }
         }
 
-        public void GenerateMapValues(Dungeon dungeon)
+        public void GenerateMapValues(Dungeon dungeon, int pass)
         {
             if (_meta == null)
                 return;
 
-            if (_meta.Shape == DungeonRoomShape.Rectangular)
+            if (pass == 0)
             {
-                AddRectangularFloor(dungeon);
-            }
-            else
-            {
-                AddCircularFloor(dungeon);
-            }
+                if (_meta.Shape == DungeonRoomShape.Rectangular)
+                {
+                    AddRectangularFloor(dungeon);
+                }
+                else
+                {
+                    AddCircularFloor(dungeon);
+                }
 
-            switch (_meta.Theme)
-            {
-                case DungeonTheme.Cave:
-                    AddCaveFeatures(dungeon, true, true, _meta.MaxModifications);
-                    AddCaveFeatures(dungeon, false, false, _meta.MaxModifications);
-                    break;
+                switch (_meta.Theme)
+                {
+                    case DungeonTheme.Cave:
+                        AddCaveFeatures(dungeon, true, true, _meta.MaxModifications);
+                        AddCaveFeatures(dungeon, false, false, _meta.MaxModifications);
+                        break;
+                }
             }
-
-            AddDecoration(dungeon);
+            else if (pass == 1)
+            {
+                AddDecoration(dungeon);
+            }
         }
 
         public void GenerateTiles(Dungeon dungeon)
@@ -73,14 +81,19 @@ namespace Fluid.Roguelike.Dungeon
 
                     if (dungeon.ValueMap.ContainsKey(key))
                     {
-                        if (dungeon.ValueMap[key] != (int) DungeonTile.Index.Wall)
+                        if (dungeon.ValueMap[key].Index != DungeonTile.Index.Wall)
                         {
-                            dungeon.ValueMap[key] = (int) DungeonTile.Index.Floor;
+                            dungeon.ValueMap[key].Theme = _meta.Theme;
+                            dungeon.ValueMap[key].Index = DungeonTile.Index.Floor;
                         }
                     }
                     else
                     {
-                        dungeon.ValueMap.Add(key, (int) DungeonTile.Index.Floor);
+                        dungeon.ValueMap.Add(key, new Dungeon.MapValue
+                        {
+                            Theme = _meta.Theme,
+                            Index = DungeonTile.Index.Floor
+                        });
                     }
                 }
             }
@@ -101,14 +114,19 @@ namespace Fluid.Roguelike.Dungeon
 
                     if (dungeon.ValueMap.ContainsKey(key))
                     {
-                        if (dungeon.ValueMap[key] != (int)DungeonTile.Index.Wall)
+                        if (dungeon.ValueMap[key].Index != DungeonTile.Index.Wall)
                         {
-                            dungeon.ValueMap[key] = (int)DungeonTile.Index.Floor;
+                            dungeon.ValueMap[key].Theme = _meta.Theme;
+                            dungeon.ValueMap[key].Index = DungeonTile.Index.Floor;
                         }
                     }
                     else
                     {
-                        dungeon.ValueMap.Add(key, (int)DungeonTile.Index.Floor);
+                        dungeon.ValueMap.Add(key, new Dungeon.MapValue
+                        {
+                            Theme = _meta.Theme,
+                            Index = DungeonTile.Index.Floor
+                        });
                     }
                 }
             }
@@ -146,7 +164,7 @@ namespace Fluid.Roguelike.Dungeon
                         continue;
 
                     var value = dungeon.ValueMap[key];
-                    if (value == (int) DungeonTile.Index.Wall)
+                    if (value.Index == DungeonTile.Index.Wall)
                     {
                         if (GetAdjacentIndex(dungeon, key, BuilderDirection.East) == DungeonTile.Index.Wall &&
                             GetAdjacentIndex(dungeon, key, BuilderDirection.West) == DungeonTile.Index.Floor)
@@ -203,7 +221,8 @@ namespace Fluid.Roguelike.Dungeon
             var chance = Mathf.Max((count / (float)maxCount) - 0.1f, 0);
             if (Random.value < chance)
             {
-                dungeon.ValueMap[key] = (int) b;
+                dungeon.ValueMap[key].Theme = _meta.Theme;
+                dungeon.ValueMap[key].Index = b;
                 return true;
             }
 
@@ -236,7 +255,7 @@ namespace Fluid.Roguelike.Dungeon
                 return;
             }
 
-            var index = (DungeonTile.Index) dungeon.ValueMap[key];
+            var index = dungeon.ValueMap[key].Index;
             if (index != indexType)
                 return;
 
@@ -284,9 +303,30 @@ namespace Fluid.Roguelike.Dungeon
                     break;
             }
             if (dungeon.ValueMap.ContainsKey(adjacentKey))
-                return (DungeonTile.Index)dungeon.ValueMap[adjacentKey];
+                return dungeon.ValueMap[adjacentKey].Index;
 
             return DungeonTile.Index.Void;
+        }
+
+        private Tuple<int, int> GetAdjacentKey(Dungeon dungeon, Tuple<int, int> key, BuilderDirection direction)
+        {
+            var adjacentKey = key;
+            switch (direction)
+            {
+                case BuilderDirection.North:
+                    adjacentKey = new Tuple<int, int>(key.Item1, key.Item2 - 1);
+                    break;
+                case BuilderDirection.East:
+                    adjacentKey = new Tuple<int, int>(key.Item1 + 1, key.Item2);
+                    break;
+                case BuilderDirection.South:
+                    adjacentKey = new Tuple<int, int>(key.Item1, key.Item2 + 1);
+                    break;
+                case BuilderDirection.West:
+                    adjacentKey = new Tuple<int, int>(key.Item1 - 1, key.Item2);
+                    break;
+            }
+            return adjacentKey;
         }
 
         private void AddTiles(Dungeon dungeon)
@@ -312,7 +352,7 @@ namespace Fluid.Roguelike.Dungeon
                     }
 
                     var value = dungeon.ValueMap[key];
-                    if (value <= (int)DungeonTile.Index.Void)
+                    if (value.Index == (int)DungeonTile.Index.Void)
                     {
                         continue;
                     }
@@ -321,8 +361,59 @@ namespace Fluid.Roguelike.Dungeon
                     tile.transform.position = new Vector3(x, y, 0);
                     dungeon.Tiles.Add(key, tile);
 
-                    SetSprite(tile.GroundLayer, (DungeonTile.Index)value, IsEdge(dungeon, key), IsBorder(dungeon, key));
+                    SetSprite(tile.GroundLayer, value, IsEdge(dungeon, key), IsBorder(dungeon, key));
                 }
+            }
+        }
+
+        public void WallIn(Dungeon dungeon, DungeonTheme theme)
+        {
+            var map = new Dictionary<Tuple<int, int>, Dungeon.MapValue>(dungeon.ValueMap);
+            foreach (var kvp in map)
+            {
+                TryWallIn(dungeon, theme, kvp.Key, BuilderDirection.North);
+                TryWallIn(dungeon, theme, kvp.Key, BuilderDirection.East);
+                TryWallIn(dungeon, theme, kvp.Key, BuilderDirection.South);
+                TryWallIn(dungeon, theme, kvp.Key, BuilderDirection.West);
+            }
+        }
+
+        private void TryWallIn(Dungeon dungeon, DungeonTheme theme, Tuple<int, int> key, BuilderDirection direction)
+        {
+            var value = dungeon.ValueMap[key];
+            if (value.Theme != theme)
+                return;
+
+            var adjacentKey = GetAdjacentKey(dungeon, key, direction);
+            if (dungeon.ValueMap.ContainsKey(adjacentKey) == false)
+            {
+                dungeon.ValueMap.Add(adjacentKey, new Dungeon.MapValue
+                {
+                    Theme = theme,
+                    Index = DungeonTile.Index.Wall,
+                });
+            }
+
+            var adjacent = dungeon.ValueMap[adjacentKey];
+            if (adjacent.Theme != theme)
+            {
+                if (Random.value < 0.9f)
+                {
+                    dungeon.ValueMap[key].Index = DungeonTile.Index.Wall;
+                }
+            }
+        }
+
+        public void AddTilesForAllMapValues(Dungeon dungeon)
+        {
+            var tiles = new GameObject("Tiles");
+            foreach(var kvp in dungeon.ValueMap)
+            {
+                var tile = GameObject.Instantiate(_tilePrefab, tiles.transform, true);
+                tile.transform.position = new Vector3(kvp.Key.Item1, kvp.Key.Item2, 0);
+                dungeon.Tiles.Add(kvp.Key, tile);
+
+                SetSprite(tile.GroundLayer, kvp.Value, IsEdge(dungeon, kvp.Key), IsBorder(dungeon, kvp.Key));
             }
         }
 
@@ -360,10 +451,10 @@ namespace Fluid.Roguelike.Dungeon
             return false;
         }
 
-        private void SetSprite(SpriteRenderer tileView, DungeonTile.Index tileIndex, bool isEdge, bool isBorder)
+        private void SetSprite(SpriteRenderer tileView, Dungeon.MapValue value, bool isEdge, bool isBorder)
         {
             Color color;
-            var sprite = _sprites.Find(_meta.Theme, tileIndex, isEdge, isBorder, out color);
+            var sprite = _sprites.Find(value.Theme, value.Index, isEdge, isBorder, out color);
             tileView.sprite = sprite;
             tileView.color = color;
         }

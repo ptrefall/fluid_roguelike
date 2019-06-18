@@ -64,11 +64,24 @@ namespace Fluid.Roguelike.Dungeon
 
         public DungeonDomainBuilder SpawnRoom(int minSize, int maxSize, DungeonRoomShape shape, bool allowOverlap, int maxModifications = 20)
         {
-            var width = Random.Range(minSize, maxSize+1);
-            var height = Random.Range(minSize, maxSize + 1);
+            var width = UnityEngine.Random.Range(minSize, maxSize + 1);
+            var height = UnityEngine.Random.Range(minSize, maxSize + 1);
+            if (width <= 2)
+                height = maxSize;
+            else if (height <= 2)
+                width = maxSize;
+
+            return SpawnRoom(new Tuple<int, int>(width, height), shape, allowOverlap, maxModifications);
+        }
+
+        public DungeonDomainBuilder SpawnRoom(Tuple<int, int> size, DungeonRoomShape shape, bool allowOverlap, int maxModifications = 20)
+        {
+            var width = size.Item1;
+            var height = size.Item2;
+
             if (shape == DungeonRoomShape.Random)
             {
-                shape = (DungeonRoomShape)Random.Range((int)DungeonRoomShape.Rectangular, (int)DungeonRoomShape.Round + 1);
+                shape = (DungeonRoomShape)UnityEngine.Random.Range((int)DungeonRoomShape.Rectangular, (int)DungeonRoomShape.Round + 1);
             }
             Action($"Spawn room ({shape}:{width}x{height})");
             {
@@ -100,11 +113,11 @@ namespace Fluid.Roguelike.Dungeon
                         {
                             if (validExits.Count > 0)
                             {
-                                direction = validExits[Random.Range(0, validExits.Count)];
+                                direction = validExits[UnityEngine.Random.Range(0, validExits.Count)];
                             }
                             else
                             {
-                                direction = (BuilderDirection) Random.Range((int) BuilderDirection.North, (int) BuilderDirection.West + 1);
+                                direction = (BuilderDirection)UnityEngine.Random.Range((int) BuilderDirection.North, (int) BuilderDirection.West + 1);
                             }
                         }
 
@@ -145,6 +158,19 @@ namespace Fluid.Roguelike.Dungeon
                                 } break;
                         }
 
+                        parentRoom.Connections.Add(new DungeonRoomConnectionMeta
+                        {
+                            From = parentRoom,
+                            To = room,
+                            Direction = direction,
+                        });
+                        room.Connections.Add(new DungeonRoomConnectionMeta
+                        {
+                            From = room,
+                            To = parentRoom,
+                            Direction = Opposite(direction),
+                        });
+
                         Debug.Log($"Spawn room[{room.Id}] ([{room.X},{room.Y}], {room.Shape}:{room.Width}x{room.Height}:{room.Theme}) to the {direction} of room[{parentRoom.Id}]\n");
                     }
                     else
@@ -164,6 +190,23 @@ namespace Fluid.Roguelike.Dungeon
             }
             End();
             return this;
+        }
+
+        private BuilderDirection Opposite(BuilderDirection direction)
+        {
+            switch(direction)
+            {
+                case BuilderDirection.North:
+                    return BuilderDirection.South;
+                case BuilderDirection.East:
+                    return BuilderDirection.West;
+                case BuilderDirection.South:
+                    return BuilderDirection.North;
+                case BuilderDirection.West:
+                    return BuilderDirection.East;
+            }
+
+            return BuilderDirection.Portal;
         }
 
         private DungeonRoomMeta TryGetParentRoom(DungeonContext context, bool allowOverlap, out List<BuilderDirection> validExits)
@@ -254,6 +297,11 @@ namespace Fluid.Roguelike.Dungeon
             return this;
         }
 
+        public DungeonDomainBuilder Random()
+        {
+            return this.RandomSelect<DungeonDomainBuilder, DungeonContext>("Random");
+        }
+
         public DungeonDomainBuilder Optionally()
         {
             return this.AlwaysSucceedSelect<DungeonDomainBuilder, DungeonContext>("Optionally");
@@ -282,7 +330,7 @@ namespace Fluid.Roguelike.Dungeon
             return this;
         }
 
-        public DungeonDomainBuilder AddDecoration(TextAsset textAsset)
+        public DungeonDomainBuilder AddDecoration(DungeonTheme theme, TextAsset textAsset)
         {
             if (textAsset == null)
                 return this;
@@ -296,7 +344,7 @@ namespace Fluid.Roguelike.Dungeon
                     {
                         Debug.Log($"Spawn decoration {textAsset.name} in room {parentRoom.Id}\n");
                         var decorationMeta = new DungeonRoomDecorationMeta();
-                        decorationMeta.Generate(textAsset);
+                        decorationMeta.Generate(theme, textAsset);
                         parentRoom.DecorationMeta.Add(decorationMeta);
                         return TaskStatus.Success;
                     }
@@ -319,20 +367,32 @@ namespace Fluid.Roguelike.Dungeon
                 SetTheme(DungeonTheme.Cave);
                 {
                     ChangeBuilderDirection(BuilderDirection.Random);
-                    SpawnRoom(8, 16, DungeonRoomShape.Rectangular, false);
+                    Random();
+                    {
+                        SpawnRoom(new Tuple<int, int>(2, 8), DungeonRoomShape.Rectangular, false);
+                        SpawnRoom(new Tuple<int, int>(8, 2), DungeonRoomShape.Rectangular, false);
+                    }
+                    End();
+                    SpawnRoom(4, 8, DungeonRoomShape.Rectangular, false);
                     {
                         TrySpawnPlayer();
                     }
-                    SpawnRoom(12, 16, DungeonRoomShape.Random, false);
-                    SpawnRoom(8, 12, DungeonRoomShape.Random, false, 0);
-                    {
-                        AddDecoration(_decorations.Find(DungeonTheme.Cave, DecorationType.Altar));
-                    }
+                    SpawnRoom(2, 6, DungeonRoomShape.Random, false);
+                    SpawnRoom(2, 12, DungeonRoomShape.Random, false);
                     Repeat(10);
                     {
-                        SpawnRoom(8, 16, DungeonRoomShape.Random, false);
+                        SpawnRoom(2, 8, DungeonRoomShape.Random, false);
                     }
                     EndRepeat();
+                    Random();
+                    {
+                        SpawnRoom(new Tuple<int, int>(2, 8), DungeonRoomShape.Rectangular, false);
+                        SpawnRoom(new Tuple<int, int>(8, 2), DungeonRoomShape.Rectangular, false);
+                    }
+                    End();
+                    {
+                        AddDecoration(DungeonTheme.Cave, _decorations.Find(DungeonTheme.Cave, DecorationType.Altar));
+                    }
                 }
             }
             End();
@@ -350,13 +410,6 @@ namespace Fluid.Roguelike.Dungeon
                     {
                         TrySpawnPlayer();
                     }
-                    SpawnRoom(4, 8, DungeonRoomShape.Random, false);
-                    SpawnRoom(8, 12, DungeonRoomShape.Random, false);
-                    Repeat(10);
-                    {
-                        SpawnRoom(4, 12, DungeonRoomShape.Random, false);
-                    }
-                    EndRepeat();
                 }
             }
             End();
