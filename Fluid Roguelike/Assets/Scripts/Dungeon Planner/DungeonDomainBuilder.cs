@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Fluid.Roguelike.Database;
 using FluidHTN;
 using FluidHTN.Compounds;
 using FluidHTN.Factory;
@@ -11,9 +12,11 @@ namespace Fluid.Roguelike.Dungeon
     public class DungeonDomainBuilder : BaseDomainBuilder<DungeonDomainBuilder, DungeonContext>
     {
         private Dictionary<Tuple<int, int>, bool> IsOccupied { get; set; } = new Dictionary<Tuple<int, int>, bool>();
+        private DecorationDatabaseManager _decorations;
 
-        public DungeonDomainBuilder(string domainName) : base(domainName, new DefaultFactory())
+        public DungeonDomainBuilder(string domainName, DecorationDatabaseManager decorations) : base(domainName, new DefaultFactory())
         {
+            _decorations = decorations;
         }
 
         public void ClearCache()
@@ -59,7 +62,7 @@ namespace Fluid.Roguelike.Dungeon
             return this;
         }
 
-        public DungeonDomainBuilder SpawnRoom(int minSize, int maxSize, DungeonRoomShape shape, bool allowOverlap)
+        public DungeonDomainBuilder SpawnRoom(int minSize, int maxSize, DungeonRoomShape shape, bool allowOverlap, int maxModifications = 20)
         {
             var width = Random.Range(minSize, maxSize+1);
             var height = Random.Range(minSize, maxSize + 1);
@@ -81,6 +84,7 @@ namespace Fluid.Roguelike.Dungeon
                         CenterX = 0,
                         CenterY = 0,
                         Theme = context.CurrentTheme,
+                        MaxModifications = maxModifications,
                     };
 
                     var parentRoom = TryGetParentRoom(context, allowOverlap, out var validExits);
@@ -278,6 +282,34 @@ namespace Fluid.Roguelike.Dungeon
             return this;
         }
 
+        public DungeonDomainBuilder AddDecoration(TextAsset textAsset)
+        {
+            if (textAsset == null)
+                return this;
+
+            Action($"Add decoration");
+            {
+                Do((context) =>
+                {
+                    var parentRoom = context.RoomStack.Peek();
+                    if (parentRoom != null)
+                    {
+                        Debug.Log($"Spawn decoration {textAsset.name} in room {parentRoom.Id}\n");
+                        var decorationMeta = new DungeonRoomDecorationMeta();
+                        decorationMeta.Generate(textAsset);
+                        parentRoom.DecorationMeta.Add(decorationMeta);
+                        return TaskStatus.Success;
+                    }
+
+                    Debug.Log($"Error! Can't spawn decoration in the void!\n");
+                    return TaskStatus.Failure;
+                });
+            }
+            End();
+
+            return this;
+        }
+
         // ------------------------------------------- BUILDER PREFABS
 
         public DungeonDomainBuilder CreateTheCave()
@@ -287,15 +319,18 @@ namespace Fluid.Roguelike.Dungeon
                 SetTheme(DungeonTheme.Cave);
                 {
                     ChangeBuilderDirection(BuilderDirection.Random);
-                    SpawnRoom(4, 8, DungeonRoomShape.Rectangular, false);
+                    SpawnRoom(8, 16, DungeonRoomShape.Rectangular, false);
                     {
                         TrySpawnPlayer();
                     }
-                    SpawnRoom(8, 8, DungeonRoomShape.Random, false);
-                    SpawnRoom(4, 6, DungeonRoomShape.Random, false);
+                    SpawnRoom(12, 16, DungeonRoomShape.Random, false);
+                    SpawnRoom(8, 12, DungeonRoomShape.Random, false, 0);
+                    {
+                        AddDecoration(_decorations.Find(DungeonTheme.Cave, DecorationType.Altar));
+                    }
                     Repeat(10);
                     {
-                        SpawnRoom(4, 12, DungeonRoomShape.Random, false);
+                        SpawnRoom(8, 16, DungeonRoomShape.Random, false);
                     }
                     EndRepeat();
                 }

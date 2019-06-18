@@ -13,12 +13,14 @@ namespace Fluid.Roguelike.Database
     {
         [SerializeField] private List<SpriteDbEntry> _db = new List<SpriteDbEntry>();
 
-        public Sprite Find(DungeonTile.Index index, bool isEdge, bool isBorder)
+        public Sprite Find(DungeonTile.Index index, bool isEdge, bool isBorder, out Color color)
         {
             foreach (var entry in _db)
             {
                 if (entry.Index == index)
                 {
+                    color = entry.Color;
+
                     var options = (isEdge && entry.HasEdges) ? entry.EdgeSprites : ((isBorder && entry.HasBorders) ? entry.BorderSprites : entry.Sprites);
                     var totalWeight = 0f;
                     foreach (var option in options)
@@ -32,13 +34,16 @@ namespace Fluid.Roguelike.Database
                         totalWeight -= option.Weight;
 
                         if (targetWeight >= totalWeight)
+                        {
                             return option.Sprite;
+                        }
                     }
 
                     return entry.Default;
                 }
             }
 
+            color = Color.white;
             return default(Sprite);
         }
     }
@@ -50,6 +55,7 @@ namespace Fluid.Roguelike.Database
         public WeightedSprite[] Sprites;
         public WeightedSprite[] EdgeSprites;
         public WeightedSprite[] BorderSprites;
+        public Color Color = UnityEngine.Color.white;
         public Sprite Default => Sprites != null && Sprites.Length > 0 ? Sprites[0].Sprite : default(Sprite);
         public bool HasEdges => EdgeSprites != null && EdgeSprites.Length > 0;
         public bool HasBorders => BorderSprites != null && BorderSprites.Length > 0;
@@ -67,16 +73,17 @@ namespace Fluid.Roguelike.Database
     {
         [SerializeField] private List<SpriteDatabaseManagerEntry> _dbs = new List<SpriteDatabaseManagerEntry>();
 
-        public Sprite Find(DungeonTheme theme, DungeonTile.Index index, bool isEdge, bool isBorder)
+        public Sprite Find(DungeonTheme theme, DungeonTile.Index index, bool isEdge, bool isBorder, out Color color)
         {
             foreach (var db in _dbs)
             {
                 if (db.Theme == theme)
                 {
-                    return db.Database.Find(index, isEdge, isBorder);
+                    return db.Database.Find(index, isEdge, isBorder, out color);
                 }
             }
 
+            color = Color.white;
             return default(Sprite);
         }
     }

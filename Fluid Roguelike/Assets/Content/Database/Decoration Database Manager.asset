@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bffc6771cefa8824bbd80475b536f896, type: 3}
-  m_Name: Dungeon
-  m_EditorClassIdentifier: 
-  _dungeonName: Dungeon
-  _decorations: {fileID: 11400000, guid: 1d1b46e62842f924a96a0c7318824f82, type: 2}
+  m_Script: {fileID: 0}
+  m_Name: Decoration Database Manager
+  m_EditorClassIdentifier: Assembly-CSharp:Fluid.Roguelike.Database:DecorationDatabaseManager
+  _dbs:
+  - Theme: 5
+    Db: {fileID: 11400000, guid: 13102613ac6a4874c85a6845b3c6f6de, type: 2}

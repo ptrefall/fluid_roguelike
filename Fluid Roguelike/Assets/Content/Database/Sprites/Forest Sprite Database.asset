@@ -13,16 +13,14 @@ MonoBehaviour:
   m_Name: Forest Sprite Database
   m_EditorClassIdentifier: 
   _db:
-  - Theme: 0
-    Index: 1
+  - Index: 1
     Sprites:
     - Sprite: {fileID: 8589081340543278931, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
         type: 3}
       Weight: 100
     EdgeSprites: []
     BorderSprites: []
-  - Theme: 0
-    Index: 2
+  - Index: 2
     Sprites:
     - Sprite: {fileID: 4855184231590579541, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
         type: 3}

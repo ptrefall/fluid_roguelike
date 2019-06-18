@@ -13,19 +13,26 @@ MonoBehaviour:
   m_Name: Cave Sprite Database
   m_EditorClassIdentifier: 
   _db:
-  - Theme: 5
-    Index: 1
+  - Index: 1
     Sprites:
     - Sprite: {fileID: 6898460269864436913, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
         type: 3}
       Weight: 100
     EdgeSprites: []
     BorderSprites: []
-  - Theme: 5
-    Index: 2
+    Color: {r: 1, g: 1, b: 1, a: 1}
+  - Index: 2
     Sprites:
     - Sprite: {fileID: -76382776144924731, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
         type: 3}
       Weight: 100
     EdgeSprites: []
     BorderSprites: []
+    Color: {r: 1, g: 1, b: 1, a: 1}
+  - Index: 4
+    Sprites:
+    - Sprite: {fileID: 21300000, guid: f0ac05580667cc74ab8df41c7b8dc082, type: 3}
+      Weight: 100
+    EdgeSprites: []
+    BorderSprites: []
+    Color: {r: 1, g: 1, b: 1, a: 1}

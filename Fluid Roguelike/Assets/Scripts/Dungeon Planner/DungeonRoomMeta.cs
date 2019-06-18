@@ -14,6 +14,7 @@ namespace Fluid.Roguelike.Dungeon
         public DungeonRoomShape Shape { get; set; }
         public DungeonTheme Theme { get; set; }
         public int Id { get; }
+        public int MaxModifications { get; set; } = 20;
 
         public List<DungeonRoomConnectionMeta> Connections { get; } = new List<DungeonRoomConnectionMeta>();
         public List<DungeonRoomDecorationMeta> DecorationMeta { get; } = new List<DungeonRoomDecorationMeta>();

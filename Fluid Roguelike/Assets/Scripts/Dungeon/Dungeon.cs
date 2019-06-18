@@ -22,6 +22,7 @@ namespace Fluid.Roguelike.Dungeon
             {
                 var room = GameObject.Instantiate(_dungeonRoomPrefab);
                 room.SetMeta(meta);
+                room.GenerateMapValues(this);
                 room.GenerateTiles(this);
             }
 

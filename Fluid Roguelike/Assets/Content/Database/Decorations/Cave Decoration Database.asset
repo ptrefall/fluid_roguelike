@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bffc6771cefa8824bbd80475b536f896, type: 3}
-  m_Name: Dungeon
+  m_Script: {fileID: 11500000, guid: 87a771427a8e652438e00bc7d0849a12, type: 3}
+  m_Name: Cave Decoration Database
   m_EditorClassIdentifier: 
-  _dungeonName: Dungeon
-  _decorations: {fileID: 11400000, guid: 1d1b46e62842f924a96a0c7318824f82, type: 2}
+  _db:
+  - Type: 0
+    Assets:
+    - Asset: {fileID: 4900000, guid: bc30ae7d476aa2a47a7934222e4d0a96, type: 3}
+      Weight: 100

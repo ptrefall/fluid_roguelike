@@ -33,6 +33,14 @@ namespace Fluid.Roguelike.Dungeon
             if (textAsset == null)
                 return;
 
+            Generate(textAsset);
+        }
+
+        public void Generate(TextAsset textAsset)
+        {
+            if (textAsset == null)
+                return;
+
             using (var reader = new StringReader(textAsset.text))
             {
                 int y = 0;
@@ -40,10 +48,11 @@ namespace Fluid.Roguelike.Dungeon
                 while ((line = reader.ReadLine()) != null)
                 {
                     var x = 0;
-                    foreach (var tile in line)
+                    var split = line.Split(',');
+                    foreach (var tile in split)
                     {
                         var key = new Tuple<int, int>(x, y);
-                        ValueMap.Add(key, (int)tile);
+                        ValueMap.Add(key, Convert.ToInt32(tile));
                         x++;
                     }
 
