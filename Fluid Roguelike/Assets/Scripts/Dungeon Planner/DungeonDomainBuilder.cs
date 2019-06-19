@@ -271,7 +271,7 @@ namespace Fluid.Roguelike.Dungeon
             {
                 Action($"Try spawn player");
                 {
-                    Condition("Player not already spawned",
+                    Condition("Player needs spawn point",
                         context => context.HasState(DungeonWorldState.PlayerNeedsSpawnPoint));
                     Do((context) =>
                     {
@@ -279,7 +279,7 @@ namespace Fluid.Roguelike.Dungeon
                         if (parentRoom != null)
                         {
                             Debug.Log($"Spawn player in room {parentRoom.Id}\n");
-                            var playerSpawn = new DungeonSpawnPlayerMeta
+                            var playerSpawn = new DungeonSpawnMeta
                             {
                                 SpawnRoom = parentRoom,
                             };
@@ -288,6 +288,40 @@ namespace Fluid.Roguelike.Dungeon
                         }
 
                         Debug.Log($"Error! Can't spawn player in the void!\n");
+                        return TaskStatus.Failure;
+                    });
+                    Effect("Player spawned", EffectType.PlanAndExecute,
+                        (context, type) => context.SetState(DungeonWorldState.PlayerNeedsSpawnPoint, false, type));
+                }
+                End();
+            }
+            End();
+            return this;
+        }
+
+        public DungeonDomainBuilder TrySpawnNpc(string race, string name)
+        {
+            Optionally();
+            {
+                Action($"Try spawn npc");
+                {
+                    Do((context) =>
+                    {
+                        var parentRoom = context.RoomStack.Peek();
+                        if (parentRoom != null)
+                        {
+                            Debug.Log($"Spawn npc {race}/{name} in room {parentRoom.Id}\n");
+                            var npcSpawn = new DungeonSpawnNpcMeta()
+                            {
+                                SpawnRoom = parentRoom,
+                                Race = race,
+                                Name = name,
+                            };
+                            context.NpcSpawnMeta.Add(npcSpawn);
+                            return TaskStatus.Success;
+                        }
+
+                        Debug.Log($"Error! Can't spawn npc in the void!\n");
                         return TaskStatus.Failure;
                     });
                 }
@@ -392,6 +426,7 @@ namespace Fluid.Roguelike.Dungeon
                     End();
                     {
                         AddDecoration(DungeonTheme.Cave, _decorations.Find(DungeonTheme.Cave, DecorationType.Altar));
+                        TrySpawnNpc("kobold", "warrior");
                     }
                 }
             }

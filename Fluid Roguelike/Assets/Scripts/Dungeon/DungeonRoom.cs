@@ -28,6 +28,48 @@ namespace Fluid.Roguelike.Dungeon
             }
         }
 
+        public Tuple<int, int> GetValidSpawnPosition(Dungeon dungeon)
+        {
+            var halfWidth = _meta.Width / 2;
+            var halfHeight = _meta.Height / 2;
+
+            var validPositions = new List<Tuple<int, int>>();
+
+            for (var dx = -halfWidth; dx <= halfWidth; dx++)
+            {
+                for (var dy = -halfHeight; dy <= halfHeight; dy++)
+                {
+                    var x = _meta.CenterX + dx;
+                    var y = _meta.CenterY + dy;
+                    var key = new Tuple<int, int>(x, y);
+
+                    if (dungeon.ValueMap.ContainsKey(key))
+                    {
+                        if (dungeon.ValueMap[key].Index == DungeonTile.Index.Floor)
+                        {
+                            var collision = dungeon.TryGetInteractible(key, true);
+                            if (collision == null)
+                            {
+                                validPositions.Add(key);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (validPositions.Count > 1)
+            {
+                return validPositions[Random.Range(0, validPositions.Count)];
+            }
+
+            if (validPositions.Count == 1)
+            {
+                return validPositions[0];
+            }
+
+            return null;
+        }
+
         public void GenerateMapValues(Dungeon dungeon, int pass)
         {
             if (_meta == null)

@@ -27,9 +27,11 @@ namespace Fluid.Roguelike.Dungeon
         public bool Generate(int dungeonDepth)
         {
             _context.SetState(DungeonWorldState.DungeonDepth, dungeonDepth, EffectType.Permanent);
+            _context.SetState(DungeonWorldState.PlayerNeedsSpawnPoint, true, EffectType.Permanent);
             _context.RoomStack.Clear();
             _context.AllRooms.Clear();
             _context.PlayerSpawnMeta = null;
+            _context.NpcSpawnMeta.Clear();
 
             var status = _domain.FindPlan(_context, out var plan);
             if(status == DecompositionStatus.Succeeded)

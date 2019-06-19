@@ -10,6 +10,7 @@ namespace Fluid.Roguelike.Dungeon
         public DungeonTheme CurrentTheme { get; set; }
         public Stack<DungeonRoomMeta> RoomStack { get; set; } = new Stack<DungeonRoomMeta>();
         public List<DungeonRoomMeta> AllRooms { get; set; } = new List<DungeonRoomMeta>();
-        public DungeonSpawnPlayerMeta PlayerSpawnMeta { get; set; }
+        public DungeonSpawnMeta PlayerSpawnMeta { get; set; }
+        public List<DungeonSpawnNpcMeta> NpcSpawnMeta { get; set; } = new List<DungeonSpawnNpcMeta>();
     }
 }

@@ -11,7 +11,7 @@ namespace Fluid.Roguelike
         private float nextSameKeyTime = 0f;
         private KeyCode lastKey = KeyCode.Escape;
 
-        private const float keyPause = 0.25f;
+        private const float keyPause = 0.15f;
 
         public override void Tick(Dungeon.Dungeon dungeon)
         {
@@ -25,6 +25,11 @@ namespace Fluid.Roguelike
 
             // We did not consume a turn
             if (result == MoveResult.None)
+            {
+                return;
+            }
+
+            if (result == MoveResult.Collided)
             {
                 forceKeyDown = true;
                 return;
@@ -49,7 +54,7 @@ namespace Fluid.Roguelike
                 }
             }
 
-            // TODO: Consume a turn and trigger AI
+            // Consume a turn and trigger AI
             ConsumeTurn(dungeon);
             dungeon.TickAI();
         }

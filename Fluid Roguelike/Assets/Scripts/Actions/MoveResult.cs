@@ -3,6 +3,7 @@
     public enum MoveResult
     {
         None,
+        Collided,
         Moved,
         Interaction,
         NoMoveStatusEffect,

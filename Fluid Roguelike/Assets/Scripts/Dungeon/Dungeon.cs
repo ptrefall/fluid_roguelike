@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Database;
 using UnityEngine;
@@ -63,12 +65,30 @@ namespace Fluid.Roguelike.Dungeon
             }
 
             _rooms[0].WallIn(this, DungeonTheme.Cave);
+
             _rooms[0].AddTilesForAllMapValues(this);
 
-            _playerController = new PlayerController();
-            _playerController.Set(Spawn("human", "player"));
+            StartCoroutine(SpawnContext());
+        }
 
-            _aiControllers.Add(SpawnAI("kobold", "warrior"));
+        private IEnumerator SpawnContext()
+        {
+            yield return null;
+            yield return null;
+
+            if (_agent.Context.PlayerSpawnMeta != null)
+            {
+                _playerController =
+                    SpawnPlayer("human", "player", _agent.Context.PlayerSpawnMeta); // player -> naked/warrior/etc
+            }
+
+            foreach (var npcMeta in _agent.Context.NpcSpawnMeta)
+            {
+                for (var i = 0; i < npcMeta.Count; i++)
+                {
+                    _aiControllers.Add(SpawnAi(npcMeta));
+                }
+            }
         }
 
         public IInteractible TryGetInteractible(Tuple<int, int> position, bool hitPlayer)
@@ -94,7 +114,7 @@ namespace Fluid.Roguelike.Dungeon
             return null;
         }
 
-        public Character.Character Spawn(string race, string name)
+        public Character.Character Spawn(string race, string name, Vector3 position)
         {
             var character = GameObject.Instantiate(_characterPrefab);
             if (_characterDb)
@@ -103,14 +123,57 @@ namespace Fluid.Roguelike.Dungeon
                 character.View.color = playerColor;
             }
 
+            character.transform.position = position;
+
             return character;
         }
 
-        public AIController SpawnAI(string race, string name)
+        public PlayerController SpawnPlayer(string race, string name, DungeonSpawnMeta meta)
         {
-            var controller = new AIController();
-            controller.Set(Spawn(race, name));
+            var controller = new PlayerController();
+            // TODO: Need to look up spawn position in room, that we ensure valid positions
+            var pos = new Vector3(meta.SpawnRoom.CenterX, meta.SpawnRoom.CenterY, 0);
+            var character = Spawn(race, name, pos);
+
+            var cameraBrain = Camera.main.GetComponent<CinemachineBrain>();
+            if (cameraBrain != null && cameraBrain.ActiveVirtualCamera != null)
+            {
+                cameraBrain.ActiveVirtualCamera.LookAt = character.transform;
+                cameraBrain.ActiveVirtualCamera.Follow = character.transform;
+            }
+
+            controller.Set(character);
             return controller;
+        }
+
+        public AIController SpawnAi(DungeonSpawnNpcMeta meta)
+        {
+            // TODO: Need to look up spawn position in room, that we ensure valid positions
+            var room = GetRoom(meta.SpawnRoom);
+            if (room == null)
+                return null;
+
+            var key = room.GetValidSpawnPosition(this);
+            if (key == null)
+                return null;
+
+            var controller = new AIController();
+            var pos = new Vector3(key.Item1, key.Item2, 0);
+            controller.Set(Spawn(meta.Race, meta.Name, pos));
+            return controller;
+        }
+
+        public DungeonRoom GetRoom(DungeonRoomMeta meta)
+        {
+            foreach (var room in _rooms)
+            {
+                if (room.Meta.Id == meta.Id)
+                {
+                    return room;
+                }
+            }
+
+            return null;
         }
 
         private void Update()

@@ -53,12 +53,12 @@ namespace Fluid.Roguelike
 
             if (dungeon.ValueMap.ContainsKey(targetKey) == false)
             {
-                return MoveResult.None;
+                return MoveResult.Collided;
             }
 
             if (dungeon.ValueMap[targetKey].Index == DungeonTile.Index.Wall)
             {
-                return MoveResult.None;
+                return MoveResult.Collided;
             }
 
             // Check collision in direction that should trigger interaction instead
