@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Fluid.Roguelike.Database;
 using UnityEngine;
 
 namespace Fluid.Roguelike.Dungeon
@@ -15,7 +16,8 @@ namespace Fluid.Roguelike.Dungeon
 
         [SerializeField] private DungeonAgent _agent;
         [SerializeField] private DungeonRoom _dungeonRoomPrefab;
-        [SerializeField] private Character.Character _playerCharacter;
+        [SerializeField] private Character.Character _characterPrefab;
+        [SerializeField] private CharacterDatabaseManager _characterDb;
 
         private PlayerController _playerController;
 
@@ -62,7 +64,21 @@ namespace Fluid.Roguelike.Dungeon
             _rooms[0].AddTilesForAllMapValues(this);
 
             _playerController = new PlayerController();
-            _playerController.Set(_playerCharacter);
+            _playerController.Set(Spawn("human", "player"));
+
+            var koboldTest = Spawn("kobold", "warrior");
+        }
+
+        public Character.Character Spawn(string race, string name)
+        {
+            var character = GameObject.Instantiate(_characterPrefab);
+            if (_characterDb)
+            {
+                character.View.sprite = _characterDb.Find(race, name, out var playerColor);
+                character.View.color = playerColor;
+            }
+
+            return character;
         }
 
         private void Update()
