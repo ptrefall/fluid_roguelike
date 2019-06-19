@@ -8,9 +8,12 @@ namespace Fluid.Roguelike
 {
     public enum MoveDirection { None, N, E, S, W };
 
-    public abstract class CharacterController
+    public abstract class CharacterController : IInteractible
     {
         private Character.Character _character;
+
+        public Tuple<int, int> Position => new Tuple<int, int>((int)_character.transform.position.x, (int)_character.transform.position.y);
+        public Character.Character Character => _character;
 
         public void Set(Character.Character character)
         {
@@ -18,8 +21,15 @@ namespace Fluid.Roguelike
         }
 
         public abstract void Tick(Dungeon.Dungeon dungeon);
+        public void ConsumeTurn(Dungeon.Dungeon dungeon)
+        {
+            if (_character != null)
+            {
+                _character.TickTurn();
+            }
+        }
 
-        protected MoveResult Move(Dungeon.Dungeon dungeon, MoveDirection dir)
+        protected MoveResult Move(Dungeon.Dungeon dungeon, MoveDirection dir, bool isPlayer)
         {
             if (_character == null)
                 return MoveResult.None;
@@ -51,7 +61,11 @@ namespace Fluid.Roguelike
                 return MoveResult.None;
             }
 
-            // TODO: Check collision in direction that should trigger interaction instead
+            // Check collision in direction that should trigger interaction instead
+            if (dungeon.TryGetInteractible(targetKey, hitPlayer: !isPlayer) != null)
+            {
+                return MoveResult.Interaction;
+            }
 
             _character.Translate(move);
             return MoveResult.Moved;

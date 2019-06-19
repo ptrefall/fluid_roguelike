@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Database;
 using UnityEngine;
 
@@ -20,6 +21,7 @@ namespace Fluid.Roguelike.Dungeon
         [SerializeField] private CharacterDatabaseManager _characterDb;
 
         private PlayerController _playerController;
+        private List<AIController> _aiControllers = new List<AIController>();
 
         public Dictionary<Tuple<int, int>, DungeonTile> Tiles { get; } = new Dictionary<Tuple<int, int>, DungeonTile>();
         public Dictionary<Tuple<int, int>, MapValue> ValueMap { get; } = new Dictionary<Tuple<int, int>, MapValue>();
@@ -66,7 +68,30 @@ namespace Fluid.Roguelike.Dungeon
             _playerController = new PlayerController();
             _playerController.Set(Spawn("human", "player"));
 
-            var koboldTest = Spawn("kobold", "warrior");
+            _aiControllers.Add(SpawnAI("kobold", "warrior"));
+        }
+
+        public IInteractible TryGetInteractible(Tuple<int, int> position, bool hitPlayer)
+        {
+            if (hitPlayer)
+            {
+                if (_playerController.Position.Item1 == position.Item1 &&
+                    _playerController.Position.Item2 == position.Item2)
+                {
+                    return _playerController;
+                }
+            }
+
+            foreach (var ai in _aiControllers)
+            {
+                if (ai.Position.Item1 == position.Item1 &&
+                    ai.Position.Item2 == position.Item2)
+                {
+                    return ai;
+                }
+            }
+
+            return null;
         }
 
         public Character.Character Spawn(string race, string name)
@@ -81,9 +106,24 @@ namespace Fluid.Roguelike.Dungeon
             return character;
         }
 
+        public AIController SpawnAI(string race, string name)
+        {
+            var controller = new AIController();
+            controller.Set(Spawn(race, name));
+            return controller;
+        }
+
         private void Update()
         {
             _playerController?.Tick(this);
+        }
+
+        public void TickAI()
+        {
+            foreach (var ai in _aiControllers)
+            {
+                ai.Tick(this);
+            }
         }
 
         private void OnDrawGizmos()

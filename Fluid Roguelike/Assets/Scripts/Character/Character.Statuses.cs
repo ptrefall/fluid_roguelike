@@ -29,6 +29,27 @@ namespace Fluid.Roguelike.Character
             return status;
         }
 
+        public bool HasStatus(CharacterStatusType statusType)
+        {
+            foreach (var s in _permanentStatuses)
+            {
+                if (s.Type == statusType)
+                {
+                    return true;
+                }
+            }
+
+            foreach (var s in _timedStatuses)
+            {
+                if (s.Type == statusType)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void AddPermanentStatus(CharacterStatusType statusType)
         {
             foreach (var s in _permanentStatuses)
