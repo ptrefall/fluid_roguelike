@@ -255,7 +255,7 @@ MonoBehaviour:
   _agent: {fileID: 413436164}
   _dungeonRoomPrefab: {fileID: 2339689353353514637, guid: 2fae576e354029d44926fb1e826cf087,
     type: 3}
-  _playerCharacter: {fileID: 376981803}
+  _playerCharacter: {fileID: 1590166529}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -552,3 +552,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3077be8c9dd3234891a4eb6dd6ac1f1, type: 3}
+--- !u!114 &1590166529 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2593886561837760541, guid: c3077be8c9dd3234891a4eb6dd6ac1f1,
+    type: 3}
+  m_PrefabInstance: {fileID: 1590166528}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea20c0439265e1a4e8281bf4bcd622be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

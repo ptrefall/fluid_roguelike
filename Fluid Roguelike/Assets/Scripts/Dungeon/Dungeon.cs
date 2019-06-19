@@ -15,7 +15,7 @@ namespace Fluid.Roguelike.Dungeon
 
         [SerializeField] private DungeonAgent _agent;
         [SerializeField] private DungeonRoom _dungeonRoomPrefab;
-        [SerializeField] private Transform _playerCharacter;
+        [SerializeField] private Character.Character _playerCharacter;
 
         private PlayerController _playerController;
 
@@ -67,7 +67,7 @@ namespace Fluid.Roguelike.Dungeon
 
         private void Update()
         {
-            _playerController?.Tick();
+            _playerController?.Tick(this);
         }
 
         private void OnDrawGizmos()
