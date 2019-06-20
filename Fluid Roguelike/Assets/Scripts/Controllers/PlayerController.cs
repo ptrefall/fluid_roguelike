@@ -45,7 +45,7 @@ namespace Fluid.Roguelike
                 if (interactible != null)
                 {
                     Debug.Log("Get drunk!");
-                    Character.AddPermanentStatus(CharacterStatusType.Drunk);
+                    Character.AddTimedStatus(CharacterStatusType.Drunk, 10);
                     forceKeyDown = true;
                 }
                 else
