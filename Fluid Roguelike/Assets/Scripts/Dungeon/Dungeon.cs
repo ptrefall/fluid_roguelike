@@ -85,7 +85,7 @@ namespace Fluid.Roguelike.Dungeon
             if (_agent.Context.PlayerSpawnMeta != null)
             {
                 _playerController =
-                    SpawnPlayer("human", "player", _agent.Context.PlayerSpawnMeta); // player -> naked/warrior/etc
+                    SpawnPlayer("human", "naked", _agent.Context.PlayerSpawnMeta); // player -> naked/warrior/etc
             }
 
             foreach (var npcMeta in _agent.Context.NpcSpawnMeta)
@@ -127,7 +127,7 @@ namespace Fluid.Roguelike.Dungeon
         public Character.Character Spawn(string race, string name, int2 position, out CharacterDomainDefinition brain)
         {
             brain = null;
-            var character = GameObject.Instantiate(_characterPrefab);
+            var character = GameObject.Instantiate(_characterPrefab).Init();
             if (character.Context != null)
             {
                 character.Context.Dungeon = this;

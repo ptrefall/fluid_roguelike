@@ -15,9 +15,10 @@ namespace Fluid.Roguelike.Character
 
         public int2 Position => new int2((int) transform.position.x, (int) transform.position.y);
 
-        private void Start()
+        public Character Init()
         {
             Context = new CharacterContext(this);
+            return this;
         }
 
         public void Translate(int2 move)

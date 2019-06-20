@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _race: kobold
   _db:
-  - Name: 
+  - Name: warrior
     Sprite: {fileID: 6445117415765249051, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
       type: 3}
     Color: {r: 1, g: 1, b: 1, a: 1}
     Brain: {fileID: 11400000, guid: 6226edd0546a8e44a82145be758d7338, type: 2}
+    Sensors: 00000000
+    Stats:
+    - Type: 0
+      Value: 1
