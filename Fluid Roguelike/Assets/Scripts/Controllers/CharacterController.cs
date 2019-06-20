@@ -2,17 +2,18 @@
 using System;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Dungeon;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Fluid.Roguelike
 {
     public enum MoveDirection { None, N, E, S, W };
 
-    public abstract class CharacterController : IBumpTarget
+    public abstract class CharacterController
     {
         private Character.Character _character;
 
-        public Tuple<int, int> Position => new Tuple<int, int>((int)_character.transform.position.x, (int)_character.transform.position.y);
+        public int2 Position => _character.Position;
         public Character.Character Character => _character;
 
         public void Set(Character.Character character)
@@ -35,53 +36,12 @@ namespace Fluid.Roguelike
                 return MoveResult.None;
 
             var move = DirectionToVec(dir);
-
-            // Check status effect modifications
-            move = _character.Modify(move, out var consumedMoveModification);
-            if (consumedMoveModification)
-            {
-                if (Mathf.Approximately(move.sqrMagnitude, 0))
-                {
-                    return MoveResult.NoMoveStatusEffect;
-                }
-            }
-
-            // Check collision in direction that prevent move
-            var targetKey = new Tuple<int, int>(
-                (int) (_character.transform.position.x + move.x),
-                (int) (_character.transform.position.y + move.y));
-
-            if (dungeon.ValueMap.ContainsKey(targetKey) == false)
-            {
-                return MoveResult.Collided;
-            }
-
-            if (dungeon.ValueMap[targetKey].Index == DungeonTile.Index.Wall)
-            {
-                return MoveResult.Collided;
-            }
-
-            // Check collision in direction that should trigger interaction instead
-            var bumpTarget = dungeon.TryGetBumpTarget(targetKey, hitPlayer: !isPlayer);
-            if (bumpTarget != null)
-            {
-                if (_character.Context.TrySetBumpTarget(bumpTarget))
-                {
-                    return MoveResult.Bump;
-                }
-                else
-                {
-                    return MoveResult.Collided;
-                }
-            }
-
-            _character.Translate(move);
-            return MoveResult.Moved;
+            return Character.Move(move, isPlayer);
         }
 
-        public static Vector3 DirectionToVec(MoveDirection dir)
+        public static int2 DirectionToVec(MoveDirection dir)
         {
-            Vector3 move = Vector3.zero;
+            var move = int2.zero;
             switch (dir)
             {
                 case MoveDirection.N:

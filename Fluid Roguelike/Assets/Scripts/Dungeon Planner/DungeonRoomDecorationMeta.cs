@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Fluid.Roguelike.Dungeon
 {
     public class DungeonRoomDecorationMeta
     {
-        public Dictionary<Tuple<int, int>, Dungeon.MapValue> ValueMap { get; } = new Dictionary<Tuple<int, int>, Dungeon.MapValue>();
+        public Dictionary<int2, Dungeon.MapValue> ValueMap { get; } = new Dictionary<int2, Dungeon.MapValue>();
 
         /// <summary>
         /// Generate a value map from a double array.
@@ -21,7 +22,7 @@ namespace Fluid.Roguelike.Dungeon
             {
                 for (var y = 0; y < valueMap.GetLength(1); y++)
                 {
-                    var key = new Tuple<int, int>(x, y);
+                    var key = new int2(x, y);
                     ValueMap.Add(key, new Dungeon.MapValue
                     {
                         Theme = theme,
@@ -56,7 +57,7 @@ namespace Fluid.Roguelike.Dungeon
                     var split = line.Split(',');
                     foreach (var tile in split)
                     {
-                        var key = new Tuple<int, int>(x, y);
+                        var key = new int2(x, y);
                         ValueMap.Add(key, new Dungeon.MapValue
                         {
                             Theme = theme,

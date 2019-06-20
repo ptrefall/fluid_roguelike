@@ -1,5 +1,6 @@
 ﻿using System;
 using Fluid.Roguelike.Actions;
+using Unity.Mathematics;
 using UnityEngine;
 using Random = System.Random;
 
@@ -10,7 +11,7 @@ namespace Fluid.Roguelike.Character
         public abstract CharacterStatusType Type { get; }
         public int Life { get; set; } = -1;
 
-        public virtual Vector3 Modify(Vector3 move, out bool consume)
+        public virtual int2 Modify(int2 move, out bool consume)
         {
             consume = false;
             return move;
@@ -21,10 +22,10 @@ namespace Fluid.Roguelike.Character
     {
         public override CharacterStatusType Type => CharacterStatusType.Stunned;
 
-        public override Vector3 Modify(Vector3 move, out bool consume)
+        public override int2 Modify(int2 move, out bool consume)
         {
             consume = true;
-            return Vector3.zero;
+            return int2.zero;
         }
     }
 
@@ -32,7 +33,7 @@ namespace Fluid.Roguelike.Character
     {
         public override CharacterStatusType Type => CharacterStatusType.Confused;
 
-        public override Vector3 Modify(Vector3 move, out bool consume)
+        public override int2 Modify(int2 move, out bool consume)
         {
             consume = false;
             var dir = (MoveDirection)UnityEngine.Random.Range((int)MoveDirection.N, (int)MoveDirection.W + 1);
@@ -44,7 +45,7 @@ namespace Fluid.Roguelike.Character
     {
         public override CharacterStatusType Type => CharacterStatusType.Drunk;
 
-        public override Vector3 Modify(Vector3 move, out bool consume)
+        public override int2 Modify(int2 move, out bool consume)
         {
             consume = false;
             var dir = (MoveDirection) UnityEngine.Random.Range((int) MoveDirection.N, (int) MoveDirection.W + 1);

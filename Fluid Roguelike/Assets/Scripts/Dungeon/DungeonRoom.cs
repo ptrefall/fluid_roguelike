@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Fluid.Roguelike.Database;
+using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -28,12 +29,12 @@ namespace Fluid.Roguelike.Dungeon
             }
         }
 
-        public Tuple<int, int> GetValidSpawnPosition(Dungeon dungeon)
+        public bool GetValidSpawnPosition(Dungeon dungeon, out int2 position)
         {
             var halfWidth = _meta.Width / 2;
             var halfHeight = _meta.Height / 2;
 
-            var validPositions = new List<Tuple<int, int>>();
+            var validPositions = new List<int2>();
 
             for (var dx = -halfWidth; dx <= halfWidth; dx++)
             {
@@ -41,7 +42,7 @@ namespace Fluid.Roguelike.Dungeon
                 {
                     var x = _meta.CenterX + dx;
                     var y = _meta.CenterY + dy;
-                    var key = new Tuple<int, int>(x, y);
+                    var key = new int2(x, y);
 
                     if (dungeon.ValueMap.ContainsKey(key))
                     {
@@ -59,15 +60,18 @@ namespace Fluid.Roguelike.Dungeon
 
             if (validPositions.Count > 1)
             {
-                return validPositions[Random.Range(0, validPositions.Count)];
+                position = validPositions[Random.Range(0, validPositions.Count)];
+                return true;
             }
 
             if (validPositions.Count == 1)
             {
-                return validPositions[0];
+                position = validPositions[0];
+                return true;
             }
 
-            return null;
+            position = int2.zero;
+            return false;
         }
 
         public void GenerateMapValues(Dungeon dungeon, int pass)
@@ -119,7 +123,7 @@ namespace Fluid.Roguelike.Dungeon
                 {
                     var x = _meta.CenterX + dx;
                     var y = _meta.CenterY + dy;
-                    var key = new Tuple<int, int>(x, y);
+                    var key = new int2(x, y);
 
                     if (dungeon.ValueMap.ContainsKey(key))
                     {
@@ -152,7 +156,7 @@ namespace Fluid.Roguelike.Dungeon
                 {
                     var x = _meta.CenterX + dx;
                     var y = _meta.CenterY + dy;
-                    var key = new Tuple<int, int>(x, y);
+                    var key = new int2(x, y);
 
                     if (dungeon.ValueMap.ContainsKey(key))
                     {
@@ -200,7 +204,7 @@ namespace Fluid.Roguelike.Dungeon
                 {
                     var x = _meta.CenterX + dx;
                     var y = _meta.CenterY + dy;
-                    var key = new Tuple<int, int>(x, y);
+                    var key = new int2(x, y);
 
                     if (dungeon.ValueMap.ContainsKey(key) == false)
                         continue;
@@ -255,7 +259,7 @@ namespace Fluid.Roguelike.Dungeon
 
         /// <summary>
         /// The higher the count of tiles in a direction with the same index, the higher the chance is to covert
-        private bool TryConvertIndexAtoB(Dungeon dungeon, Tuple<int, int> key, BuilderDirection direction, DungeonTile.Index a, DungeonTile.Index b, int maxCount)
+        private bool TryConvertIndexAtoB(Dungeon dungeon, int2 key, BuilderDirection direction, DungeonTile.Index a, DungeonTile.Index b, int maxCount)
         {
             var count = 0;
             CountIndexInDirection(dungeon, key, direction, a, ref count);
@@ -277,7 +281,7 @@ namespace Fluid.Roguelike.Dungeon
             {
                 foreach (var kvp in decorator.ValueMap)
                 {
-                    var globalKey = new Tuple<int, int>(kvp.Key.Item1 + _meta.CenterX, kvp.Key.Item2 + _meta.CenterY);
+                    var globalKey = new int2(kvp.Key.x + _meta.CenterX, kvp.Key.y + _meta.CenterY);
                     if (dungeon.ValueMap.ContainsKey(globalKey))
                     {
                         dungeon.ValueMap[globalKey] = kvp.Value;
@@ -290,7 +294,7 @@ namespace Fluid.Roguelike.Dungeon
             }
         }
 
-        private void CountIndexInDirection(Dungeon dungeon, Tuple<int, int> key, BuilderDirection direction, DungeonTile.Index indexType, ref int count)
+        private void CountIndexInDirection(Dungeon dungeon, int2 key, BuilderDirection direction, DungeonTile.Index indexType, ref int count)
         {
             if (dungeon.ValueMap.ContainsKey(key) == false)
             {
@@ -307,41 +311,41 @@ namespace Fluid.Roguelike.Dungeon
             switch (direction)
             {
                 case BuilderDirection.North:
-                    adjacentKey = new Tuple<int, int>(key.Item1, key.Item2 - 1);
+                    adjacentKey = new int2(key.x, key.y - 1);
                     break;
                 case BuilderDirection.East:
-                    adjacentKey = new Tuple<int, int>(key.Item1 + 1, key.Item2);
+                    adjacentKey = new int2(key.x + 1, key.y);
                     break;
                 case BuilderDirection.South:
-                    adjacentKey = new Tuple<int, int>(key.Item1, key.Item2 + 1);
+                    adjacentKey = new int2(key.x, key.y + 1);
                     break;
                 case BuilderDirection.West:
-                    adjacentKey = new Tuple<int, int>(key.Item1 - 1, key.Item2);
+                    adjacentKey = new int2(key.x - 1, key.y);
                     break;
             }
 
-            if (adjacentKey.Item1 == key.Item1 && adjacentKey.Item2 == key.Item2)
+            if (adjacentKey.x == key.x && adjacentKey.y == key.y)
                 return;
 
             CountIndexInDirection(dungeon, adjacentKey, direction, indexType, ref count);
         }
 
-        private DungeonTile.Index GetAdjacentIndex(Dungeon dungeon, Tuple<int, int> key, BuilderDirection direction)
+        private DungeonTile.Index GetAdjacentIndex(Dungeon dungeon, int2 key, BuilderDirection direction)
         {
             var adjacentKey = key;
             switch (direction)
             {
                 case BuilderDirection.North:
-                    adjacentKey = new Tuple<int, int>(key.Item1, key.Item2 - 1);
+                    adjacentKey = new int2(key.x, key.y - 1);
                     break;
                 case BuilderDirection.East:
-                    adjacentKey = new Tuple<int, int>(key.Item1 + 1, key.Item2);
+                    adjacentKey = new int2(key.x + 1, key.y);
                     break;
                 case BuilderDirection.South:
-                    adjacentKey = new Tuple<int, int>(key.Item1, key.Item2 + 1);
+                    adjacentKey = new int2(key.x, key.y + 1);
                     break;
                 case BuilderDirection.West:
-                    adjacentKey = new Tuple<int, int>(key.Item1 - 1, key.Item2);
+                    adjacentKey = new int2(key.x - 1, key.y);
                     break;
             }
             if (dungeon.ValueMap.ContainsKey(adjacentKey))
@@ -350,22 +354,22 @@ namespace Fluid.Roguelike.Dungeon
             return DungeonTile.Index.Void;
         }
 
-        private Tuple<int, int> GetAdjacentKey(Dungeon dungeon, Tuple<int, int> key, BuilderDirection direction)
+        private int2 GetAdjacentKey(Dungeon dungeon, int2 key, BuilderDirection direction)
         {
             var adjacentKey = key;
             switch (direction)
             {
                 case BuilderDirection.North:
-                    adjacentKey = new Tuple<int, int>(key.Item1, key.Item2 - 1);
+                    adjacentKey = new int2(key.x, key.y - 1);
                     break;
                 case BuilderDirection.East:
-                    adjacentKey = new Tuple<int, int>(key.Item1 + 1, key.Item2);
+                    adjacentKey = new int2(key.x + 1, key.y);
                     break;
                 case BuilderDirection.South:
-                    adjacentKey = new Tuple<int, int>(key.Item1, key.Item2 + 1);
+                    adjacentKey = new int2(key.x, key.y + 1);
                     break;
                 case BuilderDirection.West:
-                    adjacentKey = new Tuple<int, int>(key.Item1 - 1, key.Item2);
+                    adjacentKey = new int2(key.x - 1, key.y);
                     break;
             }
             return adjacentKey;
@@ -382,7 +386,7 @@ namespace Fluid.Roguelike.Dungeon
                 {
                     var x = _meta.CenterX + dx;
                     var y = _meta.CenterY + dy;
-                    var key = new System.Tuple<int, int>(x, y);
+                    var key = new int2(x, y);
 
                     if (dungeon.Tiles.ContainsKey(key))
                     {
@@ -410,7 +414,7 @@ namespace Fluid.Roguelike.Dungeon
 
         public void WallIn(Dungeon dungeon, DungeonTheme theme)
         {
-            var map = new Dictionary<Tuple<int, int>, Dungeon.MapValue>(dungeon.ValueMap);
+            var map = new Dictionary<int2, Dungeon.MapValue>(dungeon.ValueMap);
             foreach (var kvp in map)
             {
                 TryWallIn(dungeon, theme, kvp.Key, BuilderDirection.North);
@@ -420,7 +424,7 @@ namespace Fluid.Roguelike.Dungeon
             }
         }
 
-        private void TryWallIn(Dungeon dungeon, DungeonTheme theme, Tuple<int, int> key, BuilderDirection direction)
+        private void TryWallIn(Dungeon dungeon, DungeonTheme theme, int2 key, BuilderDirection direction)
         {
             var value = dungeon.ValueMap[key];
             if (value.Theme != theme)
@@ -452,20 +456,20 @@ namespace Fluid.Roguelike.Dungeon
             foreach(var kvp in dungeon.ValueMap)
             {
                 var tile = GameObject.Instantiate(_tilePrefab, tiles.transform, true);
-                tile.transform.position = new Vector3(kvp.Key.Item1, kvp.Key.Item2, 0);
+                tile.transform.position = new Vector3(kvp.Key.x, kvp.Key.y, 0);
                 dungeon.Tiles.Add(kvp.Key, tile);
 
                 SetSprite(tile.GroundLayer, kvp.Value, IsEdge(dungeon, kvp.Key), IsBorder(dungeon, kvp.Key));
             }
         }
 
-        private bool IsEdge(Dungeon dungeon, Tuple<int, int> key)
+        private bool IsEdge(Dungeon dungeon, int2 key)
         { 
             if (dungeon.ValueMap.ContainsKey(key) == false)
                 return false;
 
             var value = dungeon.ValueMap[key];
-            var southKey = new Tuple<int, int>(key.Item1, key.Item2 + 1);
+            var southKey = new int2(key.x, key.y + 1);
             if (dungeon.ValueMap.ContainsKey(southKey) == false)
                 return true;
 
@@ -476,13 +480,13 @@ namespace Fluid.Roguelike.Dungeon
             return false;
         }
 
-        private bool IsBorder(Dungeon dungeon, Tuple<int, int> key)
+        private bool IsBorder(Dungeon dungeon, int2 key)
         {
             if (dungeon.ValueMap.ContainsKey(key) == false)
                 return false;
 
             var value = dungeon.ValueMap[key];
-            var  northKey = new Tuple<int, int>(key.Item1, key.Item2 - 1);
+            var  northKey = new int2(key.x, key.y - 1);
             if (dungeon.ValueMap.ContainsKey(northKey) == false)
                 return true;
 

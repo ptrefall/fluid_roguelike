@@ -18,6 +18,8 @@ namespace Fluid.Roguelike
 
         public override void Tick(Dungeon.Dungeon dungeon)
         {
+            Character.TickTurn_Sensors();
+
             if (_brain != null)
             {
                 _brainHandler.Tick(_brain, Character.Context);

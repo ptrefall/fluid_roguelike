@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.State;
 using FluidHTN;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Fluid.Roguelike.Character
@@ -134,7 +135,7 @@ namespace Fluid.Roguelike.Character
             }
         }
 
-        public Vector3 Modify(Vector3 move, out bool consumed)
+        public int2 Modify(int2 move, out bool consumed)
         {
             foreach (var s in _permanentStatuses)
             {

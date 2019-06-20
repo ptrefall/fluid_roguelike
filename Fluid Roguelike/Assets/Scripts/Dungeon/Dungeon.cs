@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using Cinemachine;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.AI;
+using Fluid.Roguelike.Character.Sensory;
 using Fluid.Roguelike.Database;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Fluid.Roguelike.Dungeon
@@ -24,10 +26,13 @@ namespace Fluid.Roguelike.Dungeon
         [SerializeField] private CharacterDatabaseManager _characterDb;
 
         private PlayerController _playerController;
-        private List<AIController> _aiControllers = new List<AIController>();
+        private readonly List<AIController> _aiControllers = new List<AIController>();
+        private readonly List<Character.Character> _characters = new List<Character.Character>();
 
-        public Dictionary<Tuple<int, int>, DungeonTile> Tiles { get; } = new Dictionary<Tuple<int, int>, DungeonTile>();
-        public Dictionary<Tuple<int, int>, MapValue> ValueMap { get; } = new Dictionary<Tuple<int, int>, MapValue>();
+        public List<Character.Character> Characters => _characters;
+
+        public Dictionary<int2, DungeonTile> Tiles { get; } = new Dictionary<int2, DungeonTile>();
+        public Dictionary<int2, MapValue> ValueMap { get; } = new Dictionary<int2, MapValue>();
         private List<DungeonRoom> _rooms = new List<DungeonRoom>();
         private List<DungeonArea> _areas = new List<DungeonArea>();
 
@@ -87,57 +92,76 @@ namespace Fluid.Roguelike.Dungeon
             {
                 for (var i = 0; i < npcMeta.Count; i++)
                 {
-                    _aiControllers.Add(SpawnAi(npcMeta));
+                    var ai = SpawnAi(npcMeta);
+                    if (ai != null)
+                    {
+                        _aiControllers.Add(ai);
+                    }
                 }
             }
         }
 
-        public IBumpTarget TryGetBumpTarget(Tuple<int, int> position, bool hitPlayer)
+        public IBumpTarget TryGetBumpTarget(int2 position, bool hitPlayer)
         {
             if (hitPlayer)
             {
-                if (_playerController.Position.Item1 == position.Item1 &&
-                    _playerController.Position.Item2 == position.Item2)
+                var equality = (_playerController.Position == position);
+                if (equality.x && equality.y)
                 {
-                    return _playerController;
+                    return _playerController.Character;
                 }
             }
 
             foreach (var ai in _aiControllers)
             {
-                if (ai.Position.Item1 == position.Item1 &&
-                    ai.Position.Item2 == position.Item2)
+                var equality = (ai.Position == position);
+                if (equality.x && equality.y)
                 {
-                    return ai;
+                    return ai.Character;
                 }
             }
 
             return null;
         }
 
-        public Character.Character Spawn(string race, string name, Vector3 position, out CharacterDomainDefinition brain)
+        public Character.Character Spawn(string race, string name, int2 position, out CharacterDomainDefinition brain)
         {
+            brain = null;
             var character = GameObject.Instantiate(_characterPrefab);
+            if (character.Context != null)
+            {
+                character.Context.Dungeon = this;
+            }
+
             if (_characterDb)
             {
-                character.View.sprite = _characterDb.Find(race, name, out var playerColor, out brain);
-                character.View.color = playerColor;
-            }
-            else
-            {
-                brain = null;
+                if (_characterDb.Find(race, name, out var data))
+                {
+                    character.View.sprite = data.Sprite;
+                    character.View.color = data.Color;
+                    foreach (var sensor in data.Sensors)
+                    {
+                        character.AddSensor(sensor);
+                    }
+
+                    foreach (var stat in data.Stats)
+                    {
+                        character.AddStat(stat.Type, stat.Value);
+                    }
+
+                    brain = data.Brain;
+                }
             }
 
-            character.transform.position = position;
-
+            character.transform.position = new Vector3(position.x, position.y, 0);
+            _characters.Add(character);
             return character;
         }
 
         public PlayerController SpawnPlayer(string race, string name, DungeonSpawnMeta meta)
         {
             // TODO: Need to look up spawn position in room, that we ensure valid positions
-            var pos = new Vector3(meta.SpawnRoom.CenterX, meta.SpawnRoom.CenterY, 0);
-            var character = Spawn(race, name, pos, out var brain);
+            var character = Spawn(race, name, new int2(meta.SpawnRoom.CenterX, meta.SpawnRoom.CenterY), out var brain);
 
             var cameraBrain = Camera.main.GetComponent<CinemachineBrain>();
             if (cameraBrain != null && cameraBrain.ActiveVirtualCamera != null)
@@ -153,17 +177,14 @@ namespace Fluid.Roguelike.Dungeon
 
         public AIController SpawnAi(DungeonSpawnNpcMeta meta)
         {
-            // TODO: Need to look up spawn position in room, that we ensure valid positions
             var room = GetRoom(meta.SpawnRoom);
             if (room == null)
                 return null;
 
-            var key = room.GetValidSpawnPosition(this);
-            if (key == null)
+            if (room.GetValidSpawnPosition(this, out var position) == false)
                 return null;
 
-            var pos = new Vector3(key.Item1, key.Item2, 0);
-            var character = Spawn(meta.Race, meta.Name, pos, out var brain);
+            var character = Spawn(meta.Race, meta.Name, position, out var brain);
 
             var controller = new AIController(brain);
             controller.Set(character);
@@ -203,7 +224,7 @@ namespace Fluid.Roguelike.Dungeon
             {
                 foreach (var value in ValueMap)
                 {
-                    UnityEditor.Handles.Label(new Vector3(value.Key.Item1, value.Key.Item2 + 0.25f, 0), ((int)value.Value.Index).ToString());
+                    UnityEditor.Handles.Label(new Vector3(value.Key.x, value.Key.y + 0.25f, 0), ((int)value.Value.Index).ToString());
                 }
             }
 #endif

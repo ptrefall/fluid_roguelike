@@ -49,9 +49,11 @@ namespace Fluid.Roguelike
                 }
             }
 
-            // Consume a turn and trigger AI
-            ConsumeTurn(dungeon);
+            // We tick the AI first, so that we're not updating status effects until NPCs have had the chance to add new ones.
             dungeon.TickAI();
+
+            ConsumeTurn(dungeon);
+            Character.TickTurn_Sensors();
         }
 
         private MoveDirection CheckMoveInput()

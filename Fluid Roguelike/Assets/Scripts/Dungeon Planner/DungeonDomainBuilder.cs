@@ -4,6 +4,7 @@ using Fluid.Roguelike.Database;
 using FluidHTN;
 using FluidHTN.Compounds;
 using FluidHTN.Factory;
+using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -11,7 +12,7 @@ namespace Fluid.Roguelike.Dungeon
 {
     public class DungeonDomainBuilder : BaseDomainBuilder<DungeonDomainBuilder, DungeonContext>
     {
-        private Dictionary<Tuple<int, int>, bool> IsOccupied { get; set; } = new Dictionary<Tuple<int, int>, bool>();
+        private Dictionary<int2, bool> IsOccupied { get; set; } = new Dictionary<int2, bool>();
         private DecorationDatabaseManager _decorations;
 
         public DungeonDomainBuilder(string domainName, DecorationDatabaseManager decorations) : base(domainName, new DefaultFactory())
@@ -71,13 +72,13 @@ namespace Fluid.Roguelike.Dungeon
             else if (height <= 2)
                 width = maxSize;
 
-            return SpawnRoom(new Tuple<int, int>(width, height), shape, allowOverlap, maxModifications);
+            return SpawnRoom(new int2(width, height), shape, allowOverlap, maxModifications);
         }
 
-        public DungeonDomainBuilder SpawnRoom(Tuple<int, int> size, DungeonRoomShape shape, bool allowOverlap, int maxModifications = 20)
+        public DungeonDomainBuilder SpawnRoom(int2 size, DungeonRoomShape shape, bool allowOverlap, int maxModifications = 20)
         {
-            var width = size.Item1;
-            var height = size.Item2;
+            var width = size.x;
+            var height = size.y;
 
             if (shape == DungeonRoomShape.Random)
             {
@@ -178,9 +179,9 @@ namespace Fluid.Roguelike.Dungeon
                         Debug.Log($"Spawn first room[{room.Id}] ([{room.X},{room.Y}], {room.Shape}:{room.Width}x{room.Height}:{room.Theme})\n");
                     }
 
-                    if (IsOccupied.ContainsKey(new Tuple<int, int>(room.X, room.Y)) == false)
+                    if (IsOccupied.ContainsKey(new int2(room.X, room.Y)) == false)
                     {
-                        IsOccupied.Add(new Tuple<int, int>(room.X, room.Y), true);
+                        IsOccupied.Add(new int2(room.X, room.Y), true);
                     }
 
                     context.RoomStack.Push(room);
@@ -253,13 +254,13 @@ namespace Fluid.Roguelike.Dungeon
             var result = context.Factory.CreateList<BuilderDirection>();
             result.Clear();
 
-            if(IsOccupied.ContainsKey(new Tuple<int, int>(r.X,r.Y-1)) == false)
+            if(IsOccupied.ContainsKey(new int2(r.X,r.Y-1)) == false)
                 result.Add(BuilderDirection.North);
-            if (IsOccupied.ContainsKey(new Tuple<int, int>(r.X+1, r.Y)) == false)
+            if (IsOccupied.ContainsKey(new int2(r.X+1, r.Y)) == false)
                 result.Add(BuilderDirection.East);
-            if (IsOccupied.ContainsKey(new Tuple<int, int>(r.X, r.Y+1)) == false)
+            if (IsOccupied.ContainsKey(new int2(r.X, r.Y+1)) == false)
                 result.Add(BuilderDirection.South);
-            if (IsOccupied.ContainsKey(new Tuple<int, int>(r.X-1, r.Y)) == false)
+            if (IsOccupied.ContainsKey(new int2(r.X-1, r.Y)) == false)
                 result.Add(BuilderDirection.West);
 
             return result;
@@ -403,8 +404,8 @@ namespace Fluid.Roguelike.Dungeon
                     ChangeBuilderDirection(BuilderDirection.Random);
                     Random();
                     {
-                        SpawnRoom(new Tuple<int, int>(2, 8), DungeonRoomShape.Rectangular, false);
-                        SpawnRoom(new Tuple<int, int>(8, 2), DungeonRoomShape.Rectangular, false);
+                        SpawnRoom(new int2(2, 8), DungeonRoomShape.Rectangular, false);
+                        SpawnRoom(new int2(8, 2), DungeonRoomShape.Rectangular, false);
                     }
                     End();
                     SpawnRoom(4, 8, DungeonRoomShape.Rectangular, false);
@@ -420,8 +421,8 @@ namespace Fluid.Roguelike.Dungeon
                     EndRepeat();
                     Random();
                     {
-                        SpawnRoom(new Tuple<int, int>(2, 8), DungeonRoomShape.Rectangular, false);
-                        SpawnRoom(new Tuple<int, int>(8, 2), DungeonRoomShape.Rectangular, false);
+                        SpawnRoom(new int2(2, 8), DungeonRoomShape.Rectangular, false);
+                        SpawnRoom(new int2(8, 2), DungeonRoomShape.Rectangular, false);
                     }
                     End();
                     {

@@ -3,8 +3,11 @@
     public enum CharacterWorldState
     {
         HasBumpTarget,
+        HasEnemyTarget,
+        HasEnemyTargetInMeleeRange,
         IsStunned,
         IsConfused,
         IsDrunk,
+        LastMoveResult,
     }
 }

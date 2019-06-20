@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Fluid.Roguelike.AI;
+using Fluid.Roguelike.Character.Sensory;
+using Fluid.Roguelike.Character.Stats;
 using UnityEngine;
 
 namespace Fluid.Roguelike.Database
@@ -13,21 +15,19 @@ namespace Fluid.Roguelike.Database
 
         public string Race => _race;
 
-        public Sprite Find(string name, out Color color, out CharacterDomainDefinition brain)
+        public bool Find(string name, out CharacterDbEntry character)
         {
             foreach (var entry in _db)
             {
                 if (entry.Name == name)
                 {
-                    color = entry.Color;
-                    brain = entry.Brain;
-                    return entry.Sprite;
+                    character = entry;
+                    return true;
                 }
             }
 
-            color = Color.white;
-            brain = null;
-            return default(Sprite);
+            character = null;
+            return false;
         }
     }
 
@@ -38,7 +38,30 @@ namespace Fluid.Roguelike.Database
         public Sprite Sprite;
         public Color Color = UnityEngine.Color.white;
         public CharacterDomainDefinition Brain;
+
+        public List<SensorTypes> Sensors;
+        public List<StatDbEntry> Stats = new List<StatDbEntry>
+        {
+            new StatDbEntry
+            {
+                Type = StatType.Health,
+                Value = 1,
+            },
+            new StatDbEntry
+            {
+                Type = StatType.Sight,
+                Value = 6,
+            },
+        };
+
         //TODO: Extend with more data later
+    }
+
+    [Serializable]
+    public class StatDbEntry
+    {
+        public StatType Type;
+        public int Value;
     }
 
     [CreateAssetMenu(fileName = "Character Database Manager", menuName = "Content/Character Database Manager")]
@@ -46,19 +69,18 @@ namespace Fluid.Roguelike.Database
     {
         [SerializeField] private List<CharacterDatabase> _dbs = new List<CharacterDatabase>();
 
-        public Sprite Find(string race, string name, out Color color, out CharacterDomainDefinition brain)
+        public bool Find(string race, string name, out CharacterDbEntry output)
         {
             foreach (var db in _dbs)
             {
                 if (db.Race == race)
                 {
-                    return db.Find(name, out color, out brain);
+                    return db.Find(name, out output);
                 }
             }
 
-            color = Color.white;
-            brain = null;
-            return default(Sprite);
+            output = null;
+            return false;
         }
     }
 }
