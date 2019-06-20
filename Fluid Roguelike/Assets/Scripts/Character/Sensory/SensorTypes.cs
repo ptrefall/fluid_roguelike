@@ -3,5 +3,6 @@
     public enum SensorTypes
     {
         Sight,
+        MeleeRange,
     }
 }

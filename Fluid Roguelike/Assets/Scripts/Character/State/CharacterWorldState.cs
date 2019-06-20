@@ -2,6 +2,7 @@
 {
     public enum CharacterWorldState
     {
+        HasConsumedTurn,
         HasBumpTarget,
         HasEnemyTarget,
         HasEnemyTargetInMeleeRange,

@@ -28,33 +28,34 @@ namespace Fluid.Roguelike.AI.Operators
                 //TODO: Replace with A*
                 UnityEngine.Debug.Log("Move to target!");
                 var dir = c.CurrentEnemyTarget.Position - c.Self.Position;
-                if (dir.x > dir.y)
+                if (UnityEngine.Mathf.Abs(dir.x) > UnityEngine.Mathf.Abs(dir.y))
                 {
-                    dir.x = 1;
+                    if (dir.x > 0) dir.x = 1; else dir.x = -1;
                     dir.y = 0;
                 }
-                else if(dir.x < dir.y)
+                else if(UnityEngine.Mathf.Abs(dir.x) < UnityEngine.Mathf.Abs(dir.y))
                 {
                     dir.x = 0;
-                    dir.y = 1;
+                    if (dir.y > 0) dir.y = 1; else dir.y = -1;
                 }
                 else if (math.lengthsq(dir) > 0)
                 {
                     if (Random.value < 0.5f)
                     {
-                        dir.x = 1;
+                        if (dir.x > 0) dir.x = 1; else dir.x = -1;
                         dir.y = 0;
                     }
                     else
                     {
                         dir.x = 0;
-                        dir.y = 1;
+                        if (dir.y > 0) dir.y = 1; else dir.y = -1;
                     }
                 }
 
                 var result = c.Self.Move(dir, false);
                 if (result == MoveResult.Moved)
                 {
+                    c.SetState(CharacterWorldState.HasConsumedTurn, true, EffectType.Permanent);
                     return TaskStatus.Success;
                 }
                 else

@@ -22,7 +22,14 @@ namespace Fluid.Roguelike
 
             if (_brain != null)
             {
-                _brainHandler.Tick(_brain, Character.Context);
+                int steps = 0;
+                Character.Context.SetState(CharacterWorldState.HasConsumedTurn, false, EffectType.Permanent);
+                while (Character.Context.HasState(CharacterWorldState.HasConsumedTurn) == false)
+                {
+                    steps++;
+                    _brainHandler.Tick(_brain, Character.Context);
+                    if (steps > 10) break;
+                }
             }
 
             ConsumeTurn(dungeon);

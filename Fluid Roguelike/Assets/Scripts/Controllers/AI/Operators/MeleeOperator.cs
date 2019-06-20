@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Fluid.Roguelike.Character.State;
 using FluidHTN;
 using FluidHTN.Operators;
 
@@ -20,8 +21,14 @@ namespace Fluid.Roguelike.AI.Operators
 
         public TaskStatus Update(IContext ctx)
         {
-            UnityEngine.Debug.Log("Hit target!");
-            return TaskStatus.Success;
+            if (ctx is CharacterContext c)
+            {
+                UnityEngine.Debug.Log("Hit target!");
+                c.SetState(CharacterWorldState.HasConsumedTurn, true, EffectType.Permanent);
+                return TaskStatus.Success;
+            }
+
+            return TaskStatus.Failure;
         }
 
         public void Stop(IContext ctx)
