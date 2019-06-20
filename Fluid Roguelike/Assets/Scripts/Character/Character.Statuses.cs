@@ -1,6 +1,8 @@
 ﻿
 using System.Collections.Generic;
 using Fluid.Roguelike.Actions;
+using Fluid.Roguelike.Character.State;
+using FluidHTN;
 using UnityEngine;
 
 namespace Fluid.Roguelike.Character
@@ -64,6 +66,7 @@ namespace Fluid.Roguelike.Character
             if (status != null)
             {
                 _permanentStatuses.Add(status);
+                UpdateWorldState(statusType, true);
             }
         }
 
@@ -74,6 +77,7 @@ namespace Fluid.Roguelike.Character
                 if (s.Type == statusType)
                 {
                     _permanentStatuses.Remove(s);
+                    UpdateWorldState(statusType, false);
                     return;
                 }
             }
@@ -97,6 +101,7 @@ namespace Fluid.Roguelike.Character
             {
                 status.Life = numTurns;
                 _timedStatuses.Add(status);
+                UpdateWorldState(statusType, true);
             }
         }
 
@@ -107,12 +112,13 @@ namespace Fluid.Roguelike.Character
                 if (s.Type == statusType)
                 {
                     _timedStatuses.Remove(s);
+                    UpdateWorldState(statusType, false);
                     return;
                 }
             }
         }
 
-        public void TickTurn()
+        public void TickTurn_Status()
         {
             for(var i = 0; i < _timedStatuses.Count; i++)
             {
@@ -122,6 +128,8 @@ namespace Fluid.Roguelike.Character
                 {
                     _timedStatuses.RemoveAt(i);
                     i--;
+
+                    UpdateWorldState(s.Type, false);
                 }
             }
         }
@@ -142,6 +150,22 @@ namespace Fluid.Roguelike.Character
 
             consumed = false;
             return move;
+        }
+
+        private void UpdateWorldState(CharacterStatusType statusType, bool added)
+        {
+            switch (statusType)
+            {
+                case CharacterStatusType.Stunned:
+                    Context.SetState(CharacterWorldState.IsStunned, added, EffectType.Permanent);
+                    break;
+                case CharacterStatusType.Confused:
+                    Context.SetState(CharacterWorldState.IsConfused, added, EffectType.Permanent);
+                    break;
+                case CharacterStatusType.Drunk:
+                    Context.SetState(CharacterWorldState.IsDrunk, added, EffectType.Permanent);
+                    break;
+            }
         }
     }
 }

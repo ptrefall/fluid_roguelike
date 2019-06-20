@@ -8,7 +8,7 @@ namespace Fluid.Roguelike
 {
     public enum MoveDirection { None, N, E, S, W };
 
-    public abstract class CharacterController : IInteractible
+    public abstract class CharacterController : IBumpTarget
     {
         private Character.Character _character;
 
@@ -25,7 +25,7 @@ namespace Fluid.Roguelike
         {
             if (_character != null)
             {
-                _character.TickTurn();
+                _character.TickTurn_Status();
             }
         }
 
@@ -62,9 +62,17 @@ namespace Fluid.Roguelike
             }
 
             // Check collision in direction that should trigger interaction instead
-            if (dungeon.TryGetInteractible(targetKey, hitPlayer: !isPlayer) != null)
+            var bumpTarget = dungeon.TryGetBumpTarget(targetKey, hitPlayer: !isPlayer);
+            if (bumpTarget != null)
             {
-                return MoveResult.Interaction;
+                if (_character.Context.TrySetBumpTarget(bumpTarget))
+                {
+                    return MoveResult.Bump;
+                }
+                else
+                {
+                    return MoveResult.Collided;
+                }
             }
 
             _character.Translate(move);

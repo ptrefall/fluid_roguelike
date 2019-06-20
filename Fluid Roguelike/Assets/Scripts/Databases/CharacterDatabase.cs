@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
-using Fluid.Roguelike.Dungeon;
-using JetBrains.Annotations;
+using Fluid.Roguelike.AI;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Fluid.Roguelike.Database
 {
@@ -16,18 +13,20 @@ namespace Fluid.Roguelike.Database
 
         public string Race => _race;
 
-        public Sprite Find(string name, out Color color)
+        public Sprite Find(string name, out Color color, out CharacterDomainDefinition brain)
         {
             foreach (var entry in _db)
             {
-                if (entry.name == name)
+                if (entry.Name == name)
                 {
                     color = entry.Color;
+                    brain = entry.Brain;
                     return entry.Sprite;
                 }
             }
 
             color = Color.white;
+            brain = null;
             return default(Sprite);
         }
     }
@@ -35,9 +34,10 @@ namespace Fluid.Roguelike.Database
     [Serializable]
     public class CharacterDbEntry
     {
-        public string name;
+        public string Name;
         public Sprite Sprite;
         public Color Color = UnityEngine.Color.white;
+        public CharacterDomainDefinition Brain;
         //TODO: Extend with more data later
     }
 
@@ -46,17 +46,18 @@ namespace Fluid.Roguelike.Database
     {
         [SerializeField] private List<CharacterDatabase> _dbs = new List<CharacterDatabase>();
 
-        public Sprite Find(string race, string name, out Color color)
+        public Sprite Find(string race, string name, out Color color, out CharacterDomainDefinition brain)
         {
             foreach (var db in _dbs)
             {
                 if (db.Race == race)
                 {
-                    return db.Find(name, out color);
+                    return db.Find(name, out color, out brain);
                 }
             }
 
             color = Color.white;
+            brain = null;
             return default(Sprite);
         }
     }

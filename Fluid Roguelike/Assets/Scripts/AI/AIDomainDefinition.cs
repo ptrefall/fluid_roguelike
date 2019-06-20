@@ -1,7 +1,7 @@
 ﻿using FluidHTN;
 using UnityEngine;
 
-namespace Fluid.Roguelike
+namespace Fluid.Roguelike.AI
 {
     public abstract class AIDomainDefinition<T> : ScriptableObject
         where T : IContext

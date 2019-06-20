@@ -5,7 +5,7 @@
         None,
         Collided,
         Moved,
-        Interaction,
+        Bump,
         NoMoveStatusEffect,
     }
 }

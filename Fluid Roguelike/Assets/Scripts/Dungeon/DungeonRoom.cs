@@ -47,7 +47,7 @@ namespace Fluid.Roguelike.Dungeon
                     {
                         if (dungeon.ValueMap[key].Index == DungeonTile.Index.Floor)
                         {
-                            var collision = dungeon.TryGetInteractible(key, true);
+                            var collision = dungeon.TryGetBumpTarget(key, true);
                             if (collision == null)
                             {
                                 validPositions.Add(key);

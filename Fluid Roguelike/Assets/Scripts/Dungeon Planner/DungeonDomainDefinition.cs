@@ -1,4 +1,6 @@
-﻿using Fluid.Roguelike.Database;
+﻿
+using Fluid.Roguelike.AI;
+using Fluid.Roguelike.Database;
 using FluidHTN;
 using UnityEngine;
 

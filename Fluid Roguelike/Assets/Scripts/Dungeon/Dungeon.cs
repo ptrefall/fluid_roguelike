@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using Fluid.Roguelike.Actions;
+using Fluid.Roguelike.AI;
 using Fluid.Roguelike.Database;
 using UnityEngine;
 
@@ -91,7 +92,7 @@ namespace Fluid.Roguelike.Dungeon
             }
         }
 
-        public IInteractible TryGetInteractible(Tuple<int, int> position, bool hitPlayer)
+        public IBumpTarget TryGetBumpTarget(Tuple<int, int> position, bool hitPlayer)
         {
             if (hitPlayer)
             {
@@ -114,13 +115,17 @@ namespace Fluid.Roguelike.Dungeon
             return null;
         }
 
-        public Character.Character Spawn(string race, string name, Vector3 position)
+        public Character.Character Spawn(string race, string name, Vector3 position, out CharacterDomainDefinition brain)
         {
             var character = GameObject.Instantiate(_characterPrefab);
             if (_characterDb)
             {
-                character.View.sprite = _characterDb.Find(race, name, out var playerColor);
+                character.View.sprite = _characterDb.Find(race, name, out var playerColor, out brain);
                 character.View.color = playerColor;
+            }
+            else
+            {
+                brain = null;
             }
 
             character.transform.position = position;
@@ -130,10 +135,9 @@ namespace Fluid.Roguelike.Dungeon
 
         public PlayerController SpawnPlayer(string race, string name, DungeonSpawnMeta meta)
         {
-            var controller = new PlayerController();
             // TODO: Need to look up spawn position in room, that we ensure valid positions
             var pos = new Vector3(meta.SpawnRoom.CenterX, meta.SpawnRoom.CenterY, 0);
-            var character = Spawn(race, name, pos);
+            var character = Spawn(race, name, pos, out var brain);
 
             var cameraBrain = Camera.main.GetComponent<CinemachineBrain>();
             if (cameraBrain != null && cameraBrain.ActiveVirtualCamera != null)
@@ -142,6 +146,7 @@ namespace Fluid.Roguelike.Dungeon
                 cameraBrain.ActiveVirtualCamera.Follow = character.transform;
             }
 
+            var controller = new PlayerController();
             controller.Set(character);
             return controller;
         }
@@ -157,9 +162,11 @@ namespace Fluid.Roguelike.Dungeon
             if (key == null)
                 return null;
 
-            var controller = new AIController();
             var pos = new Vector3(key.Item1, key.Item2, 0);
-            controller.Set(Spawn(meta.Race, meta.Name, pos));
+            var character = Spawn(meta.Race, meta.Name, pos, out var brain);
+
+            var controller = new AIController(brain);
+            controller.Set(character);
             return controller;
         }
 

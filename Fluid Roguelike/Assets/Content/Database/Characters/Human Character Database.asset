@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _race: human
   _db:
-  - name: player
+  - Name: 
     Sprite: {fileID: -2498970910985527441, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
       type: 3}
     Color: {r: 1, g: 1, b: 1, a: 1}
+    Brain: {fileID: 11400000, guid: 5fbc0e525ca259f46ace5918d6a08752, type: 2}

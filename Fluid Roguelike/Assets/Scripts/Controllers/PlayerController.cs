@@ -35,16 +35,11 @@ namespace Fluid.Roguelike
                 return;
             }
 
-            if (result == MoveResult.Interaction)
+            if (result == MoveResult.Bump)
             {
-                // TODO: Do interaction in dir
-                var move = DirectionToVec(dir);
-                var pos = Position;
-                var targetPosition = new Tuple<int, int>(pos.Item1 + (int) move.x, pos.Item2 + (int) move.y);
-                var interactible = dungeon.TryGetInteractible(targetPosition, hitPlayer: false);
-                if (interactible != null)
+                if (Character.Context.CurrentBumpTarget != null)
                 {
-                    Debug.Log("Get drunk!");
+                    Debug.Log("Git drunk!");
                     Character.AddTimedStatus(CharacterStatusType.Drunk, 10);
                     forceKeyDown = true;
                 }
