@@ -1,9 +1,6 @@
 ﻿
-using System;
 using Fluid.Roguelike.Actions;
-using Fluid.Roguelike.Dungeon;
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace Fluid.Roguelike
 {
@@ -16,7 +13,7 @@ namespace Fluid.Roguelike
         public int2 Position => _character.Position;
         public Character.Character Character => _character;
 
-        public void Set(Character.Character character)
+        public virtual void Set(Character.Character character)
         {
             _character = character;
         }

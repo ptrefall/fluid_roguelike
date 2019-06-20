@@ -1,10 +1,8 @@
-﻿using System;
+﻿
 using System.Collections;
 using System.Collections.Generic;
-using Cinemachine;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.AI;
-using Fluid.Roguelike.Character.Sensory;
 using Fluid.Roguelike.Database;
 using Unity.Mathematics;
 using UnityEngine;
@@ -33,8 +31,8 @@ namespace Fluid.Roguelike.Dungeon
 
         public Dictionary<int2, DungeonTile> Tiles { get; } = new Dictionary<int2, DungeonTile>();
         public Dictionary<int2, MapValue> ValueMap { get; } = new Dictionary<int2, MapValue>();
-        private List<DungeonRoom> _rooms = new List<DungeonRoom>();
-        private List<DungeonArea> _areas = new List<DungeonArea>();
+        private readonly List<DungeonRoom> _rooms = new List<DungeonRoom>();
+        private readonly List<DungeonArea> _areas = new List<DungeonArea>();
 
         private void Start()
         {
@@ -105,10 +103,13 @@ namespace Fluid.Roguelike.Dungeon
         {
             if (hitPlayer)
             {
-                var equality = (_playerController.Position == position);
-                if (equality.x && equality.y)
+                if (_playerController != null)
                 {
-                    return _playerController.Character;
+                    var equality = (_playerController.Position == position);
+                    if (equality.x && equality.y)
+                    {
+                        return _playerController.Character;
+                    }
                 }
             }
 
@@ -160,19 +161,23 @@ namespace Fluid.Roguelike.Dungeon
 
         public PlayerController SpawnPlayer(string race, string name, DungeonSpawnMeta meta)
         {
-            // TODO: Need to look up spawn position in room, that we ensure valid positions
-            var character = Spawn(race, name, new int2(meta.SpawnRoom.CenterX, meta.SpawnRoom.CenterY), out var brain);
+            var room = GetRoom(meta.SpawnRoom);
+            if (room == null)
+                return null;
 
-            var cameraBrain = Camera.main.GetComponent<CinemachineBrain>();
-            if (cameraBrain != null && cameraBrain.ActiveVirtualCamera != null)
+            if (room.GetValidSpawnPosition(this, out var position) == false)
+                return null;
+
+            // TODO: Need to look up spawn position in room, that we ensure valid positions
+            var character = Spawn(race, name, position, out var brain);
+            if (character != null)
             {
-                cameraBrain.ActiveVirtualCamera.LookAt = character.transform;
-                cameraBrain.ActiveVirtualCamera.Follow = character.transform;
+                var controller = new PlayerController();
+                controller.Set(character);
+                return controller;
             }
 
-            var controller = new PlayerController();
-            controller.Set(character);
-            return controller;
+            return null;
         }
 
         public AIController SpawnAi(DungeonSpawnNpcMeta meta)
@@ -185,10 +190,14 @@ namespace Fluid.Roguelike.Dungeon
                 return null;
 
             var character = Spawn(meta.Race, meta.Name, position, out var brain);
+            if (character != null)
+            {
+                var controller = new AIController(brain);
+                controller.Set(character);
+                return controller;
+            }
 
-            var controller = new AIController(brain);
-            controller.Set(character);
-            return controller;
+            return null;
         }
 
         public DungeonRoom GetRoom(DungeonRoomMeta meta)

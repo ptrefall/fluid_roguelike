@@ -1,5 +1,5 @@
 ﻿
-using System;
+using Cinemachine;
 using Fluid.Roguelike.Actions;
 using UnityEngine;
 
@@ -12,6 +12,18 @@ namespace Fluid.Roguelike
         private KeyCode lastKey = KeyCode.Escape;
 
         private const float keyPause = 0.15f;
+
+        public override void Set(Character.Character character)
+        {
+            base.Set(character);
+
+            var cameraBrain = Camera.main.GetComponent<CinemachineBrain>();
+            if (cameraBrain != null && cameraBrain.ActiveVirtualCamera != null)
+            {
+                cameraBrain.ActiveVirtualCamera.LookAt = character.transform;
+                cameraBrain.ActiveVirtualCamera.Follow = character.transform;
+            }
+        }
 
         public override void Tick(Dungeon.Dungeon dungeon)
         {
