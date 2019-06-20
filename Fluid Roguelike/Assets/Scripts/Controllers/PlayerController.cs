@@ -27,6 +27,16 @@ namespace Fluid.Roguelike
 
         public override void Tick(Dungeon.Dungeon dungeon)
         {
+            // Cheats
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                Character.AddTimedStatus(CharacterStatusType.Stunned, 2);
+                Debug.Log($"{Character.name} got stunned!");
+                return;
+            }
+
+            // Logic
+
             MoveResult result = MoveResult.None;
             MoveDirection dir = CheckMoveInput();
 
@@ -51,8 +61,10 @@ namespace Fluid.Roguelike
             {
                 if (Character.Context.CurrentBumpTarget != null)
                 {
-                    Debug.Log("Git drunk!");
-                    Character.AddTimedStatus(CharacterStatusType.Drunk, 10);
+                    if (Character.Context.CurrentBumpTarget is Character.Character c)
+                    {
+                        Character.Melee(c);
+                    }
                     forceKeyDown = true;
                 }
                 else
@@ -72,7 +84,6 @@ namespace Fluid.Roguelike
         {
             if (forceKeyDown)
             {
-                forceKeyDown = false;
                 return CheckMoveInputKeyDown();
             }
 
@@ -134,18 +145,30 @@ namespace Fluid.Roguelike
             var dir = MoveDirection.None;
             if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
             {
+                lastKey = KeyCode.W;
+                nextSameKeyTime = Time.time + keyPause;
+                forceKeyDown = false;
                 dir = MoveDirection.N;
             }
             else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
             {
+                lastKey = KeyCode.D;
+                nextSameKeyTime = Time.time + keyPause;
+                forceKeyDown = false;
                 dir = MoveDirection.E;
             }
             else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
             {
+                lastKey = KeyCode.S;
+                nextSameKeyTime = Time.time + keyPause;
+                forceKeyDown = false;
                 dir = MoveDirection.S;
             }
             else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
+                lastKey = KeyCode.A;
+                nextSameKeyTime = Time.time + keyPause;
+                forceKeyDown = false;
                 dir = MoveDirection.W;
             }
 

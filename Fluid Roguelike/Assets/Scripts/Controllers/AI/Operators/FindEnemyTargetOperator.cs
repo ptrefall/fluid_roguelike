@@ -11,6 +11,7 @@ namespace Fluid.Roguelike.AI.Operators
         {
             if (ctx is CharacterContext c)
             {
+                bool hasTarget = c.CurrentEnemyTarget != null;
                 c.CurrentEnemyTarget = null;
 
                 if (c.KnownEnemies.Count == 0)
@@ -31,9 +32,13 @@ namespace Fluid.Roguelike.AI.Operators
                 }
 
                 c.SetState(CharacterWorldState.HasEnemyTarget, c.CurrentEnemyTarget != null, EffectType.Permanent);
-                if (c.CurrentEnemyTarget != null)
+                if (c.CurrentEnemyTarget != null && !hasTarget)
                 {
                     UnityEngine.Debug.Log("Found enemy target!");
+                }
+                else if(c.CurrentEnemyTarget == null && hasTarget)
+                {
+                    UnityEngine.Debug.Log("Lost enemy target!");
                 }
 
                 return c.CurrentEnemyTarget != null ? TaskStatus.Success : TaskStatus.Failure;

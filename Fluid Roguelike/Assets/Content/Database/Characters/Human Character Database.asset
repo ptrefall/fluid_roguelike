@@ -20,4 +20,8 @@ MonoBehaviour:
     Color: {r: 1, g: 1, b: 1, a: 1}
     Brain: {fileID: 11400000, guid: 5fbc0e525ca259f46ace5918d6a08752, type: 2}
     Sensors: 
-    Stats: []
+    Stats:
+    - Type: 0
+      Value: 10
+    - Type: 1
+      Value: 10

@@ -23,7 +23,8 @@ namespace Fluid.Roguelike.AI.Operators
         {
             if (ctx is CharacterContext c)
             {
-                UnityEngine.Debug.Log("Hit target!");
+                c.Self.Melee(c.CurrentEnemyTarget);
+
                 c.SetState(CharacterWorldState.HasConsumedTurn, true, EffectType.Permanent);
                 return TaskStatus.Success;
             }

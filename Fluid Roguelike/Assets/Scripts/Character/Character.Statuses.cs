@@ -86,6 +86,7 @@ namespace Fluid.Roguelike.Character
 
         public void AddTimedStatus(CharacterStatusType statusType, int numTurns)
         {
+            numTurns++;
             foreach (var s in _timedStatuses)
             {
                 if (s.Type == statusType)

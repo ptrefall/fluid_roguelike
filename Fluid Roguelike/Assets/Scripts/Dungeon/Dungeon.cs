@@ -134,6 +134,8 @@ namespace Fluid.Roguelike.Dungeon
                 character.Context.Dungeon = this;
             }
 
+            character.name = $"{race} {name}";
+
             if (_characterDb)
             {
                 if (_characterDb.Find(race, name, out var data))

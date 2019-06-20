@@ -75,6 +75,7 @@ namespace Fluid.Roguelike.AI
             Action("Melee enemy");
             if (Pointer is IPrimitiveTask task)
             {
+                HasState(CharacterWorldState.IsStunned, 0);
                 HasState(CharacterWorldState.HasEnemyTargetInMeleeRange);
                 task.SetOperator(new MeleeOperator(MeleeOperator.TargetType.Enemy));
             }
