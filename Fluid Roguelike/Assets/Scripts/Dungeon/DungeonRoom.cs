@@ -476,7 +476,19 @@ namespace Fluid.Roguelike.Dungeon
             var adjacent = dungeon.ValueMap[adjacentKey];
             if (adjacent.Theme != theme)
             {
-                dungeon.ValueMap[key].Index = DungeonTile.Index.Wall;
+                // If we're at a forest tile and the adjacent tile is already a wall, we don't always want to place a forest wall tile.
+                if (adjacent.Index == DungeonTile.Index.Wall && value.Theme == DungeonTheme.Forest)
+                {
+                    if (Random.value < 0.4f)
+                    {
+                        dungeon.ValueMap[key].Index = DungeonTile.Index.Wall;
+                    }
+                }
+                else
+                {
+                    dungeon.ValueMap[key].Index = DungeonTile.Index.Wall;
+                }
+
                 if (room.ConnectionMap.ContainsKey(key) == false)
                 {
                     var adjacentRoom = dungeon.GetRoom(adjacentKey);
@@ -485,6 +497,13 @@ namespace Fluid.Roguelike.Dungeon
                         room.ConnectionMap.Add(key, new Tuple<int2, DungeonRoom>(
                             adjacentKey,
                             adjacentRoom));
+
+                        if (adjacentRoom.ConnectionMap.ContainsKey(adjacentKey) == false)
+                        {
+                            adjacentRoom.ConnectionMap.Add(adjacentKey, new Tuple<int2, DungeonRoom>(
+                                key,
+                                room));
+                        }
                     }
                 }
             }
