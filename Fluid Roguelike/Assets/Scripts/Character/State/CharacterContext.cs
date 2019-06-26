@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Fluid.Roguelike.Actions;
 using FluidHTN;
 using FluidHTN.Contexts;
+using Unity.Mathematics;
 
 namespace Fluid.Roguelike.Character.State
 {
@@ -14,6 +16,8 @@ namespace Fluid.Roguelike.Character.State
         public List<Character> KnownEnemies = new List<Character>();
         public List<Character> KnownFriends = new List<Character>();
         public List<Character> KnownNeutrals = new List<Character>();
+
+        public Dictionary<int2, float> FieldOfView = new Dictionary<int2, float>();
 
         public Character CurrentEnemyTarget { get; set; }
 

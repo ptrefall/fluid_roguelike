@@ -4,5 +4,6 @@
     {
         Sight,
         MeleeRange,
+        FieldOfView,
     }
 }

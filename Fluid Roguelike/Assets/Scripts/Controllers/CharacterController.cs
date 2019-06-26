@@ -1,4 +1,5 @@
 ﻿
+using System.Runtime.Remoting.Messaging;
 using Fluid.Roguelike.Actions;
 using Unity.Mathematics;
 
@@ -56,6 +57,35 @@ namespace Fluid.Roguelike
             }
 
             return move;
+        }
+
+        public static MoveDirection VecToDirection(int2 dir)
+        {
+            if (UnityEngine.Mathf.Abs(dir.x) > UnityEngine.Mathf.Abs(dir.y))
+            {
+                if (dir.x > 0) return MoveDirection.E;
+                else return MoveDirection.W;
+            }
+            else if (UnityEngine.Mathf.Abs(dir.x) < UnityEngine.Mathf.Abs(dir.y))
+            {
+                if (dir.y > 0) return MoveDirection.N;
+                else return MoveDirection.S;
+            }
+            else if (math.lengthsq(dir) > 0)
+            {
+                if (UnityEngine.Random.value < 0.5f)
+                {
+                    if (dir.x > 0) return MoveDirection.E;
+                    else return MoveDirection.W;
+                }
+                else
+                {
+                    if (dir.y > 0) return MoveDirection.N;
+                    else return MoveDirection.S;
+                }
+            }
+
+            return MoveDirection.None;
         }
     }
 }

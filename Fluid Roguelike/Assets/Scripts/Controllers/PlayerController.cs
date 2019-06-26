@@ -91,12 +91,16 @@ namespace Fluid.Roguelike
         {
             if (Character != null)
             {
-                var sightSq = Character.Sight;
-                sightSq *= sightSq;
                 foreach (var tile in dungeon.Tiles)
                 {
-                    var distSq = math.distancesq(Character.Position, tile.Key);
-                    tile.Value.Visibility(distSq <= sightSq);
+                    if (Character.Context.FieldOfView.ContainsKey(tile.Key))
+                    {
+                        tile.Value.Visibility(true);
+                    }
+                    else
+                    {
+                        tile.Value.Visibility(false);
+                    }
                 }
 
                 foreach (var character in dungeon.Characters)
@@ -104,8 +108,14 @@ namespace Fluid.Roguelike
                     if (character == Character)
                         continue;
 
-                    var distSq = math.distancesq(Character.Position, character.Position);
-                    character.Visibility(distSq <= sightSq);
+                    if (Character.Context.FieldOfView.ContainsKey(character.Position))
+                    {
+                        character.Visibility(true);
+                    }
+                    else
+                    {
+                        character.Visibility(false);
+                    }
                 }
             }
         }

@@ -184,6 +184,13 @@ namespace Fluid.Roguelike.Dungeon
                     }
                 }
             }
+
+            foreach (var character in Characters)
+            {
+                character.TickTurn_Sensors();
+            }
+
+            _playerController?.UpdateVisibility(this);
         }
 
         public IBumpTarget TryGetBumpTarget(int2 position, bool hitPlayer)
@@ -264,7 +271,6 @@ namespace Fluid.Roguelike.Dungeon
             {
                 var controller = new PlayerController();
                 controller.Set(character);
-                controller.UpdateVisibility(this);
                 return controller;
             }
 
@@ -326,6 +332,62 @@ namespace Fluid.Roguelike.Dungeon
             }
 
             return null;
+        }
+
+        public int GetMinX()
+        {
+            var x = int.MaxValue;
+            foreach (var p in ValueMap)
+            {
+                if (p.Key.x < x)
+                {
+                    x = p.Key.x;
+                }
+            }
+
+            return x;
+        }
+
+        public int GetMaxX()
+        {
+            var x = int.MinValue;
+            foreach (var p in ValueMap)
+            {
+                if (p.Key.x > x)
+                {
+                    x = p.Key.x;
+                }
+            }
+
+            return x;
+        }
+
+        public int GetMinY()
+        {
+            var y = int.MaxValue;
+            foreach (var p in ValueMap)
+            {
+                if (p.Key.y < y)
+                {
+                    y = p.Key.y;
+                }
+            }
+
+            return y;
+        }
+
+        public int GetMaxY()
+        {
+            var y = int.MinValue;
+            foreach (var p in ValueMap)
+            {
+                if (p.Key.y > y)
+                {
+                    y = p.Key.y;
+                }
+            }
+
+            return y;
         }
 
         private void Update()
