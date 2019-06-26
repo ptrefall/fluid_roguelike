@@ -613,6 +613,7 @@ namespace Fluid.Roguelike.Dungeon
                 dungeon.Tiles.Add(kvp.Key, tile);
 
                 SetSprite(tile.GroundLayer, kvp.Value, IsEdge(dungeon, kvp.Key), IsBorder(dungeon, kvp.Key));
+                tile.Visibility(false);
             }
         }
 

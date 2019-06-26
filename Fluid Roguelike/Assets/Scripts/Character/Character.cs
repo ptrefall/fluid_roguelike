@@ -27,5 +27,10 @@ namespace Fluid.Roguelike.Character
         {
             transform.Translate(new Vector3(move.x, move.y, 0));
         }
+
+        public void Visibility(bool isVisible)
+        {
+            View.gameObject.SetActive(isVisible);
+        }
     }
 }

@@ -264,6 +264,7 @@ namespace Fluid.Roguelike.Dungeon
             {
                 var controller = new PlayerController();
                 controller.Set(character);
+                controller.UpdateVisibility(this);
                 return controller;
             }
 

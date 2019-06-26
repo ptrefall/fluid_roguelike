@@ -21,5 +21,13 @@ namespace Fluid.Roguelike.Dungeon
         {
             _groundLayer.sprite = ground;
         }
+
+        public void Visibility(bool isVisible)
+        {
+            if (GroundLayer != null)
+            {
+                GroundLayer.gameObject.SetActive(isVisible);
+            }
+        }
     }
 }

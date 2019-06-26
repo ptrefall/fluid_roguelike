@@ -2,6 +2,7 @@
 using Cinemachine;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.State;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Fluid.Roguelike
@@ -82,6 +83,31 @@ namespace Fluid.Roguelike
 
             ConsumeTurn(dungeon);
             Character.TickTurn_Sensors();
+
+            UpdateVisibility(dungeon);
+        }
+
+        public void UpdateVisibility(Dungeon.Dungeon dungeon)
+        {
+            if (Character != null)
+            {
+                var sightSq = Character.Sight;
+                sightSq *= sightSq;
+                foreach (var tile in dungeon.Tiles)
+                {
+                    var distSq = math.distancesq(Character.Position, tile.Key);
+                    tile.Value.Visibility(distSq <= sightSq);
+                }
+
+                foreach (var character in dungeon.Characters)
+                {
+                    if (character == Character)
+                        continue;
+
+                    var distSq = math.distancesq(Character.Position, character.Position);
+                    character.Visibility(distSq <= sightSq);
+                }
+            }
         }
 
         private MoveDirection CheckMoveInput()
