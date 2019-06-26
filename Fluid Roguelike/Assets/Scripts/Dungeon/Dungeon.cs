@@ -16,6 +16,7 @@ namespace Fluid.Roguelike.Dungeon
             public DungeonTile.Index Index { get; set; }
             public DungeonTheme Theme { get; set; }
             public bool IsSpecial { get; set; } = false;
+            public DungeonRoom Room { get; set; }
         }
 
         [SerializeField] private DungeonAgent _agent;
@@ -31,8 +32,8 @@ namespace Fluid.Roguelike.Dungeon
 
         public Dictionary<int2, DungeonTile> Tiles { get; } = new Dictionary<int2, DungeonTile>();
         public Dictionary<int2, MapValue> ValueMap { get; } = new Dictionary<int2, MapValue>();
-        private readonly List<DungeonRoom> _rooms = new List<DungeonRoom>();
-        private readonly List<DungeonArea> _areas = new List<DungeonArea>();
+        public readonly List<DungeonRoom> Rooms = new List<DungeonRoom>();
+        public readonly List<DungeonArea> Areas = new List<DungeonArea>();
 
         private void Start()
         {
@@ -42,10 +43,10 @@ namespace Fluid.Roguelike.Dungeon
                 var room = GameObject.Instantiate(_dungeonRoomPrefab);
                 room.SetMeta(meta);
                 room.GenerateMapValues(this, 0);
-                _rooms.Add(room);
+                Rooms.Add(room);
 
                 var foundArea = false;
-                foreach (var area in _areas)
+                foreach (var area in Areas)
                 {
                     if (area.Theme == meta.Theme && area.IsConnectedTo(room))
                     {
@@ -59,18 +60,20 @@ namespace Fluid.Roguelike.Dungeon
                     var area = new GameObject(meta.Theme.ToString()).AddComponent<DungeonArea>();
                     area.Theme = meta.Theme;
                     area.Add(room);
-                    _areas.Add(area);
+                    Areas.Add(area);
                 }
             }
 
-            foreach (var room in _rooms)
+            foreach (var room in Rooms)
             {
                 room.GenerateMapValues(this, 1);
             }
 
-            _rooms[0].WallIn(this, DungeonTheme.Cave);
+            DungeonRoom.WallIn(this, DungeonTheme.Cave);
+            DungeonRoom.WallIn(this, DungeonTheme.Forest);
+            DungeonRoom.AddAreaConnections(this);
 
-            _rooms[0].AddTilesForAllMapValues(this);
+            Rooms[0].AddTilesForAllMapValues(this);
 
             StartCoroutine(SpawnContext());
         }
@@ -204,11 +207,35 @@ namespace Fluid.Roguelike.Dungeon
 
         public DungeonRoom GetRoom(DungeonRoomMeta meta)
         {
-            foreach (var room in _rooms)
+            foreach (var room in Rooms)
             {
                 if (room.Meta.Id == meta.Id)
                 {
                     return room;
+                }
+            }
+
+            return null;
+        }
+
+        public DungeonRoom GetRoom(int2 position)
+        {
+            foreach (var room in Rooms)
+            {
+                if (room.ValueMap.ContainsKey(position))
+                    return room;
+            }
+
+            return null;
+        }
+
+        public DungeonArea GetArea(DungeonRoom room)
+        {
+            foreach (var area in Areas)
+            {
+                if (area.IsInArea(room))
+                {
+                    return area;
                 }
             }
 

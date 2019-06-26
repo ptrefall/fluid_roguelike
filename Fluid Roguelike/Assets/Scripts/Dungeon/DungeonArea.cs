@@ -11,22 +11,23 @@ namespace Fluid.Roguelike.Dungeon
     public class DungeonArea : MonoBehaviour
     {
         public DungeonTheme Theme { get; set; }
-        public List<DungeonRoom> _rooms { get; } = new List<DungeonRoom>();
+        public List<DungeonRoom> Rooms { get; } = new List<DungeonRoom>();
+        public List<DungeonArea> Connections { get; } = new List<DungeonArea>();
 
         public void Add(DungeonRoom room)
         {
             room.transform.SetParent(transform, true);
-            _rooms.Add(room);
+            Rooms.Add(room);
         }
 
         public bool IsInArea(DungeonRoom room)
         {
-            return _rooms.Contains(room);
+            return Rooms.Contains(room);
         }
 
         public bool IsConnectedTo(DungeonRoom room)
         {
-            foreach(var r in _rooms)
+            foreach(var r in Rooms)
             {
                 foreach(var connection in r.Meta.Connections)
                 {

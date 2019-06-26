@@ -7,6 +7,7 @@ namespace Fluid.Roguelike.AI.Effects
     public class SetWorldStateEffect : IEffect
     {
         public string Name { get; }
+        public int Depth { get; set; }
         public EffectType Type { get; }
         public CharacterWorldState State { get; }
         public byte Value { get; }
@@ -39,6 +40,7 @@ namespace Fluid.Roguelike.AI.Effects
         {
             if (ctx is CharacterContext c)
             {
+                ctx.Log(Name, $"SetWorldStateEffect.Apply({State}:{Value}:{Type})", Depth, this);
                 c.SetState(State, Value, Type);
                 return;
             }

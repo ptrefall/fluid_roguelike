@@ -16,6 +16,9 @@ namespace Fluid.Roguelike.Dungeon
 
         public DungeonRoomMeta Meta => _meta;
 
+        public Dictionary<int2, Dungeon.MapValue> ValueMap { get; } = new Dictionary<int2, Dungeon.MapValue>();
+        public Dictionary<int2, Tuple<int2, DungeonRoom>> ConnectionMap { get; } = new Dictionary<int2, Tuple<int2, DungeonRoom>>();
+
         public void SetMeta(DungeonRoomMeta meta)
         {
             _meta = meta;
@@ -135,11 +138,15 @@ namespace Fluid.Roguelike.Dungeon
                     }
                     else
                     {
-                        dungeon.ValueMap.Add(key, new Dungeon.MapValue
+                        var tile = new Dungeon.MapValue
                         {
                             Theme = _meta.Theme,
-                            Index = DungeonTile.Index.Floor
-                        });
+                            Index = DungeonTile.Index.Floor,
+                            Room = this,
+                        };
+
+                        dungeon.ValueMap.Add(key, tile);
+                        ValueMap.Add(key, tile);
                     }
                 }
             }
@@ -160,19 +167,30 @@ namespace Fluid.Roguelike.Dungeon
 
                     if (dungeon.ValueMap.ContainsKey(key))
                     {
-                        if (dungeon.ValueMap[key].Index != DungeonTile.Index.Wall)
+                        var tile = dungeon.ValueMap[key];
+                        if (tile.Index != DungeonTile.Index.Wall)
                         {
-                            dungeon.ValueMap[key].Theme = _meta.Theme;
-                            dungeon.ValueMap[key].Index = DungeonTile.Index.Floor;
+                            tile.Theme = _meta.Theme;
+                            tile.Index = DungeonTile.Index.Floor;
+                            if (tile.Room.Meta.Id != Meta.Id)
+                            {
+                                tile.Room.ValueMap.Remove(key);
+                                tile.Room = this;
+                                tile.Room.ValueMap.Add(key, tile);
+                            }
                         }
                     }
                     else
                     {
-                        dungeon.ValueMap.Add(key, new Dungeon.MapValue
+                        var tile = new Dungeon.MapValue
                         {
                             Theme = _meta.Theme,
-                            Index = DungeonTile.Index.Floor
-                        });
+                            Index = DungeonTile.Index.Floor,
+                            Room = this,
+                        };
+
+                        dungeon.ValueMap.Add(key, tile);
+                        ValueMap.Add(key, tile);
                     }
                 }
             }
@@ -210,6 +228,9 @@ namespace Fluid.Roguelike.Dungeon
                         continue;
 
                     var value = dungeon.ValueMap[key];
+                    if (value.Room.Meta.Id != Meta.Id)
+                        continue;
+                    
                     if (value.Index == DungeonTile.Index.Wall)
                     {
                         if (GetAdjacentIndex(dungeon, key, BuilderDirection.East) == DungeonTile.Index.Wall &&
@@ -284,11 +305,17 @@ namespace Fluid.Roguelike.Dungeon
                     var globalKey = new int2(kvp.Key.x + _meta.CenterX, kvp.Key.y + _meta.CenterY);
                     if (dungeon.ValueMap.ContainsKey(globalKey))
                     {
+                        var oldValue = dungeon.ValueMap[globalKey];
+                        oldValue.Room.ValueMap.Remove(globalKey);
+
                         dungeon.ValueMap[globalKey] = kvp.Value;
+                        kvp.Value.Room = this;
+                        ValueMap.Add(globalKey, kvp.Value);
                     }
                     else
                     {
                         dungeon.ValueMap.Add(globalKey, kvp.Value);
+                        ValueMap.Add(globalKey, kvp.Value);
                     }
                 }
             }
@@ -354,7 +381,7 @@ namespace Fluid.Roguelike.Dungeon
             return DungeonTile.Index.Void;
         }
 
-        private int2 GetAdjacentKey(Dungeon dungeon, int2 key, BuilderDirection direction)
+        private static int2 GetAdjacentKey(Dungeon dungeon, int2 key, BuilderDirection direction)
         {
             var adjacentKey = key;
             switch (direction)
@@ -412,19 +439,22 @@ namespace Fluid.Roguelike.Dungeon
             }
         }
 
-        public void WallIn(Dungeon dungeon, DungeonTheme theme)
+        public static void WallIn(Dungeon dungeon, DungeonTheme theme)
         {
             var map = new Dictionary<int2, Dungeon.MapValue>(dungeon.ValueMap);
             foreach (var kvp in map)
             {
-                TryWallIn(dungeon, theme, kvp.Key, BuilderDirection.North);
-                TryWallIn(dungeon, theme, kvp.Key, BuilderDirection.East);
-                TryWallIn(dungeon, theme, kvp.Key, BuilderDirection.South);
-                TryWallIn(dungeon, theme, kvp.Key, BuilderDirection.West);
+                if (kvp.Value.Room == null)
+                    continue;
+
+                TryWallIn(dungeon, kvp.Value.Room, theme, kvp.Key, BuilderDirection.North);
+                TryWallIn(dungeon, kvp.Value.Room, theme, kvp.Key, BuilderDirection.East);
+                TryWallIn(dungeon, kvp.Value.Room, theme, kvp.Key, BuilderDirection.South);
+                TryWallIn(dungeon, kvp.Value.Room, theme, kvp.Key, BuilderDirection.West);
             }
         }
 
-        private void TryWallIn(Dungeon dungeon, DungeonTheme theme, int2 key, BuilderDirection direction)
+        private static void TryWallIn(Dungeon dungeon, DungeonRoom room, DungeonTheme theme, int2 key, BuilderDirection direction)
         {
             var value = dungeon.ValueMap[key];
             if (value.Theme != theme)
@@ -433,19 +463,61 @@ namespace Fluid.Roguelike.Dungeon
             var adjacentKey = GetAdjacentKey(dungeon, key, direction);
             if (dungeon.ValueMap.ContainsKey(adjacentKey) == false)
             {
-                dungeon.ValueMap.Add(adjacentKey, new Dungeon.MapValue
+                var tile = new Dungeon.MapValue
                 {
                     Theme = theme,
                     Index = DungeonTile.Index.Wall,
-                });
+                    Room = room,
+                };
+                dungeon.ValueMap.Add(adjacentKey, tile);
+                room.ValueMap.Add(adjacentKey, value);
             }
 
             var adjacent = dungeon.ValueMap[adjacentKey];
             if (adjacent.Theme != theme)
             {
-                if (Random.value < 0.9f)
+                dungeon.ValueMap[key].Index = DungeonTile.Index.Wall;
+                if (room.ConnectionMap.ContainsKey(key) == false)
                 {
-                    dungeon.ValueMap[key].Index = DungeonTile.Index.Wall;
+                    var adjacentRoom = dungeon.GetRoom(adjacentKey);
+                    if (adjacentRoom != null)
+                    {
+                        room.ConnectionMap.Add(key, new Tuple<int2, DungeonRoom>(
+                            adjacentKey,
+                            adjacentRoom));
+                    }
+                }
+            }
+        }
+
+        public static void AddAreaConnections(Dungeon dungeon)
+        {
+            foreach (var area in dungeon.Areas)
+            {
+                foreach (var room in area.Rooms)
+                {
+                    foreach (var kvp in room.ConnectionMap)
+                    {
+                        var connectedArea = dungeon.GetArea(kvp.Value.Item2);
+                        if (connectedArea != null)
+                        {
+                            if (area.Connections.Contains(connectedArea))
+                                continue;
+
+                            area.Connections.Add(connectedArea);
+                            connectedArea.Connections.Add(area);
+
+                            if (dungeon.ValueMap.ContainsKey(kvp.Key))
+                            {
+                                dungeon.ValueMap[kvp.Key].Index = DungeonTile.Index.Floor;
+                            }
+
+                            if (dungeon.ValueMap.ContainsKey(kvp.Value.Item1))
+                            {
+                                dungeon.ValueMap[kvp.Value.Item1].Index = DungeonTile.Index.Floor;
+                            }
+                        }
+                    }
                 }
             }
         }

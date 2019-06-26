@@ -8,6 +8,7 @@ namespace Fluid.Roguelike.AI.Conditions
     public class HasWorldStateCondition : ICondition
     {
         public string Name { get; }
+        public int Depth { get; set; }
         public CharacterWorldState State { get; }
         public byte Value { get; }
 
@@ -29,7 +30,9 @@ namespace Fluid.Roguelike.AI.Conditions
         {
             if (ctx is CharacterContext c)
             {
-                return c.HasState(State, Value);
+                var result = c.HasState(State, Value);
+                ctx.Log(Name, $"HasWorldStateCondition.IsValid({State}:{Value}:{result})", Depth, this);
+                return result;
             }
 
             throw new Exception("Unexpected context type!");

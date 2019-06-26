@@ -11,7 +11,7 @@ namespace Fluid.Roguelike.Character.State
         public override List<string> MTRDebug { get; set; } = new List<string>();
         public override List<string> LastMTRDebug { get; set; } = new List<string>();
         public override bool DebugMTR { get; } = true;
-        public override Stack<FluidHTN.Debug.IBaseDecompositionLogEntry> DecompositionLog { get; set; } = new Stack<FluidHTN.Debug.IBaseDecompositionLogEntry>();
+        public override Queue<FluidHTN.Debug.IBaseDecompositionLogEntry> DecompositionLog { get; set; }
         public override bool LogDecomposition { get; } = true;
 
         public override byte[] WorldState { get; } = new byte[Enum.GetValues(typeof(CharacterWorldState)).Length];
