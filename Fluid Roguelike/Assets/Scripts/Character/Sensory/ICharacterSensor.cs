@@ -7,5 +7,6 @@ namespace Fluid.Roguelike.Character.Sensory
         SensorTypes Type { get; }
 
         void Tick(CharacterContext context);
+        void Reset(CharacterContext context);
     }
 }

@@ -36,7 +36,9 @@ namespace Fluid.Roguelike.Database
     {
         public string Name;
         public Sprite Sprite;
+        public Sprite DeathSprite;
         public Color Color = UnityEngine.Color.white;
+        public Color DeathColor = UnityEngine.Color.white;
         public CharacterDomainDefinition Brain;
 
         public List<SensorTypes> Sensors;

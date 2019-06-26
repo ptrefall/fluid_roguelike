@@ -1,6 +1,7 @@
 ﻿
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.State;
+using Fluid.Roguelike.Database;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ namespace Fluid.Roguelike.Character
     {
         [SerializeField] private SpriteRenderer _view;
 
+        public CharacterDbEntry Meta { get; set; }
         public CharacterContext Context { get; private set; }
         public SpriteRenderer View => _view;
 

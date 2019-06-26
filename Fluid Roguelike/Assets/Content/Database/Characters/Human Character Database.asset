@@ -17,7 +17,10 @@ MonoBehaviour:
   - Name: naked
     Sprite: {fileID: -2498970910985527441, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
       type: 3}
+    DeathSprite: {fileID: -7770711556875768801, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
     Color: {r: 1, g: 1, b: 1, a: 1}
+    DeathColor: {r: 0.990566, g: 0.2476415, b: 0.2476415, a: 1}
     Brain: {fileID: 11400000, guid: 5fbc0e525ca259f46ace5918d6a08752, type: 2}
     Sensors: 
     Stats:

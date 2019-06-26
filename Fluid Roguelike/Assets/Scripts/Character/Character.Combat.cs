@@ -12,6 +12,8 @@ namespace Fluid.Roguelike.Character
 {
     public partial class Character
     {
+        public bool IsDead => Context.HasState(CharacterWorldState.IsDead);
+
         public bool Melee(Character target)
         {
             //TODO: Take stats and equipment into account.
@@ -30,6 +32,19 @@ namespace Fluid.Roguelike.Character
             }
 
             return true;
+        }
+
+        public void Die()
+        {
+            Context.SetState(CharacterWorldState.IsDead, true, EffectType.Permanent);
+            Reset_Sensors();
+            Reset_Status();
+
+            if (Meta != null)
+            {
+                View.sprite = Meta.DeathSprite;
+                View.color = Meta.DeathColor;
+            }
         }
     }
 }

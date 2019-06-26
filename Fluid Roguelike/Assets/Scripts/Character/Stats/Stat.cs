@@ -13,8 +13,8 @@ namespace Fluid.Roguelike.Character.Stats
 
         public delegate void StatEvent(Stat stat, int oldValue);
 
-        public StatEvent OnValueChanged;
-        public StatEvent OnMaxValueChanged;
+        public StatEvent OnValueChanged { get; set; }
+        public StatEvent OnMaxValueChanged { get; set; }
 
         public int Value
         {

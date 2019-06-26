@@ -25,5 +25,10 @@ namespace Fluid.Roguelike.Character.Sensory
                 context.KnownEnemies.Add(character);
             }
         }
+
+        public void Reset(CharacterContext context)
+        {
+            context.KnownEnemies.Clear();
+        }
     }
 }

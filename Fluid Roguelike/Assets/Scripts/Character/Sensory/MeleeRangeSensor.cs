@@ -18,5 +18,13 @@ namespace Fluid.Roguelike.Character.Sensory
                 math.lengthsq(dir) <= 1, 
                 FluidHTN.EffectType.Permanent);
         }
+
+        public void Reset(CharacterContext context)
+        {
+            context.SetState(
+                CharacterWorldState.HasEnemyTargetInMeleeRange,
+                false,
+                FluidHTN.EffectType.Permanent);
+        }
     }
 }

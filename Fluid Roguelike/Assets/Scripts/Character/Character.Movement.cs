@@ -14,6 +14,9 @@ namespace Fluid.Roguelike.Character
     {
         public MoveResult Move(int2 dir, bool isPlayer)
         {
+            if (IsDead)
+                return MoveResult.None;
+
             var result = OnMove(dir, isPlayer);
             Context.SetState(CharacterWorldState.LastMoveResult, (int) result, EffectType.Permanent);
             return result;

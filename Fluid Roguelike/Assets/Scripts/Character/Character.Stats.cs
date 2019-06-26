@@ -41,7 +41,9 @@ namespace Fluid.Roguelike.Character
                 }
             }
 
-            _stats.Add(new Stat(type, value));
+            var s = new Stat(type, value);
+            s.OnValueChanged += OnStatChanged;
+            _stats.Add(s);
         }
 
         public bool SetValue(StatType type, int value)
@@ -83,6 +85,19 @@ namespace Fluid.Roguelike.Character
             }
 
             return null;
+        }
+
+        private void OnStatChanged(Stat stat, int oldValue)
+        {
+            switch (stat.Type)
+            {
+                case StatType.Health:
+                    if (stat.Value <= 0)
+                    {
+                        Die();
+                    }
+                    break;
+            }
         }
     }
 }

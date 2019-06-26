@@ -227,6 +227,7 @@ namespace Fluid.Roguelike.Dungeon
             {
                 if (_characterDb.Find(race, name, out var data))
                 {
+                    character.Meta = data;
                     character.View.sprite = data.Sprite;
                     character.View.color = data.Color;
                     foreach (var sensor in data.Sensors)

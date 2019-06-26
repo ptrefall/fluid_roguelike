@@ -1,6 +1,7 @@
 ﻿
 using Cinemachine;
 using Fluid.Roguelike.Actions;
+using Fluid.Roguelike.Character.State;
 using UnityEngine;
 
 namespace Fluid.Roguelike
@@ -27,6 +28,9 @@ namespace Fluid.Roguelike
 
         public override void Tick(Dungeon.Dungeon dungeon)
         {
+            if (Character.IsDead)
+                return;
+
             // Cheats
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {

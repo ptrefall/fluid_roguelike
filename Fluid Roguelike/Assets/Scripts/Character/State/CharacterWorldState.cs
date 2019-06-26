@@ -9,6 +9,7 @@
         IsStunned,
         IsConfused,
         IsDrunk,
+        IsDead,
         LastMoveResult,
     }
 }

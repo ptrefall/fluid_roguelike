@@ -51,9 +51,20 @@ namespace Fluid.Roguelike.Character
 
         public void TickTurn_Sensors()
         {
+            if (IsDead)
+                return;
+
             foreach (var sensor in _sensors)
             {
                 sensor.Tick(Context);
+            }
+        }
+
+        public void Reset_Sensors()
+        {
+            foreach (var sensor in _sensors)
+            {
+                sensor.Reset(Context);
             }
         }
     }

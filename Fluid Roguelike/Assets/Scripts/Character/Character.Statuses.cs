@@ -122,7 +122,10 @@ namespace Fluid.Roguelike.Character
 
         public void TickTurn_Status()
         {
-            for(var i = 0; i < _timedStatuses.Count; i++)
+            if (IsDead)
+                return;
+
+            for (var i = 0; i < _timedStatuses.Count; i++)
             {
                 var s = _timedStatuses[i];
                 s.Life--;
@@ -134,6 +137,12 @@ namespace Fluid.Roguelike.Character
                     UpdateWorldState(s.Type, false);
                 }
             }
+        }
+
+        public void Reset_Status()
+        {
+            _permanentStatuses.Clear();
+            _timedStatuses.Clear();
         }
 
         public int2 Modify(int2 move, out bool consumed)
