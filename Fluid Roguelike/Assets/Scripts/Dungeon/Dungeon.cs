@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Fluid.Roguelike.Actions;
@@ -35,20 +36,46 @@ namespace Fluid.Roguelike.Dungeon
         public readonly List<DungeonRoom> Rooms = new List<DungeonRoom>();
         public readonly List<DungeonArea> Areas = new List<DungeonArea>();
 
+        private Queue<Color> _areaColors = new Queue<Color>();
+
         private void Start()
         {
+            _areaColors.Enqueue(Color.red);
+            _areaColors.Enqueue(Color.green);
+            _areaColors.Enqueue(Color.blue);
+            _areaColors.Enqueue(Color.yellow);
+
             _agent.Generate(0);
             foreach (var meta in _agent.Context.AllRooms)
             {
                 var room = GameObject.Instantiate(_dungeonRoomPrefab);
+                room.Init();
                 room.SetMeta(meta);
                 room.GenerateMapValues(this, 0);
                 Rooms.Add(room);
+            }
 
+            foreach (var room in Rooms)
+            {
+                room.GenerateMapValues(this, 1);
+            }
+
+            var splitThemes = new List<DungeonTheme>
+            {
+                DungeonTheme.Forest,
+            };
+
+            SplitDisconnectedRooms(splitThemes);
+
+            DungeonRoom.WallIn(this, DungeonTheme.Cave);
+            DungeonRoom.WallIn(this, DungeonTheme.Forest);
+
+            foreach (var room in Rooms)
+            {
                 var foundArea = false;
                 foreach (var area in Areas)
                 {
-                    if (area.Theme == meta.Theme && area.IsConnectedTo(room))
+                    if (area.Theme == room.Meta.Theme && area.IsConnectedTo(this, room))
                     {
                         area.Add(room);
                         foundArea = true;
@@ -57,25 +84,82 @@ namespace Fluid.Roguelike.Dungeon
 
                 if (!foundArea)
                 {
-                    var area = new GameObject(meta.Theme.ToString()).AddComponent<DungeonArea>();
-                    area.Theme = meta.Theme;
+                    var area = new GameObject(room.Meta.Theme.ToString()).AddComponent<DungeonArea>();
+                    area.Theme = room.Meta.Theme;
+                    area.DebugColor = _areaColors.Count > 0 ? _areaColors.Dequeue() : Color.black;
                     area.Add(room);
                     Areas.Add(area);
                 }
             }
 
-            foreach (var room in Rooms)
-            {
-                room.GenerateMapValues(this, 1);
-            }
-
-            DungeonRoom.WallIn(this, DungeonTheme.Cave);
-            DungeonRoom.WallIn(this, DungeonTheme.Forest);
             DungeonRoom.AddAreaConnections(this);
 
             Rooms[0].AddTilesForAllMapValues(this);
 
             StartCoroutine(SpawnContext());
+        }
+
+        private void SplitDisconnectedRooms(List<DungeonTheme> splitThemes)
+        {
+            List<int2> closed = new List<int2>();
+            for (var i = 0; i < Rooms.Count; i++)
+            {
+                if (splitThemes.Contains(Rooms[i].Meta.Theme) == false)
+                    continue;
+
+                closed.Clear();
+                List<int2> splitTiles = null;
+                var room = Rooms[i];
+                foreach (var tile in room.ValueMap)
+                {
+                    if (tile.Value.Index != DungeonTile.Index.Floor)
+                        continue;
+
+                    if (closed.Contains(tile.Key))
+                        continue;
+
+                    closed.Add(tile.Key);
+
+                    foreach (var tile2 in room.ValueMap)
+                    {
+                        if (closed.Contains(tile2.Key))
+                            continue;
+
+                        if (tile2.Value.Index != DungeonTile.Index.Floor)
+                            continue;
+
+                        var connected = DungeonRoom.IsConnected(this, room.Meta.Theme, tile.Key, tile2.Key);
+                        if (!connected)
+                        {
+                            if (splitTiles == null)
+                                splitTiles = new List<int2>();
+
+                            splitTiles.Add(tile2.Key);
+                        }
+                    }
+                }
+
+                if (splitTiles != null)
+                {
+                    var splitRoom = GameObject.Instantiate(_dungeonRoomPrefab);
+                    splitRoom.Init();
+                    splitRoom.SetMeta(room.Meta);
+                    foreach (var key in splitTiles)
+                    {
+                        if (room.ValueMap.ContainsKey(key))
+                        {
+                            var tile = room.ValueMap[key];
+                            if (tile != null)
+                            {
+                                room.ValueMap.Remove(key);
+                                splitRoom.ValueMap.Add(key, tile);
+                                tile.Room = splitRoom;
+                            }
+                        }
+                    }
+                    Rooms.Add(splitRoom);
+                }
+            }
         }
 
         private IEnumerator SpawnContext()
@@ -260,9 +344,30 @@ namespace Fluid.Roguelike.Dungeon
 #if UNITY_EDITOR
             if (ValueMap != null)
             {
+                GUIStyle style = new GUIStyle();
+                style.normal.textColor = Color.white;
+
                 foreach (var value in ValueMap)
                 {
-                    UnityEditor.Handles.Label(new Vector3(value.Key.x, value.Key.y + 0.25f, 0), ((int)value.Value.Index).ToString());
+                    if (value.Value.Room == null)
+                    {
+                        style.normal.textColor = Color.magenta;
+                    }
+                    else
+                    {
+                        var area = GetArea(value.Value.Room);
+                        if (area == null)
+                        {
+                            style.normal.textColor = Color.cyan;
+                        }
+                        else
+                        {
+                            style.normal.textColor = area.DebugColor;
+                        }
+                    }
+
+                    var text = $"{value.Value.Room?.Id ?? 0}:{((int) value.Value.Index)}{(value.Value.IsSpecial ? "*" : "")}";
+                    UnityEditor.Handles.Label(new Vector3(value.Key.x, value.Key.y + 0.25f, 0), text, style);
                 }
             }
 #endif

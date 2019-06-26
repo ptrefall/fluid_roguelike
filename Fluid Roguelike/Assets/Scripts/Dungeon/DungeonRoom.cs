@@ -9,15 +9,22 @@ namespace Fluid.Roguelike.Dungeon
 {
     public class DungeonRoom : MonoBehaviour
     {
+        private static int RoomIds = 0;
         [SerializeField] private SpriteRenderer _roomTile;
         [SerializeField] private DungeonTile _tilePrefab;
         [SerializeField] private SpriteDatabaseManager _sprites;
         private DungeonRoomMeta _meta;
 
+        public int Id { get; private set; }
         public DungeonRoomMeta Meta => _meta;
 
         public Dictionary<int2, Dungeon.MapValue> ValueMap { get; } = new Dictionary<int2, Dungeon.MapValue>();
         public Dictionary<int2, Tuple<int2, DungeonRoom>> ConnectionMap { get; } = new Dictionary<int2, Tuple<int2, DungeonRoom>>();
+
+        public void Init()
+        {
+            Id = ++RoomIds;
+        }
 
         public void SetMeta(DungeonRoomMeta meta)
         {
@@ -26,9 +33,6 @@ namespace Fluid.Roguelike.Dungeon
             if (_roomTile != null)
             {
                 SetSprite(_roomTile, new Dungeon.MapValue { Theme = _meta.Theme, Index = DungeonTile.Index.WorldMap  }, false, false);
-
-                //_roomTile.size = new Vector2(_meta.Width, _meta.Height);
-                //_roomTile.transform.localScale = new Vector3(_meta.Width, _meta.Height, 1);
             }
         }
 
@@ -130,10 +134,17 @@ namespace Fluid.Roguelike.Dungeon
 
                     if (dungeon.ValueMap.ContainsKey(key))
                     {
-                        if (dungeon.ValueMap[key].Index != DungeonTile.Index.Wall)
+                        var tile = dungeon.ValueMap[key];
+                        if (tile.Index != DungeonTile.Index.Wall)
                         {
-                            dungeon.ValueMap[key].Theme = _meta.Theme;
-                            dungeon.ValueMap[key].Index = DungeonTile.Index.Floor;
+                            tile.Theme = _meta.Theme;
+                            tile.Index = DungeonTile.Index.Floor;
+                            if (tile.Room != this)
+                            {
+                                tile.Room.ValueMap.Remove(key);
+                                tile.Room = this;
+                                tile.Room.ValueMap.Add(key, tile);
+                            }
                         }
                     }
                     else
@@ -172,7 +183,7 @@ namespace Fluid.Roguelike.Dungeon
                         {
                             tile.Theme = _meta.Theme;
                             tile.Index = DungeonTile.Index.Floor;
-                            if (tile.Room.Meta.Id != Meta.Id)
+                            if (tile.Room != this)
                             {
                                 tile.Room.ValueMap.Remove(key);
                                 tile.Room = this;
@@ -228,7 +239,7 @@ namespace Fluid.Roguelike.Dungeon
                         continue;
 
                     var value = dungeon.ValueMap[key];
-                    if (value.Room.Meta.Id != Meta.Id)
+                    if (value.Room != this)
                         continue;
                     
                     if (value.Index == DungeonTile.Index.Wall)
@@ -308,12 +319,13 @@ namespace Fluid.Roguelike.Dungeon
                         var oldValue = dungeon.ValueMap[globalKey];
                         oldValue.Room.ValueMap.Remove(globalKey);
 
-                        dungeon.ValueMap[globalKey] = kvp.Value;
                         kvp.Value.Room = this;
+                        dungeon.ValueMap[globalKey] = kvp.Value;
                         ValueMap.Add(globalKey, kvp.Value);
                     }
                     else
                     {
+                        kvp.Value.Room = this;
                         dungeon.ValueMap.Add(globalKey, kvp.Value);
                         ValueMap.Add(globalKey, kvp.Value);
                     }
@@ -321,7 +333,7 @@ namespace Fluid.Roguelike.Dungeon
             }
         }
 
-        private void CountIndexInDirection(Dungeon dungeon, int2 key, BuilderDirection direction, DungeonTile.Index indexType, ref int count)
+        public static void CountIndexInDirection(Dungeon dungeon, int2 key, BuilderDirection direction, DungeonTile.Index indexType, ref int count)
         {
             if (dungeon.ValueMap.ContainsKey(key) == false)
             {
@@ -357,7 +369,7 @@ namespace Fluid.Roguelike.Dungeon
             CountIndexInDirection(dungeon, adjacentKey, direction, indexType, ref count);
         }
 
-        private DungeonTile.Index GetAdjacentIndex(Dungeon dungeon, int2 key, BuilderDirection direction)
+        public static DungeonTile.Index GetAdjacentIndex(Dungeon dungeon, int2 key, BuilderDirection direction)
         {
             var adjacentKey = key;
             switch (direction)
@@ -381,7 +393,7 @@ namespace Fluid.Roguelike.Dungeon
             return DungeonTile.Index.Void;
         }
 
-        private static int2 GetAdjacentKey(Dungeon dungeon, int2 key, BuilderDirection direction)
+        public static int2 GetAdjacentKey(Dungeon dungeon, int2 key, BuilderDirection direction)
         {
             var adjacentKey = key;
             switch (direction)
@@ -539,6 +551,56 @@ namespace Fluid.Roguelike.Dungeon
                     }
                 }
             }
+        }
+
+        public static bool IsConnected(Dungeon dungeon, DungeonTheme theme, int2 start, int2 end)
+        {
+            List<int2> closed = new List<int2>();
+            return Floodfill(dungeon, theme, start, end, closed);
+        }
+
+        private static bool Floodfill(Dungeon dungeon, DungeonTheme theme, int2 start, int2 end, List<int2> closed)
+        {
+            if (FloodFillInDirection(dungeon, theme, start, end, closed, BuilderDirection.North)) return true;
+            if (FloodFillInDirection(dungeon, theme, start, end, closed, BuilderDirection.East)) return true;
+            if (FloodFillInDirection(dungeon, theme, start, end, closed, BuilderDirection.South)) return true;
+            if (FloodFillInDirection(dungeon, theme, start, end, closed, BuilderDirection.West)) return true;
+
+            return false;
+        }
+
+        private static bool FloodFillInDirection(Dungeon dungeon, DungeonTheme theme, int2 start, int2 end, List<int2> closed,
+            BuilderDirection dir)
+        {
+            var key = DungeonRoom.GetAdjacentKey(dungeon, start, dir);
+            if (key.x == end.x && key.y == end.y)
+                return true;
+
+            if (closed.Contains(key))
+                return false;
+
+            closed.Add(key);
+
+            if (IsValid(dungeon, theme, key))
+            {
+                return Floodfill(dungeon, theme, key, end, closed);
+            }
+
+            return false;
+        }
+
+        private static bool IsValid(Dungeon dungeon, DungeonTheme theme, int2 key)
+        {
+            if (dungeon.ValueMap.ContainsKey(key))
+            {
+                var tile = dungeon.ValueMap[key];
+                if (tile.Theme == theme && tile.Index == DungeonTile.Index.Floor)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void AddTilesForAllMapValues(Dungeon dungeon)
