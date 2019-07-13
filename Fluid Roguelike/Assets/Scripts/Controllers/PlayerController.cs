@@ -1,8 +1,7 @@
 ﻿
 using Cinemachine;
 using Fluid.Roguelike.Actions;
-using Fluid.Roguelike.Character.State;
-using Unity.Mathematics;
+using Fluid.Roguelike.UI;
 using UnityEngine;
 
 namespace Fluid.Roguelike
@@ -13,11 +12,25 @@ namespace Fluid.Roguelike
         private float nextSameKeyTime = 0f;
         private KeyCode lastKey = KeyCode.Escape;
 
+        private UiManager _uiManager;
+
         private const float keyPause = 0.15f;
+
+        public void Set(UiManager uiManager)
+        {
+            _uiManager = uiManager;
+        }
 
         public override void Set(Character.Character character)
         {
             base.Set(character);
+
+            var health = character.GetStat(Roguelike.Character.Stats.StatType.Health);
+            health.OnValueChanged += OnHealthChanged;
+            health.OnMaxValueChanged += OnMaxHealthChanged;
+
+            OnMaxHealthChanged(health, 0);
+            OnHealthChanged(health, 0);
 
             var cameraBrain = Camera.main.GetComponent<CinemachineBrain>();
             if (cameraBrain != null && cameraBrain.ActiveVirtualCamera != null)
@@ -25,6 +38,18 @@ namespace Fluid.Roguelike
                 cameraBrain.ActiveVirtualCamera.LookAt = character.transform;
                 cameraBrain.ActiveVirtualCamera.Follow = character.transform;
             }
+        }
+
+        private void OnHealthChanged(Character.Stats.Stat health, int oldHealth)
+        {
+            //TODO: Health UI
+            _uiManager?.SetHealth(health.Value);
+        }
+
+        private void OnMaxHealthChanged(Character.Stats.Stat health, int oldMaxHealth)
+        {
+            //TODO: Health UI
+            _uiManager?.SetMaxHealth(health.MaxValue);
         }
 
         public override void Tick(Dungeon.Dungeon dungeon)

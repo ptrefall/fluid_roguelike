@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.AI;
 using Fluid.Roguelike.Database;
+using Fluid.Roguelike.UI;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -24,6 +25,7 @@ namespace Fluid.Roguelike.Dungeon
         [SerializeField] private DungeonRoom _dungeonRoomPrefab;
         [SerializeField] private Character.Character _characterPrefab;
         [SerializeField] private CharacterDatabaseManager _characterDb;
+        [SerializeField] private UiManager _uiManager;
 
         private PlayerController _playerController;
         private readonly List<AIController> _aiControllers = new List<AIController>();
@@ -270,6 +272,7 @@ namespace Fluid.Roguelike.Dungeon
             if (character != null)
             {
                 var controller = new PlayerController();
+                controller.Set(_uiManager);
                 controller.Set(character);
                 return controller;
             }
