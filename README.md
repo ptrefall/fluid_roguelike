@@ -3,6 +3,7 @@
 A Unity based roguelike project that takes advantage of the planning capabilities of the [Fluid Hierarchical Task Network](https://github.com/ptrefall/fluid-hierarchical-task-network) planner.
 
 ## Progress
+![Week 3](https://i.imgur.com/5UfVis3.jpg)
 ![Week 3](https://i.imgur.com/CLYnulD.jpg)
 ![Week 1](https://i.imgur.com/18yeSBc.png)
 
