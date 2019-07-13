@@ -2,8 +2,9 @@
 # Fluid Roguelike
 A Unity based roguelike project that takes advantage of the planning capabilities of the [Fluid Hierarchical Task Network](https://github.com/ptrefall/fluid-hierarchical-task-network) planner.
 
-## Day 1 progress
-![Day 1](https://i.imgur.com/18yeSBc.png)
+## Progress
+![Week 3](https://i.imgur.com/CLYnulD.jpg)
+![Week 1](https://i.imgur.com/18yeSBc.png)
 
 ![RoguelikeDev Does the Complete Roguelike Tutorial Event Logo](https://i.imgur.com/3MAzEp1.png)
 
