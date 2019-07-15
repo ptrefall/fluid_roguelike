@@ -151,7 +151,7 @@ namespace Fluid.Roguelike
                 return;
 
             // Cheats
-            if (Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Alpha1))
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Alpha1))
             {
                 Character.AddTimedStatus(CharacterStatusType.Stunned, 2);
                 Debug.Log($"{Character.name} got stunned!");
@@ -240,6 +240,7 @@ namespace Fluid.Roguelike
             UpdateMap();
             UpdateInventory();
             UpdateScraps();
+            UpdateStatuses();
         }
 
         public void UpdateMap()
@@ -255,6 +256,11 @@ namespace Fluid.Roguelike
         public void UpdateScraps()
         {
             _uiManager?.UpdateScraps(Character);
+        }
+
+        public void UpdateStatuses()
+        {
+            _uiManager?.UpdateStatuses();
         }
 
         public void UpdateVisibility(Dungeon.Dungeon dungeon)

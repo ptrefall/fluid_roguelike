@@ -254,6 +254,11 @@ namespace Fluid.Roguelike.UI
                 if (effect.NeedsRemoval)
                 {
                     _statusesNeedRemoval.Add(effect.Type, fx);
+                    var updaters = fx.GetComponents<IUIStatusUpdater>();
+                    foreach (var updater in updaters)
+                    {
+                        updater?.Setup(status.Life);
+                    }
                 }
             }
         }
@@ -275,6 +280,18 @@ namespace Fluid.Roguelike.UI
                 GameObject.Destroy(kvp.Value);
             }
             _statusesNeedRemoval.Clear();
+        }
+
+        public void UpdateStatuses()
+        {
+            foreach (var kvp in _statusesNeedRemoval)
+            {
+                var updaters = kvp.Value.GetComponents<IUIStatusUpdater>();
+                foreach (var updater in updaters)
+                {
+                    updater?.Tick();
+                }
+            }
         }
 
         public void SetPrimaryWeapon(ItemDbEntry itemMeta)
