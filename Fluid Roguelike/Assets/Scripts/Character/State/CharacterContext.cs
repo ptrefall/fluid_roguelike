@@ -20,6 +20,7 @@ namespace Fluid.Roguelike.Character.State
         public List<Character> KnownNeutrals { get; set; } = new List<Character>();
 
         public Dictionary<int2, float> FieldOfView = new Dictionary<int2, float>();
+        public List<int2> DiscoveredTiles = new List<int2>();
 
         public Character CurrentEnemyTarget { get; set; }
 

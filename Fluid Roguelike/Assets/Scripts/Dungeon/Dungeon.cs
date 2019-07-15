@@ -200,6 +200,7 @@ namespace Fluid.Roguelike.Dungeon
             }
 
             _playerController?.UpdateVisibility(this);
+            _playerController?.UpdateMap();
         }
 
         public IBumpTarget TryGetBumpTarget(int2 position, bool hitPlayer)
@@ -337,6 +338,13 @@ namespace Fluid.Roguelike.Dungeon
             {
                 _worldItems.Add(item);
             }
+        }
+
+        public void PickupItemFromWorld(Item.Item item)
+        {
+            item.Pickup();
+
+            _worldItems.Remove(item);
         }
 
         public void Destroy(Character.Character character)

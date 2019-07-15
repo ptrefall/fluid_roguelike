@@ -46,7 +46,7 @@ namespace Fluid.Roguelike.Character
         {
             //TODO: Limit inventory space?
 
-            item.Pickup();
+            Context.Dungeon.PickupItemFromWorld(item);
             _inventory.Add(item);
             Debug.Log($"{Context.Self.name} picked up a {item.Meta.Name}");
 

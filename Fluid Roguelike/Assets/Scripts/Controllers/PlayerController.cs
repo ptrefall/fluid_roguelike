@@ -199,6 +199,13 @@ namespace Fluid.Roguelike
             Character.TickTurn_Sensors();
 
             UpdateVisibility(dungeon);
+
+            UpdateMap();
+        }
+
+        public void UpdateMap()
+        {
+            _uiManager?.UpdateMap(Character?.Context);
         }
 
         public void UpdateVisibility(Dungeon.Dungeon dungeon)

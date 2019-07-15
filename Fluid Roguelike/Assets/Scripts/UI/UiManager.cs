@@ -7,7 +7,11 @@ using System.Threading.Tasks;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character;
 using Fluid.Roguelike.Character.State;
+using Fluid.Roguelike.Dungeon;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
+using UnityEngine.UI;
 
 namespace Fluid.Roguelike.UI
 {
@@ -20,10 +24,106 @@ namespace Fluid.Roguelike.UI
         [SerializeField] private RectTransform _equipmentGroup;
         [SerializeField] private UnityEngine.UI.Image _primaryWeapon;
         [SerializeField] private RectTransform _knownEnemiesGroup;
+        [SerializeField] private Image _map;
+        [SerializeField] private Color _undiscoveredTile;
+        [SerializeField] private Color _discoveredWallTile;
+        [SerializeField] private Color _discoveredFloorTile;
+        [SerializeField] private Color _discoveredVoidTile;
+        [SerializeField] private Color _playerTile;
+        [SerializeField] private Color _enemyTile;
+        [SerializeField] private Color _itemTile;
 
         private readonly Dictionary<CharacterStatusType, GameObject> _statusesNeedRemoval = new Dictionary<CharacterStatusType, GameObject>();
         private readonly Dictionary<Character.Character, UIKnownEnemyInfo> _knownEnemyInfos = new Dictionary<Character.Character, UIKnownEnemyInfo>();
         public enum HeartStages { Full, Half, Empty }
+
+        public void UpdateMap(CharacterContext context)
+        {
+            if (_map == null)
+                return;
+
+            if (_map.sprite == null)
+            {
+                var rect = _map.rectTransform.rect;
+                var texture = new Texture2D((int)rect.width / 4, (int)rect.height / 4);
+                texture.alphaIsTransparency = true;
+                texture.filterMode = FilterMode.Point;
+                var sprite = Sprite.Create(texture, new Rect(0,0,texture.width,texture.height), Vector2.one * 0.5f, 1);
+                _map.sprite = sprite;
+                _map.color = Color.white;
+            }
+
+            var center = new int2(_map.sprite.texture.width / 2, _map.sprite.texture.height / 2);
+            var topLeft = new int2(0, 0);
+            var bottomRight = new int2(_map.sprite.texture.width, _map.sprite.texture.height);
+
+            for (var y = topLeft.y; y < bottomRight.y; y++)
+            {
+                for (var x = topLeft.x; x < bottomRight.x; x++)
+                {
+                    var lp = new int2(x, y);
+                    var wp = context.Self.Position + (lp - center);
+
+                    if (lp.x == center.x && lp.y == center.y)
+                    {
+                        _map.sprite.texture.SetPixel(x, y, _playerTile);
+                        continue;
+                    }
+
+                    // If this is an undiscovered tile
+                    if (context.DiscoveredTiles.Contains(wp) == false)
+                    {
+                        _map.sprite.texture.SetPixel(x,y, _undiscoveredTile);
+                        continue;
+                    }
+
+                    bool didSetEnemy = false;
+                    foreach (var enemy in context.KnownEnemies)
+                    {
+                        if (enemy.Position.x == wp.x && enemy.Position.y == wp.y)
+                        {
+                            _map.sprite.texture.SetPixel(x, y, _enemyTile);
+                            didSetEnemy = true;
+                            break;
+                        }
+                    }
+
+                    if (didSetEnemy)
+                    {
+                        continue;
+                    }
+
+                    var item = context.Dungeon.GetItemAt(wp);
+                    if (item != null)
+                    {
+                        _map.sprite.texture.SetPixel(x, y, _itemTile);
+                        continue;
+                    }
+
+                    if (context.Dungeon.ValueMap.ContainsKey(wp) == false)
+                    {
+                        _map.sprite.texture.SetPixel(x,y, _discoveredVoidTile);
+                        continue;
+                    }
+
+                    var info = context.Dungeon.ValueMap[wp];
+                    switch (info.Index)
+                    {
+                        case DungeonTile.Index.Wall:
+                            _map.sprite.texture.SetPixel(x, y, _discoveredWallTile);
+                            break;
+                        case DungeonTile.Index.Floor:
+                            _map.sprite.texture.SetPixel(x, y, _discoveredFloorTile);
+                            break;
+                        default:
+                            _map.sprite.texture.SetPixel(x, y, _discoveredVoidTile);
+                            break;
+                    }
+                }
+            }
+
+            _map.sprite.texture.Apply();
+        }
 
         public void UpdateKnownEnemies(CharacterContext context)
         {

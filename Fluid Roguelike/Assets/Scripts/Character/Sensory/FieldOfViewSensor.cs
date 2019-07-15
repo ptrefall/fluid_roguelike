@@ -62,6 +62,10 @@ namespace Fluid.Roguelike.Character.Sensory
                 {
                     var distSq = math.distancesq(context.Self.Position, p);
                     context.FieldOfView.Add(p, distSq);
+                    if (!context.DiscoveredTiles.Contains(p))
+                    {
+                        context.DiscoveredTiles.Add(p);
+                    }
                 }
             }
         }
@@ -89,12 +93,17 @@ namespace Fluid.Roguelike.Character.Sensory
         public void Reset(CharacterContext context)
         {
             context.FieldOfView.Clear();
+            context.DiscoveredTiles.Clear();
         }
 
         public static void ComputeVisibility(Dungeon.Dungeon dungeon, CharacterContext context, int2 origin, float viewRadius)
         {
             // Viewer's cell is always visible.
             context.FieldOfView.Add(origin, 0f);
+            if (!context.DiscoveredTiles.Contains(origin))
+            {
+                context.DiscoveredTiles.Add(origin);
+            }
 
             // Cast light into cells for each of 8 octants.
             //
@@ -226,6 +235,10 @@ namespace Fluid.Roguelike.Character.Sensory
                         if (context.FieldOfView.ContainsKey(pWorld) == false)
                         {
                             context.FieldOfView.Add(pWorld, distSq);
+                            if (!context.DiscoveredTiles.Contains(pWorld))
+                            {
+                                context.DiscoveredTiles.Add(pWorld);
+                            }
                         }
                     }
 
