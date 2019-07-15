@@ -27,6 +27,7 @@ namespace Fluid.Roguelike.UI
         [SerializeField] private TMPro.TextMeshProUGUI _scraps;
         [SerializeField] private RectTransform _knownEnemiesGroup;
         [SerializeField] private RectTransform _inventoryGroup;
+        [SerializeField] private RectTransform _logGroup;
         [SerializeField] private Image _map;
         [SerializeField] private Color _undiscoveredTile;
         [SerializeField] private Color _discoveredWallTile;
@@ -39,8 +40,14 @@ namespace Fluid.Roguelike.UI
         private readonly Dictionary<CharacterStatusType, GameObject> _statusesNeedRemoval = new Dictionary<CharacterStatusType, GameObject>();
         private readonly Dictionary<Character.Character, UIKnownEnemyInfo> _knownEnemyInfos = new Dictionary<Character.Character, UIKnownEnemyInfo>();
         private readonly Dictionary<Item.Item, UIInventoryItem> _inventoryInfo = new Dictionary<Item.Item, UIInventoryItem>();
+        private readonly List<UILog> _logs = new List<UILog>();
 
         public enum HeartStages { Full, Half, Empty }
+
+        public void AddLog(string log)
+        {
+
+        }
 
         public void UpdateScraps(Character.Character character)
         {

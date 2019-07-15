@@ -18,6 +18,7 @@ namespace Fluid.Roguelike.Database
         public UnityEngine.UI.Image ItemUiPrefab;
         public UIKnownEnemyInfo KnownEnemyInfoPrefab;
         public UIInventoryItem InventoryItemPrefab;
+        public UILog LogPrefab;
 
         public bool Find(StatType type, out UiDbEntry uiElement)
         {
