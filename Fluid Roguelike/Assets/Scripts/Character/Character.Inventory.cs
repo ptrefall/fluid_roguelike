@@ -42,6 +42,35 @@ namespace Fluid.Roguelike.Character
             return false;
         }
 
+        public bool PickupItem(Item.Item item)
+        {
+            //TODO: Limit inventory space?
+
+            item.Pickup();
+            _inventory.Add(item);
+            Debug.Log($"{Context.Self.name} picked up a {item.Meta.Name}");
+
+            if (PrimaryWeapon == null && item.Meta.Type == ItemType.Weapon)
+            {
+                PrimaryWeapon = item;
+                OnPrimaryWeaponChanged?.Invoke(item, null);
+            }
+            return true;
+        }
+
+        public void DropItem(Item.Item item)
+        {
+            if (PrimaryWeapon == item)
+            {
+                PrimaryWeapon = null;
+                Debug.Log($"{Context.Self.name} stops wielding a {item.Meta.Name}");
+                OnPrimaryWeaponChanged?.Invoke(null, item);
+            }
+
+            Context.Dungeon.DropItemIntoWorld(item, Position);
+            Debug.Log($"{Context.Self.name} drops a {item.Meta.Name}");
+        }
+
         public List<Item.Item> SpawnLoot()
         {
             List<Item.Item> loot = new List<Item.Item>();
@@ -51,9 +80,9 @@ namespace Fluid.Roguelike.Character
                 if (this.Context.Dungeon.ItemDb.Find(itemName, out meta))
                 {
                     var item = new Item.Item();
-                    item.Setup(Context.Dungeon, meta, spawnInWorld: false);
+                    item.Setup(Context.Dungeon, meta, spawnInWorld: true);
                     loot.Add(item);
-                    Debug.Log($"{Context.Self.name} drops a {itemName}");
+                    DropItem(item);
                 }
             }
 

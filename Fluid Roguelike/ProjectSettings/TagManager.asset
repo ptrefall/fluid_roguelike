@@ -47,6 +47,9 @@ TagManager:
   - name: Decals
     uniqueID: 3624224179
     locked: 0
+  - name: Item
+    uniqueID: 717879695
+    locked: 0
   - name: Character
     uniqueID: 2858928811
     locked: 0

@@ -323,9 +323,55 @@ namespace Fluid.Roguelike.Dungeon
             }
 
             var itemView = Instantiate(_itemViewPrefab);
+            itemView.name = meta.Name;
             itemView.sprite = meta.Sprite;
             itemView.color = meta.Color;
             return itemView;
+        }
+
+        public void DropItemIntoWorld(Item.Item item, int2 position)
+        {
+            item.Drop(position);
+
+            if (_worldItems.Contains(item) == false)
+            {
+                _worldItems.Add(item);
+            }
+        }
+
+        public void Destroy(Character.Character character)
+        {
+            character.Destroy();
+            _characters.Remove(character);
+
+            if (_playerController.Character == character)
+            {
+                _playerController.Unset(character);
+            }
+            else
+            {
+                foreach (var controller in _aiControllers)
+                {
+                    if (controller.Character == character)
+                    {
+                        _aiControllers.Remove(controller);
+                        break;
+                    }
+                }
+            }
+        }
+
+        public Item.Item GetItemAt(int2 position)
+        {
+            foreach (var item in _worldItems)
+            {
+                if (item.WorldPosition.x == position.x && item.WorldPosition.y == position.y)
+                {
+                    return item;
+                }
+            }
+
+            return null;
         }
 
         public DungeonRoom GetRoom(DungeonRoomMeta meta)

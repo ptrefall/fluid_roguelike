@@ -33,8 +33,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 256, y: -128}
+  m_AnchoredPosition: {x: 0, y: -16}
+  m_SizeDelta: {x: 128, y: -160}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &6208038462882521513
 MonoBehaviour:
@@ -243,6 +243,7 @@ MonoBehaviour:
   _hearts: []
   _equipmentGroup: {fileID: 7711258717891848354}
   _primaryWeapon: {fileID: 0}
+  _knownEnemiesGroup: {fileID: 4439961586878384855}
 --- !u!1001 &5152129130800123913
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -375,11 +376,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 69283093014129438}
     m_Modifications:
-    - target: {fileID: 4512750315678513499, guid: 358e0406c3e8ab149ab8a87045a9dbf1,
-        type: 3}
-      propertyPath: m_Name
-      value: HP
-      objectReference: {fileID: 0}
     - target: {fileID: 1067715742700019694, guid: 358e0406c3e8ab149ab8a87045a9dbf1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -484,6 +480,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4512750315678513499, guid: 358e0406c3e8ab149ab8a87045a9dbf1,
+        type: 3}
+      propertyPath: m_Name
+      value: HP
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 358e0406c3e8ab149ab8a87045a9dbf1, type: 3}

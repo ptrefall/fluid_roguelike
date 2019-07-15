@@ -18,7 +18,7 @@ namespace Fluid.Roguelike
 
         public override void Tick(Dungeon.Dungeon dungeon)
         {
-            if (Character.IsDead)
+            if (Character == null || Character.IsDead)
                 return;
 
             Character.TickTurn_Sensors();

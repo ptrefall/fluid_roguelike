@@ -23,6 +23,9 @@ namespace Fluid.Roguelike.AI.Operators
                 var bestDistance = (float)c.Self.Sight;
                 foreach (var enemy in c.KnownEnemies)
                 {
+                    if (enemy.IsDead)
+                        continue;
+
                     var distance = math.length(enemy.Position - c.Self.Position);
                     if (distance < bestDistance)
                     {

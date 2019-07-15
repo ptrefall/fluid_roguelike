@@ -47,6 +47,20 @@ namespace Fluid.Roguelike.Item
             }
         }
 
+        public void Pickup()
+        {
+            if (_worldView != null)
+            {
+                _worldView.gameObject.SetActive(false);
+            }
+        }
+
+        public void Drop(int2 position)
+        {
+            _worldView = _dungeon.SpawnItemInWorld(this, _meta);
+            WorldPosition = position;
+        }
+
         public bool TryUse(CharacterContext context)
         {
             switch (_meta.Type)

@@ -19,6 +19,14 @@ namespace Fluid.Roguelike
             _character = character;
         }
 
+        public virtual void Unset(Character.Character character)
+        {
+            if (_character == character)
+            {
+                _character = null;
+            }
+        }
+
         public abstract void Tick(Dungeon.Dungeon dungeon);
         public void ConsumeTurn(Dungeon.Dungeon dungeon)
         {

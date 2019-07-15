@@ -25,6 +25,14 @@ namespace Fluid.Roguelike.Character
             return this;
         }
 
+        public void Destroy()
+        {
+            if (_view != null)
+            {
+                GameObject.Destroy(_view.gameObject);
+            }
+        }
+
         public void Translate(int2 move)
         {
             transform.Translate(new Vector3(move.x, move.y, 0));

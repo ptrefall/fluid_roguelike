@@ -1,4 +1,5 @@
 ﻿using Fluid.Roguelike.Character.State;
+using Unity.Mathematics;
 
 namespace Fluid.Roguelike.Character.Sensory
 {
@@ -13,6 +14,7 @@ namespace Fluid.Roguelike.Character.Sensory
             // Ensure we're not blind
             if (context.Self.Sight == 0)
             {
+                context.OnKnownEnemiesUpdated?.Invoke(context);
                 return;
             }
 
@@ -22,13 +24,24 @@ namespace Fluid.Roguelike.Character.Sensory
                 if (character == context.Self)
                     continue;
 
-                context.KnownEnemies.Add(character);
+                if (character.IsDead)
+                    continue;
+
+                var dir = (character.Position - context.Self.Position);
+                var distSq = math.lengthsq(dir);
+                if (distSq <= sight * sight)
+                {
+                    context.KnownEnemies.Add(character);
+                }
             }
+
+            context.OnKnownEnemiesUpdated?.Invoke(context);
         }
 
         public void Reset(CharacterContext context)
         {
             context.KnownEnemies.Clear();
+            context.OnKnownEnemiesUpdated?.Invoke(context);
         }
     }
 }

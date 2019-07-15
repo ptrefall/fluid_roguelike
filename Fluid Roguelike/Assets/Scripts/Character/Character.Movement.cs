@@ -56,8 +56,12 @@ namespace Fluid.Roguelike.Character
                 {
                     if (bumpTarget is Character c)
                     {
-                        Context.CurrentEnemyTarget = c; // TODO: Check alignment/friendliness
-                        Context.SetState(CharacterWorldState.HasEnemyTargetInMeleeRange, true, EffectType.Permanent);
+                        if (!c.IsDead)
+                        {
+                            Context.CurrentEnemyTarget = c; // TODO: Check alignment/friendliness
+                            Context.SetState(CharacterWorldState.HasEnemyTargetInMeleeRange, true,
+                                EffectType.Permanent);
+                        }
                     }
 
                     return MoveResult.Bump;

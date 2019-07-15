@@ -31,4 +31,5 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 04ea681cd2cd4c54687c0382380a0a70, type: 2}
     Items:
     - Short Sword
-    LootItems: []
+    LootItems:
+    - Short Sword

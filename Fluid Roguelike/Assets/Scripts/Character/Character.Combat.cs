@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.Sensory;
@@ -13,6 +14,8 @@ namespace Fluid.Roguelike.Character
     public partial class Character
     {
         public bool IsDead => Context.HasState(CharacterWorldState.IsDead);
+
+        public Action<Character> OnDeath { get; set; }
 
         public bool Melee(Character target)
         {
@@ -35,14 +38,14 @@ namespace Fluid.Roguelike.Character
         public void Die()
         {
             Context.SetState(CharacterWorldState.IsDead, true, EffectType.Permanent);
+            OnDeath?.Invoke(this);
+
             Reset_Sensors();
             Reset_Status();
 
-            if (Meta != null)
-            {
-                View.sprite = Meta.DeathSprite;
-                View.color = Meta.DeathColor;
-            }
+            SpawnLoot();
+
+            Context.Dungeon.Destroy(this);
         }
     }
 }

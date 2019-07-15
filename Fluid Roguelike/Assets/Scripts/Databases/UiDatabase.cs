@@ -4,6 +4,7 @@ using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.AI;
 using Fluid.Roguelike.Character.Sensory;
 using Fluid.Roguelike.Character.Stats;
+using Fluid.Roguelike.UI;
 using UnityEngine;
 
 namespace Fluid.Roguelike.Database
@@ -15,6 +16,7 @@ namespace Fluid.Roguelike.Database
         [SerializeField] private List<UiStatusDbEntry> _statusEffectDb = new List<UiStatusDbEntry>();
         [SerializeField] private List<UiLabelDbEntry> _labelDb = new List<UiLabelDbEntry>();
         public UnityEngine.UI.Image ItemUiPrefab;
+        public UIKnownEnemyInfo KnownEnemyInfoPrefab;
 
         public bool Find(StatType type, out UiDbEntry uiElement)
         {

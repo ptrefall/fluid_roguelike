@@ -2,6 +2,7 @@
 using Cinemachine;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character;
+using Fluid.Roguelike.Character.State;
 using Fluid.Roguelike.UI;
 using UnityEngine;
 
@@ -36,6 +37,7 @@ namespace Fluid.Roguelike
             character.OnStatusAdded += OnStatusAdded;
             character.OnStatusRemoved += OnStatusRemoved;
             character.OnStatusReset += OnStatusReset;
+            character.Context.OnKnownEnemiesUpdated += OnKnownEnemiesUpdated;
 
             var health = character.GetStat(Roguelike.Character.Stats.StatType.Health);
             if (health != null)
@@ -60,13 +62,16 @@ namespace Fluid.Roguelike
             }
         }
 
-        public void Unset(Character.Character character)
+        public override void Unset(Character.Character character)
         {
-            Character.IsPlayerControlled = false;
+            base.Unset(character);
+
+            character.IsPlayerControlled = false;
             character.OnPrimaryWeaponChanged -= OnPrimaryWeaponChanged;
             character.OnStatusAdded -= OnStatusAdded;
             character.OnStatusRemoved -= OnStatusRemoved;
             character.OnStatusReset -= OnStatusReset;
+            character.Context.OnKnownEnemiesUpdated -= OnKnownEnemiesUpdated;
 
             var health = character.GetStat(Roguelike.Character.Stats.StatType.Health);
             if (health != null)
@@ -85,13 +90,11 @@ namespace Fluid.Roguelike
 
         private void OnHealthChanged(Character.Stats.Stat health, int oldHealth)
         {
-            //TODO: Health UI
             _uiManager?.SetHealth(health.Value);
         }
 
         private void OnMaxHealthChanged(Character.Stats.Stat health, int oldMaxHealth)
         {
-            //TODO: Health UI
             _uiManager?.SetMaxHealth(health.MaxValue);
         }
 
@@ -115,9 +118,14 @@ namespace Fluid.Roguelike
             _uiManager?.ResetStatuses();
         }
 
+        private void OnKnownEnemiesUpdated(CharacterContext context)
+        {
+            _uiManager?.UpdateKnownEnemies(context);
+        }
+
         public override void Tick(Dungeon.Dungeon dungeon)
         {
-            if (Character.IsDead)
+            if (Character == null || Character.IsDead)
                 return;
 
             // Cheats
@@ -130,44 +138,62 @@ namespace Fluid.Roguelike
 
             // Logic
 
-            MoveResult result = MoveResult.None;
-            MoveDirection dir = CheckMoveInput();
-
-            if (dir != MoveDirection.None)
+            if (Input.GetKeyDown(KeyCode.E))
             {
-                result = Move(dungeon, dir, true);
+                var item = dungeon.GetItemAt(Character.Position);
+                if (item == null)
+                    return;
+
+                if (Character.PickupItem(item) == false)
+                    return;
             }
-
-            // We did not consume a turn
-            if (result == MoveResult.None)
+            else
             {
-                return;
-            }
+                MoveResult result = MoveResult.None;
+                MoveDirection dir = CheckMoveInput();
 
-            if (result == MoveResult.Collided)
-            {
-                forceKeyDown = true;
-                return;
-            }
-
-            if (result == MoveResult.Bump)
-            {
-                if (Character.Context.CurrentBumpTarget != null)
+                if (dir != MoveDirection.None)
                 {
-                    if (Character.Context.CurrentBumpTarget is Character.Character c)
-                    {
-                        Character.Melee(c);
-                    }
-                    forceKeyDown = true;
+                    result = Move(dungeon, dir, true);
                 }
-                else
+
+                // We did not consume a turn
+                if (result == MoveResult.None)
                 {
-                    Debug.LogError("This should never happen");
+                    return;
+                }
+
+                if (result == MoveResult.Collided)
+                {
+                    forceKeyDown = true;
+                    return;
+                }
+
+                if (result == MoveResult.Bump)
+                {
+                    if (Character.Context.CurrentBumpTarget != null)
+                    {
+                        if (Character.Context.CurrentBumpTarget is Character.Character c)
+                        {
+                            Character.Melee(c);
+                        }
+
+                        forceKeyDown = true;
+                    }
+                    else
+                    {
+                        Debug.LogError("This should never happen");
+                    }
                 }
             }
 
             // We tick the AI first, so that we're not updating status effects until NPCs have had the chance to add new ones.
             dungeon.TickAI();
+
+            if (Character == null || Character.IsDead)
+            {
+                return;
+            }
 
             ConsumeTurn(dungeon);
             Character.TickTurn_Sensors();

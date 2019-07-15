@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character;
+using Fluid.Roguelike.Character.State;
 using UnityEngine;
 
 namespace Fluid.Roguelike.UI
@@ -18,10 +19,74 @@ namespace Fluid.Roguelike.UI
         [SerializeField] private List<UnityEngine.UI.Image> _hearts;
         [SerializeField] private RectTransform _equipmentGroup;
         [SerializeField] private UnityEngine.UI.Image _primaryWeapon;
+        [SerializeField] private RectTransform _knownEnemiesGroup;
 
         private readonly Dictionary<CharacterStatusType, GameObject> _statusesNeedRemoval = new Dictionary<CharacterStatusType, GameObject>();
+        private readonly Dictionary<Character.Character, UIKnownEnemyInfo> _knownEnemyInfos = new Dictionary<Character.Character, UIKnownEnemyInfo>();
+        public enum HeartStages { Full, Half, Empty }
 
-        private enum HeartStages { Full, Half, Empty }
+        public void UpdateKnownEnemies(CharacterContext context)
+        {
+            if (context.KnownEnemies == null || context.KnownEnemies.Count == 0)
+            {
+                foreach (var kvp in _knownEnemyInfos)
+                {
+                    GameObject.Destroy(kvp.Value.gameObject);
+                    kvp.Key.OnDeath -= OnKnownEnemyDeath;
+                }
+                _knownEnemyInfos.Clear();
+            }
+
+            if (context.KnownEnemies != null)
+            {
+                List<Character.Character> pendingRemoval = null;
+                foreach (var enemy in context.KnownEnemies)
+                {
+                    if (enemy.IsDead)
+                    {
+                        if (_knownEnemyInfos.ContainsKey(enemy))
+                        {
+                            var value = _knownEnemyInfos[enemy];
+                            GameObject.Destroy(value.gameObject);
+
+                            if (pendingRemoval == null)
+                            {
+                                pendingRemoval = new List<Character.Character>();
+                            }
+                            pendingRemoval.Add(enemy);
+                        }
+                        continue;
+                    }
+
+                    if (_knownEnemyInfos.ContainsKey(enemy))
+                        continue;
+
+                    var info = GameObject.Instantiate(_db.KnownEnemyInfoPrefab, _knownEnemiesGroup, false);
+                    info.Setup(enemy, _db);
+                    _knownEnemyInfos.Add(enemy, info);
+
+                    enemy.OnDeath += OnKnownEnemyDeath;
+                }
+
+                if (pendingRemoval != null)
+                {
+                    foreach (var enemy in pendingRemoval)
+                    {
+                        _knownEnemyInfos.Remove(enemy);
+                    }
+                }
+            }
+        }
+
+        private void OnKnownEnemyDeath(Character.Character character)
+        {
+            if (_knownEnemyInfos.ContainsKey(character))
+            {
+                var info = _knownEnemyInfos[character];
+                GameObject.Destroy(info.gameObject);
+                _knownEnemyInfos.Remove(character);
+            }
+        }
 
         public void AddStatus(Status status)
         {

@@ -13,9 +13,11 @@ namespace Fluid.Roguelike.Character.State
         public Dungeon.Dungeon Dungeon { get; set; }
         public IBumpTarget CurrentBumpTarget { get; private set; }
 
-        public List<Character> KnownEnemies = new List<Character>();
-        public List<Character> KnownFriends = new List<Character>();
-        public List<Character> KnownNeutrals = new List<Character>();
+        public Action<CharacterContext> OnKnownEnemiesUpdated { get; set; }
+
+        public List<Character> KnownEnemies { get; set; } = new List<Character>();
+        public List<Character> KnownFriends { get; set; } = new List<Character>();
+        public List<Character> KnownNeutrals { get; set; } = new List<Character>();
 
         public Dictionary<int2, float> FieldOfView = new Dictionary<int2, float>();
 
