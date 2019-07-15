@@ -413,8 +413,8 @@ namespace Fluid.Roguelike.Dungeon
                         TrySpawnPlayer();
                     }
                     SpawnRoom(2, 6, DungeonRoomShape.Random, false);
-                    SpawnRoom(2, 12, DungeonRoomShape.Random, false);
-                    Repeat(10);
+                    SpawnRoom(2, 8, DungeonRoomShape.Random, false);
+                    Repeat(4);
                     {
                         SpawnRoom(2, 8, DungeonRoomShape.Random, false);
                     }
@@ -425,6 +425,11 @@ namespace Fluid.Roguelike.Dungeon
                         SpawnRoom(new int2(8, 2), DungeonRoomShape.Rectangular, false);
                     }
                     End();
+                    Repeat(4);
+                    {
+                        SpawnRoom(4, 6, DungeonRoomShape.Random, false);
+                    }
+                    EndRepeat();
                     {
                         AddDecoration(DungeonTheme.Cave, _decorations.Find(DungeonTheme.Cave, DecorationType.Altar));
                         TrySpawnNpc("kobold", "warrior");
@@ -442,9 +447,26 @@ namespace Fluid.Roguelike.Dungeon
                 SetTheme(DungeonTheme.Forest);
                 {
                     ChangeBuilderDirection(BuilderDirection.Random);
-                    SpawnRoom(8, 12, DungeonRoomShape.Round, false);
+                    SpawnRoom(6, 8, DungeonRoomShape.Round, false);
                     {
                         TrySpawnPlayer();
+                    }
+                    Random();
+                    {
+                        SpawnRoom(new int2(2, 8), DungeonRoomShape.Rectangular, false);
+                        SpawnRoom(new int2(8, 2), DungeonRoomShape.Rectangular, false);
+                    }
+                    End();
+                    {
+                        TrySpawnNpc("critter", "rat");
+                    }
+                    Repeat(4);
+                    {
+                        SpawnRoom(4, 6, DungeonRoomShape.Random, false);
+                    }
+                    EndRepeat();
+                    {
+                        TrySpawnNpc("critter", "rat");
                     }
                 }
             }

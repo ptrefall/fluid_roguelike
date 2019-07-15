@@ -121,10 +121,13 @@ namespace Fluid.Roguelike.Character
         public List<Item.Item> SpawnLoot()
         {
             List<Item.Item> loot = new List<Item.Item>();
-            foreach (var itemName in Meta.LootItems)
+            foreach (var entry in Meta.LootItems)
             {
+                if (UnityEngine.Random.value >= entry.DropChance)
+                    continue;
+
                 ItemDbEntry meta;
-                if (this.Context.Dungeon.ItemDb.Find(itemName, out meta))
+                if (this.Context.Dungeon.ItemDb.Find(entry.Item, out meta))
                 {
                     var item = new Item.Item();
                     item.Setup(Context.Dungeon, meta, spawnInWorld: true);

@@ -31,6 +31,12 @@ namespace Fluid.Roguelike.Character
             set => SetValue(StatType.Sight, value);
         }
 
+        public int Dodge
+        {
+            get => GetStat(StatType.Dodge)?.Value ?? 0;
+            set => SetValue(StatType.Dodge, value);
+        }
+
         public void AddStat(StatType type, int value)
         {
             foreach (var stat in _stats)

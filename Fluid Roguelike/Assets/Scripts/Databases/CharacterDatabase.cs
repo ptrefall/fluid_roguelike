@@ -58,7 +58,7 @@ namespace Fluid.Roguelike.Database
 
         public List<ScriptableObject> Abilities;
         public List<string> Items;
-        public List<string> LootItems;
+        public List<LootDbEntry> LootItems;
 
         //TODO: Extend with more data later
     }
@@ -68,6 +68,13 @@ namespace Fluid.Roguelike.Database
     {
         public StatType Type;
         public int Value;
+    }
+
+    [Serializable]
+    public class LootDbEntry
+    {
+        public string Item;
+        public float DropChance = 1f;
     }
 
     [CreateAssetMenu(fileName = "Character Database Manager", menuName = "Content/Character Database Manager")]

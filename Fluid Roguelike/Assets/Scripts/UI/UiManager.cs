@@ -203,6 +203,7 @@ namespace Fluid.Roguelike.UI
                         {
                             var value = _knownEnemyInfos[enemy];
                             GameObject.Destroy(value.gameObject);
+                            enemy.OnDeath -= OnKnownEnemyDeath;
 
                             if (pendingRemoval == null)
                             {
@@ -214,13 +215,31 @@ namespace Fluid.Roguelike.UI
                     }
 
                     if (_knownEnemyInfos.ContainsKey(enemy))
+                    {
+                        // If this enemy is no longer in our field of view, remove it from the list.
+                        if (!context.FieldOfView.ContainsKey(enemy.Position))
+                        {
+                            var value = _knownEnemyInfos[enemy];
+                            GameObject.Destroy(value.gameObject);
+                            enemy.OnDeath -= OnKnownEnemyDeath;
+
+                            if (pendingRemoval == null)
+                            {
+                                pendingRemoval = new List<Character.Character>();
+                            }
+                            pendingRemoval.Add(enemy);
+                        }
                         continue;
+                    }
 
-                    var info = GameObject.Instantiate(_db.KnownEnemyInfoPrefab, _knownEnemiesGroup, false);
-                    info.Setup(enemy, _db);
-                    _knownEnemyInfos.Add(enemy, info);
+                    if (context.FieldOfView.ContainsKey(enemy.Position))
+                    {
+                        var info = GameObject.Instantiate(_db.KnownEnemyInfoPrefab, _knownEnemiesGroup, false);
+                        info.Setup(enemy, _db);
+                        _knownEnemyInfos.Add(enemy, info);
 
-                    enemy.OnDeath += OnKnownEnemyDeath;
+                        enemy.OnDeath += OnKnownEnemyDeath;
+                    }
                 }
 
                 if (pendingRemoval != null)
@@ -357,7 +376,10 @@ namespace Fluid.Roguelike.UI
             if (addHalfHeart)
             {
                 var heart = _hearts[_hearts.Count - 1];
-                heart.sprite = healthDb.Sprites[(int)HeartStages.Half];
+                if (heart != null && heart.transform != null && !heart.IsDestroyed())
+                {
+                    heart.sprite = healthDb.Sprites[(int)UiManager.HeartStages.Half];
+                }
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using Fluid.Roguelike.Ability;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.Sensory;
 using Fluid.Roguelike.Character.State;
@@ -27,10 +28,16 @@ namespace Fluid.Roguelike.Character
                 }
             }
 
-            //TODO: This should be a punch ability on the character (some characters might bite or claw instead).
-            Debug.Log($"{Context.Self.name} punched {target.name}!");
-
-            target.Health -= 1;
+            foreach (var meta in Meta.Abilities)
+            {
+                if (meta is IAbility ability)
+                {
+                    if (ability.CanUse(Context))
+                    {
+                        ability.Use(Context, target);
+                    }
+                }
+            }
 
             return true;
         }

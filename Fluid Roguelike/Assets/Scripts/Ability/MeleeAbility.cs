@@ -26,6 +26,13 @@ namespace Fluid.Roguelike.Ability
 
         public void Use(CharacterContext context, Character.Character target)
         {
+            var targetDodgeChance = target.Dodge * 0.01f;
+            if (UnityEngine.Random.value < targetDodgeChance)
+            {
+                Debug.Log($"{target.name} dodged {context.Self.name}'s attack!");
+                return;
+            }
+
             Debug.Log($"{context.Self.name} {_attackVerb} {target.name}!");
 
             var crit = UnityEngine.Random.value < _critChance;

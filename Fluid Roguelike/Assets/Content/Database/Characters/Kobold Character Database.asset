@@ -27,9 +27,12 @@ MonoBehaviour:
       Value: 10
     - Type: 1
       Value: 6
+    - Type: 2
+      Value: 5
     Abilities:
     - {fileID: 11400000, guid: 04ea681cd2cd4c54687c0382380a0a70, type: 2}
     Items:
     - Short Sword
     LootItems:
-    - Short Sword
+    - Item: Short Sword
+      DropChance: 1

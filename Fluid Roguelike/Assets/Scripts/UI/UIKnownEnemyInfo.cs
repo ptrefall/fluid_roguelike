@@ -125,7 +125,10 @@ namespace Fluid.Roguelike.UI
             if (addHalfHeart)
             {
                 var heart = _hearts[_hearts.Count - 1];
-                heart.sprite = healthDb.Sprites[(int)UiManager.HeartStages.Half];
+                if (heart != null && heart.transform != null && !heart.IsDestroyed())
+                {
+                    heart.sprite = healthDb.Sprites[(int) UiManager.HeartStages.Half];
+                }
             }
         }
 

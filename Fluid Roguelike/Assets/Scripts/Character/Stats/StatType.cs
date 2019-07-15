@@ -4,5 +4,6 @@
     {
         Health,
         Sight,
+        Dodge
     }
 }

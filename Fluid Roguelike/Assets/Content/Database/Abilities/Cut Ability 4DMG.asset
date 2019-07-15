@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 359dee7038f25f4439149a5634106fb6, type: 3}
-  m_Name: Cut Ability 2DMG
+  m_Name: Cut Ability 4DMG
   m_EditorClassIdentifier: 
-  _damage: 2
-  _critChance: 0.1
+  _damage: 4
+  _critChance: 0.05
   _attackVerb: cut

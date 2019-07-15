@@ -10,27 +10,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 17e24e1e190421549bdc50c3a86cd3b9, type: 3}
-  m_Name: Human Character Database
+  m_Name: Critter Character Database
   m_EditorClassIdentifier: 
-  _race: human
+  _race: critter
   _db:
-  - Name: naked
-    Sprite: {fileID: -2498970910985527441, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+  - Name: rat
+    Sprite: {fileID: -1452442122989861532, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
       type: 3}
-    DeathSprite: {fileID: -7770711556875768801, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
-      type: 3}
+    DeathSprite: {fileID: 0}
     Color: {r: 1, g: 1, b: 1, a: 1}
     DeathColor: {r: 1, g: 1, b: 1, a: 1}
-    Brain: {fileID: 11400000, guid: 5fbc0e525ca259f46ace5918d6a08752, type: 2}
-    Sensors: 0000000002000000
+    Brain: {fileID: 11400000, guid: cdf93a940a9966b48a59354523c9b611, type: 2}
+    Sensors: 0000000001000000
     Stats:
     - Type: 0
-      Value: 10
+      Value: 2
     - Type: 1
-      Value: 5
+      Value: 3
     - Type: 2
-      Value: 10
+      Value: 50
     Abilities:
     - {fileID: 11400000, guid: 04ea681cd2cd4c54687c0382380a0a70, type: 2}
     Items: []
-    LootItems: []
+    LootItems:
+    - Item: Broken Bone
+      DropChance: 0.9

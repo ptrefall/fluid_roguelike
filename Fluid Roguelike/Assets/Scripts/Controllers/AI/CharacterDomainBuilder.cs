@@ -95,6 +95,18 @@ namespace Fluid.Roguelike.AI
             return this;
         }
 
+        public CharacterDomainBuilder MoveAwayFromEnemy()
+        {
+            Action("Move away from enemy");
+            if (Pointer is IPrimitiveTask task)
+            {
+                task.SetOperator(new MoveAwayOperator(MoveAwayOperator.TargetType.Enemy));
+                SetState(CharacterWorldState.HasEnemyTarget, false, EffectType.PlanAndExecute);
+            }
+            End();
+            return this;
+        }
+
         // ----------------------------------------------------------------------- COMPLEX OPTIONS
 
         public CharacterDomainBuilder EngageEnemyMeleeSequence()
@@ -119,6 +131,21 @@ namespace Fluid.Roguelike.AI
             return this;
         }
 
-        
+        public CharacterDomainBuilder FleeOrEngageSequence()
+        {
+            Sequence("Flee enemy");
+            {
+                FindEnemyTarget();
+                Select("Flee or attack");
+                {
+                    HasState(CharacterWorldState.HasEnemyTarget);
+                    MoveAwayFromEnemy();
+                    MeleeEnemy();
+                }
+                End();
+            }
+            End();
+            return this;
+        }
     }
 }

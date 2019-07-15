@@ -19,6 +19,8 @@ namespace Fluid.Roguelike
 
         private const float keyPause = 0.15f;
 
+        private string oldCharacterName;
+
         public void Set(UiManager uiManager)
         {
             _uiManager = uiManager;
@@ -33,6 +35,8 @@ namespace Fluid.Roguelike
 
             base.Set(character);
 
+            oldCharacterName = character.name;
+            character.name = "Player";
             character.IsPlayerControlled = true;
             character.OnPrimaryWeaponChanged += OnPrimaryWeaponChanged;
             character.OnStatusAdded += OnStatusAdded;
@@ -67,6 +71,10 @@ namespace Fluid.Roguelike
         {
             base.Unset(character);
 
+            if (!string.IsNullOrEmpty(oldCharacterName))
+            {
+                character.name = oldCharacterName;
+            }
             character.IsPlayerControlled = false;
             character.OnPrimaryWeaponChanged -= OnPrimaryWeaponChanged;
             character.OnStatusAdded -= OnStatusAdded;
