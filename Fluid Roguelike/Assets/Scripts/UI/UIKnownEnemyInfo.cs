@@ -7,7 +7,7 @@ namespace Fluid.Roguelike.UI
 {
     public class UIKnownEnemyInfo : MonoBehaviour
     {
-        [SerializeField] private UILabel _name;
+        [SerializeField] private TMPro.TextMeshProUGUI _name;
         [SerializeField] private RectTransform _healthGroup;
         [SerializeField] private List<UnityEngine.UI.Image> _maxHearts;
         [SerializeField] private List<UnityEngine.UI.Image> _hearts;
@@ -19,8 +19,8 @@ namespace Fluid.Roguelike.UI
 
         public string Name
         {
-            get => _name.Label;
-            set => _name.SetLabel(value);
+            get => _name.text;
+            set => _name.text = value;
         }
 
         public void Setup(Character.Character character, UiDatabase db)

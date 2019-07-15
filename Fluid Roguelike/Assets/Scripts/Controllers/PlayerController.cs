@@ -20,6 +20,7 @@ namespace Fluid.Roguelike
         private const float keyPause = 0.15f;
 
         private string oldCharacterName;
+        private int _lastKnownEnemyCount = 0;
 
         public void Set(UiManager uiManager)
         {
@@ -130,6 +131,13 @@ namespace Fluid.Roguelike
         private void OnKnownEnemiesUpdated(CharacterContext context)
         {
             _uiManager?.UpdateKnownEnemies(context);
+
+            if (context.KnownEnemies.Count > _lastKnownEnemyCount)
+            {
+                forceKeyDown = true;
+            }
+
+            _lastKnownEnemyCount = context.KnownEnemies.Count;
         }
 
         private bool GetInventoryKeyDown(out int index)

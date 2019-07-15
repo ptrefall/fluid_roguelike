@@ -100,8 +100,9 @@ namespace Fluid.Roguelike.AI
             Action("Move away from enemy");
             if (Pointer is IPrimitiveTask task)
             {
+                HasState(CharacterWorldState.HasEnemyTargetInMeleeRange, 0);
                 task.SetOperator(new MoveAwayOperator(MoveAwayOperator.TargetType.Enemy));
-                SetState(CharacterWorldState.HasEnemyTarget, false, EffectType.PlanAndExecute);
+                SetState(CharacterWorldState.HasEnemyTargetInMeleeRange, false, EffectType.PlanOnly);
             }
             End();
             return this;

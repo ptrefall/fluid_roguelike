@@ -24,7 +24,7 @@ namespace Fluid.Roguelike.UI
         [SerializeField] private List<UnityEngine.UI.Image> _hearts;
         [SerializeField] private RectTransform _equipmentGroup;
         [SerializeField] private UnityEngine.UI.Image _primaryWeapon;
-        [SerializeField] private UILabel _scraps;
+        [SerializeField] private TMPro.TextMeshProUGUI _scraps;
         [SerializeField] private RectTransform _knownEnemiesGroup;
         [SerializeField] private RectTransform _inventoryGroup;
         [SerializeField] private Image _map;
@@ -44,7 +44,7 @@ namespace Fluid.Roguelike.UI
 
         public void UpdateScraps(Character.Character character)
         {
-            _scraps.SetLabel(character.Scraps.ToString());
+            _scraps.text = character.Scraps.ToString();
         }
 
         public void UpdateMap(CharacterContext context)

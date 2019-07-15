@@ -24,11 +24,11 @@ MonoBehaviour:
     Sensors: 0000000001000000
     Stats:
     - Type: 0
-      Value: 10
+      Value: 4
     - Type: 1
       Value: 6
     - Type: 2
-      Value: 5
+      Value: 1
     Abilities:
     - {fileID: 11400000, guid: 04ea681cd2cd4c54687c0382380a0a70, type: 2}
     Items:

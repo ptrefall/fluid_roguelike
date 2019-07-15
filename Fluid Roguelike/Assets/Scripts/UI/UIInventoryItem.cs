@@ -9,8 +9,8 @@ namespace Fluid.Roguelike.UI
 {
     public class UIInventoryItem : MonoBehaviour
     {
-        [SerializeField] private UILabel _name;
-        [SerializeField] private UILabel _info;
+        [SerializeField] private TMPro.TextMeshProUGUI _name;
+        [SerializeField] private TMPro.TextMeshProUGUI _info;
         [SerializeField] private Image _icon;
 
         private Item.Item _item;
@@ -18,14 +18,14 @@ namespace Fluid.Roguelike.UI
 
         public string Name
         {
-            get => _name.Label;
-            set => _name.SetLabel(value);
+            get => _name.text;
+            set => _name.text = value;
         }
 
         public string Info
         {
-            get => _info.Label;
-            set => _info.SetLabel(value);
+            get => _info.text;
+            set => _info.text = value;
         }
 
         public void Setup(Item.Item item, UiDatabase db)
