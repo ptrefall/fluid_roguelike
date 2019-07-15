@@ -201,6 +201,8 @@ namespace Fluid.Roguelike.Dungeon
 
             _playerController?.UpdateVisibility(this);
             _playerController?.UpdateMap();
+            _playerController?.UpdateInventory();
+            _playerController?.UpdateScraps();
         }
 
         public IBumpTarget TryGetBumpTarget(int2 position, bool hitPlayer)
@@ -345,6 +347,28 @@ namespace Fluid.Roguelike.Dungeon
             item.Pickup();
 
             _worldItems.Remove(item);
+        }
+
+        public int Destroy(Item.Item item)
+        {
+            item.Destroy();
+            _worldItems.Remove(item);
+
+            foreach (var character in Characters)
+            {
+                if (character.Inventory.Contains(item))
+                {
+                    character.Inventory.Remove(item);
+                    if (character.PrimaryWeapon == item)
+                    {
+                        character.SetPrimaryWeapon(null);
+                    }
+
+                    break;
+                }
+            }
+
+            return item.Meta.ScrapsValue;
         }
 
         public void Destroy(Character.Character character)

@@ -19,6 +19,7 @@ MonoBehaviour:
     Abilities:
     - {fileID: 11400000, guid: 3962a112a4683c843aeacc7900361b31, type: 2}
     DefaultAbilityIndex: 0
+    ScrapsValue: 10
     Sprite: {fileID: 7532974559942832730, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
       type: 3}
     Color: {r: 1, g: 1, b: 1, a: 1}

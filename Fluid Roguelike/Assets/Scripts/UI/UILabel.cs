@@ -34,8 +34,11 @@ namespace Fluid.Roguelike.UI
             }
         }
 
+        [ContextMenu("Update Label")]
         private void UpdateLabel()
         {
+            ClearLabel();
+            _label = _label.ToLower();
             if (_characters.Count > 0)
             {
                 foreach (var character in _characters)
@@ -56,6 +59,17 @@ namespace Fluid.Roguelike.UI
                     _characters.Add(c);
                 }
             }
+        }
+
+        [ContextMenu("Clear Label")]
+        private void ClearLabel()
+        {
+            var children = transform.GetComponentsInChildren<Image>();
+            foreach (var child in children)
+            {
+                GameObject.DestroyImmediate(child.gameObject);
+            }
+            _characters?.Clear();
         }
     }
 }

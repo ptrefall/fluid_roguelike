@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Fluid.Roguelike.Item
 {
-    public enum ItemType { Weapon, Equipment, Food, Other }
+    public enum ItemType { Weapon, Equipment, Food, Scraps, Other }
     public enum ItemRarity { Common, Uncommon, Rare, Epic, Legendary }
 
     public class Item
@@ -44,6 +44,14 @@ namespace Fluid.Roguelike.Item
             if (spawnInWorld)
             {
                 _worldView = dungeon.SpawnItemInWorld(this, meta);
+            }
+        }
+
+        public void Destroy()
+        {
+            if (_worldView != null)
+            {
+                GameObject.Destroy(_worldView.gameObject);
             }
         }
 

@@ -5,6 +5,7 @@ namespace Fluid.Roguelike.Ability
 {
     public interface IAbility
     {
+        string Info { get; }
         bool CanUse(CharacterContext context);
         void Use(CharacterContext context);
         void Use(CharacterContext context, Character.Character target);

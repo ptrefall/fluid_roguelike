@@ -101,6 +101,9 @@ namespace Fluid.Roguelike.UI
                     {
                         var heart = _hearts[_hearts.Count - 1];
                         _hearts.RemoveAt(_hearts.Count - 1);
+                        if (heart == null || heart.transform == null || heart.IsDestroyed())
+                            continue;
+
                         heart.sprite = healthDb.Sprites[(int)UiManager.HeartStages.Empty];
                     }
                 }

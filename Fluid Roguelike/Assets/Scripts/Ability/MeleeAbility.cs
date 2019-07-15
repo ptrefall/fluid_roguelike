@@ -12,6 +12,8 @@ namespace Fluid.Roguelike.Ability
         [SerializeField] private float _critChance = 0.1f;
         [SerializeField] private string _attackVerb = "punched";
 
+        public string Info => $"{_damage}dmg";
+
         public bool CanUse(CharacterContext context)
         {
             return context.HasState(CharacterWorldState.HasEnemyTargetInMeleeRange);

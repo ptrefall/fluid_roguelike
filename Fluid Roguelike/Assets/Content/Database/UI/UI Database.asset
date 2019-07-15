@@ -100,7 +100,41 @@ MonoBehaviour:
       type: 3}
   - Character: z
     Sprite: {fileID: 112252187682432892, guid: 3054d3abb78b02f4ab6c2128d2efc75e, type: 3}
+  - Character: ' '
+    Sprite: {fileID: -3714409817710726143, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
+  - Character: 0
+    Sprite: {fileID: 2600506199491239282, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
+  - Character: 1
+    Sprite: {fileID: 2037008597704345132, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
+  - Character: 2
+    Sprite: {fileID: -1698075655576530495, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
+  - Character: 3
+    Sprite: {fileID: -8202391962669466782, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
+  - Character: 4
+    Sprite: {fileID: -1887517999199226339, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
+  - Character: 5
+    Sprite: {fileID: 5418134173757753764, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
+  - Character: 6
+    Sprite: {fileID: -5344764056626162162, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
+  - Character: 7
+    Sprite: {fileID: 1082107207754780424, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
+  - Character: 8
+    Sprite: {fileID: 901874445926030393, guid: 3054d3abb78b02f4ab6c2128d2efc75e, type: 3}
+  - Character: 9
+    Sprite: {fileID: -5447048912800309967, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
   ItemUiPrefab: {fileID: 4317872541743723805, guid: 720ed75a55ab3cd4a8e9b069b99a3522,
     type: 3}
   KnownEnemyInfoPrefab: {fileID: 7859421913617064024, guid: e493d735dca09e44a8cd24c0fb1c3977,
+    type: 3}
+  InventoryItemPrefab: {fileID: 746856181868456848, guid: 8924a5294b5456d47b6c1b2a5b4ce526,
     type: 3}

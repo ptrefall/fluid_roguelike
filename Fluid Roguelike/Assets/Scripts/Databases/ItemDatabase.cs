@@ -37,6 +37,7 @@ namespace Fluid.Roguelike.Database
         public Item.ItemRarity Rarity;
         public List<ScriptableObject> Abilities;
         public int DefaultAbilityIndex = 0;
+        public int ScrapsValue = 0;
 
         public Sprite Sprite;
         public Color Color = UnityEngine.Color.white;

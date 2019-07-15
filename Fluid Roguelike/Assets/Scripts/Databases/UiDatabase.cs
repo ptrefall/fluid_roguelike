@@ -17,6 +17,7 @@ namespace Fluid.Roguelike.Database
         [SerializeField] private List<UiLabelDbEntry> _labelDb = new List<UiLabelDbEntry>();
         public UnityEngine.UI.Image ItemUiPrefab;
         public UIKnownEnemyInfo KnownEnemyInfoPrefab;
+        public UIInventoryItem InventoryItemPrefab;
 
         public bool Find(StatType type, out UiDbEntry uiElement)
         {

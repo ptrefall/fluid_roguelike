@@ -3,6 +3,7 @@ using Cinemachine;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character;
 using Fluid.Roguelike.Character.State;
+using Fluid.Roguelike.Item;
 using Fluid.Roguelike.UI;
 using UnityEngine;
 
@@ -123,13 +124,34 @@ namespace Fluid.Roguelike
             _uiManager?.UpdateKnownEnemies(context);
         }
 
+        private bool GetInventoryKeyDown(out int index)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha0))
+            {
+                index = 9;
+                return true;
+            }
+
+            for(var i = (int)KeyCode.Alpha1; i <= (int)KeyCode.Alpha9; i++)
+            {
+                if (Input.GetKeyDown((KeyCode) i))
+                {
+                    index = i - (int)KeyCode.Alpha1;
+                    return true;
+                }
+            }
+
+            index = -1;
+            return false;
+        }
+
         public override void Tick(Dungeon.Dungeon dungeon)
         {
             if (Character == null || Character.IsDead)
                 return;
 
             // Cheats
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+            if (Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Alpha1))
             {
                 Character.AddTimedStatus(CharacterStatusType.Stunned, 2);
                 Debug.Log($"{Character.name} got stunned!");
@@ -146,6 +168,21 @@ namespace Fluid.Roguelike
 
                 if (Character.PickupItem(item) == false)
                     return;
+            }
+            else if (GetInventoryKeyDown(out var index))
+            {
+                if (index >= Character.Inventory.Count)
+                    return;
+
+                var item = Character.Inventory[index];
+                if (item.Meta.Type == ItemType.Weapon && Character.PrimaryWeapon != item)
+                {
+                    Character.SetPrimaryWeapon(item);
+                }
+                else
+                {
+                    return;
+                }
             }
             else
             {
@@ -201,11 +238,23 @@ namespace Fluid.Roguelike
             UpdateVisibility(dungeon);
 
             UpdateMap();
+            UpdateInventory();
+            UpdateScraps();
         }
 
         public void UpdateMap()
         {
             _uiManager?.UpdateMap(Character?.Context);
+        }
+
+        public void UpdateInventory()
+        {
+            _uiManager?.UpdateInventory(Character);
+        }
+
+        public void UpdateScraps()
+        {
+            _uiManager?.UpdateScraps(Character);
         }
 
         public void UpdateVisibility(Dungeon.Dungeon dungeon)

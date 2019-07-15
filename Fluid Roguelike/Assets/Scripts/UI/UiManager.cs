@@ -8,6 +8,7 @@ using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character;
 using Fluid.Roguelike.Character.State;
 using Fluid.Roguelike.Dungeon;
+using Fluid.Roguelike.Item;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -23,7 +24,9 @@ namespace Fluid.Roguelike.UI
         [SerializeField] private List<UnityEngine.UI.Image> _hearts;
         [SerializeField] private RectTransform _equipmentGroup;
         [SerializeField] private UnityEngine.UI.Image _primaryWeapon;
+        [SerializeField] private UILabel _scraps;
         [SerializeField] private RectTransform _knownEnemiesGroup;
+        [SerializeField] private RectTransform _inventoryGroup;
         [SerializeField] private Image _map;
         [SerializeField] private Color _undiscoveredTile;
         [SerializeField] private Color _discoveredWallTile;
@@ -35,7 +38,14 @@ namespace Fluid.Roguelike.UI
 
         private readonly Dictionary<CharacterStatusType, GameObject> _statusesNeedRemoval = new Dictionary<CharacterStatusType, GameObject>();
         private readonly Dictionary<Character.Character, UIKnownEnemyInfo> _knownEnemyInfos = new Dictionary<Character.Character, UIKnownEnemyInfo>();
+        private readonly Dictionary<Item.Item, UIInventoryItem> _inventoryInfo = new Dictionary<Item.Item, UIInventoryItem>();
+
         public enum HeartStages { Full, Half, Empty }
+
+        public void UpdateScraps(Character.Character character)
+        {
+            _scraps.SetLabel(character.Scraps.ToString());
+        }
 
         public void UpdateMap(CharacterContext context)
         {
@@ -125,6 +135,52 @@ namespace Fluid.Roguelike.UI
             _map.sprite.texture.Apply();
         }
 
+        public void UpdateInventory(Character.Character character)
+        {
+            if (character.Inventory.Count == 0)
+            {
+                foreach (var kvp in _inventoryInfo)
+                {
+                    GameObject.Destroy(kvp.Value.gameObject);
+                }
+                _inventoryInfo.Clear();
+            }
+            else
+            {
+                int index = 0;
+                foreach (var item in character.Inventory)
+                {
+                    index++;
+                    UIInventoryItem info = null;
+                    if (_inventoryInfo.ContainsKey(item) == false)
+                    {
+                        info = GameObject.Instantiate(_db.InventoryItemPrefab, _inventoryGroup, false);
+                        info.Setup(item, _db);
+                        _inventoryInfo.Add(item, info);
+                    }
+                    else
+                    {
+                        info = _inventoryInfo[item];
+                    }
+
+                    if (item.Meta.Type == ItemType.Weapon)
+                    {
+                        if (item != character.PrimaryWeapon)
+                        {
+                            if (_db.Find(index.ToString(), out var sprite))
+                            {
+                                info.UpdateSprite(sprite, Color.white);
+                            }
+                        }
+                        else
+                        {
+                            info.SetDefaultSprite();
+                        }
+                    }
+                }
+            }
+        }
+
         public void UpdateKnownEnemies(CharacterContext context)
         {
             if (context.KnownEnemies == null || context.KnownEnemies.Count == 0)
@@ -136,8 +192,7 @@ namespace Fluid.Roguelike.UI
                 }
                 _knownEnemyInfos.Clear();
             }
-
-            if (context.KnownEnemies != null)
+            else
             {
                 List<Character.Character> pendingRemoval = null;
                 foreach (var enemy in context.KnownEnemies)
@@ -261,6 +316,9 @@ namespace Fluid.Roguelike.UI
                     {
                         var heart = _hearts[_hearts.Count - 1];
                         _hearts.RemoveAt(_hearts.Count - 1);
+                        if (heart == null || heart.transform == null || heart.IsDestroyed())
+                            continue;
+
                         heart.sprite = healthDb.Sprites[(int)HeartStages.Empty];
                     }
                 }
