@@ -56,6 +56,10 @@ namespace Fluid.Roguelike.Database
             },
         };
 
+        public List<ScriptableObject> Abilities;
+        public List<string> Items;
+        public List<string> LootItems;
+
         //TODO: Extend with more data later
     }
 

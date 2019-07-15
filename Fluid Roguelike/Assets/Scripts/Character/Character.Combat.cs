@@ -16,20 +16,18 @@ namespace Fluid.Roguelike.Character
 
         public bool Melee(Character target)
         {
-            //TODO: Take stats and equipment into account.
-            Debug.Log($"Hit {target.name}!");
+            if (PrimaryWeapon != null)
+            {
+                if (PrimaryWeapon.TryUse(Context, target))
+                {
+                    return true;
+                }
+            }
 
-            var crit = UnityEngine.Random.value < 0.1f;
-            if (crit)
-            {
-                target.Health -= 4;
-                target.AddTimedStatus(CharacterStatusType.Stunned, 2);
-                Debug.Log($"{target.name} got stunned!");
-            }
-            else
-            {
-                target.Health -= 1;
-            }
+            //TODO: This should be a punch ability on the character (some characters might bite or claw instead).
+            Debug.Log($"{Context.Self.name} punched {target.name}!");
+
+            target.Health -= 1;
 
             return true;
         }

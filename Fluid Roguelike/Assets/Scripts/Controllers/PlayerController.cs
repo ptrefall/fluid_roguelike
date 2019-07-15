@@ -1,6 +1,7 @@
 ﻿
 using Cinemachine;
 using Fluid.Roguelike.Actions;
+using Fluid.Roguelike.Character;
 using Fluid.Roguelike.UI;
 using UnityEngine;
 
@@ -23,20 +24,62 @@ namespace Fluid.Roguelike
 
         public override void Set(Character.Character character)
         {
+            if (Character != null)
+            {
+                Unset(Character);
+            }
+
             base.Set(character);
 
-            var health = character.GetStat(Roguelike.Character.Stats.StatType.Health);
-            health.OnValueChanged += OnHealthChanged;
-            health.OnMaxValueChanged += OnMaxHealthChanged;
+            character.IsPlayerControlled = true;
+            character.OnPrimaryWeaponChanged += OnPrimaryWeaponChanged;
+            character.OnStatusAdded += OnStatusAdded;
+            character.OnStatusRemoved += OnStatusRemoved;
+            character.OnStatusReset += OnStatusReset;
 
-            OnMaxHealthChanged(health, 0);
-            OnHealthChanged(health, 0);
+            var health = character.GetStat(Roguelike.Character.Stats.StatType.Health);
+            if (health != null)
+            {
+                health.OnValueChanged += OnHealthChanged;
+                health.OnMaxValueChanged += OnMaxHealthChanged;
+
+                OnMaxHealthChanged(health, 0);
+                OnHealthChanged(health, 0);
+            }
+
+            if (Character.PrimaryWeapon != null)
+            {
+                OnPrimaryWeaponChanged(Character.PrimaryWeapon, null);
+            }
 
             var cameraBrain = Camera.main.GetComponent<CinemachineBrain>();
             if (cameraBrain != null && cameraBrain.ActiveVirtualCamera != null)
             {
                 cameraBrain.ActiveVirtualCamera.LookAt = character.transform;
                 cameraBrain.ActiveVirtualCamera.Follow = character.transform;
+            }
+        }
+
+        public void Unset(Character.Character character)
+        {
+            Character.IsPlayerControlled = false;
+            character.OnPrimaryWeaponChanged -= OnPrimaryWeaponChanged;
+            character.OnStatusAdded -= OnStatusAdded;
+            character.OnStatusRemoved -= OnStatusRemoved;
+            character.OnStatusReset -= OnStatusReset;
+
+            var health = character.GetStat(Roguelike.Character.Stats.StatType.Health);
+            if (health != null)
+            {
+                health.OnValueChanged -= OnHealthChanged;
+                health.OnMaxValueChanged -= OnMaxHealthChanged;
+            }
+
+            var cameraBrain = Camera.main.GetComponent<CinemachineBrain>();
+            if (cameraBrain != null && cameraBrain.ActiveVirtualCamera != null)
+            {
+                cameraBrain.ActiveVirtualCamera.LookAt = null;
+                cameraBrain.ActiveVirtualCamera.Follow = null;
             }
         }
 
@@ -50,6 +93,26 @@ namespace Fluid.Roguelike
         {
             //TODO: Health UI
             _uiManager?.SetMaxHealth(health.MaxValue);
+        }
+
+        private void OnPrimaryWeaponChanged(Item.Item item, Item.Item oldItem)
+        {
+            _uiManager?.SetPrimaryWeapon(item.Meta);
+        }
+
+        private void OnStatusAdded(Status status)
+        {
+            _uiManager?.AddStatus(status);
+        }
+
+        private void OnStatusRemoved(Status status)
+        {
+            _uiManager?.RemoveStatus(status);
+        }
+
+        private void OnStatusReset()
+        {
+            _uiManager?.ResetStatuses();
         }
 
         public override void Tick(Dungeon.Dungeon dungeon)

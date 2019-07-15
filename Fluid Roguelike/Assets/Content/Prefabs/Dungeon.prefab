@@ -62,6 +62,8 @@ MonoBehaviour:
     type: 3}
   _characterPrefab: {fileID: 2593886561837760541, guid: c3077be8c9dd3234891a4eb6dd6ac1f1,
     type: 3}
+  _itemViewPrefab: {fileID: 5269941042296006276, guid: 6a68e0a6ecda7714f83e0ec9dbc4abd1,
+    type: 3}
   _characterDb: {fileID: 11400000, guid: ef29a709f420d5b4d8bf4dd169a8f553, type: 2}
-  _uiDb: {fileID: 11400000, guid: 4672d2acae6062d4b91034e84a3bac10, type: 2}
+  _itemDb: {fileID: 11400000, guid: afb1fdd57e199004c9ea11f77caef162, type: 2}
   _uiManager: {fileID: 0}

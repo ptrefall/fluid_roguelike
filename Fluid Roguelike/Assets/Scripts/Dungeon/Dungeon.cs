@@ -24,7 +24,9 @@ namespace Fluid.Roguelike.Dungeon
         [SerializeField] private DungeonAgent _agent;
         [SerializeField] private DungeonRoom _dungeonRoomPrefab;
         [SerializeField] private Character.Character _characterPrefab;
+        [SerializeField] private SpriteRenderer _itemViewPrefab;
         [SerializeField] private CharacterDatabaseManager _characterDb;
+        [SerializeField] private ItemDatabaseManager _itemDb;
         [SerializeField] private UiManager _uiManager;
 
         private PlayerController _playerController;
@@ -37,6 +39,11 @@ namespace Fluid.Roguelike.Dungeon
         public Dictionary<int2, MapValue> ValueMap { get; } = new Dictionary<int2, MapValue>();
         public readonly List<DungeonRoom> Rooms = new List<DungeonRoom>();
         public readonly List<DungeonArea> Areas = new List<DungeonArea>();
+
+        public ItemDatabaseManager ItemDb => _itemDb;
+        public SpriteRenderer ItemViewPrefab => _itemViewPrefab;
+        private readonly List<Item.Item> _worldItems = new List<Item.Item>();
+        public List<Item.Item> WorldItems => _worldItems;
 
         private Queue<Color> _areaColors = new Queue<Color>();
 
@@ -249,6 +256,11 @@ namespace Fluid.Roguelike.Dungeon
                         character.AddStat(stat.Type, stat.Value);
                     }
 
+                    foreach (var item in character.Meta.Items)
+                    {
+                        character.GiveItem(item);
+                    }
+
                     brain = data.Brain;
                 }
             }
@@ -274,6 +286,7 @@ namespace Fluid.Roguelike.Dungeon
                 var controller = new PlayerController();
                 controller.Set(_uiManager);
                 controller.Set(character);
+
                 return controller;
             }
 
@@ -294,10 +307,25 @@ namespace Fluid.Roguelike.Dungeon
             {
                 var controller = new AIController(brain);
                 controller.Set(character);
+
                 return controller;
             }
 
             return null;
+        }
+
+        public SpriteRenderer SpawnItemInWorld(Item.Item item, ItemDbEntry meta)
+        {
+            if (item.WorldView != null)
+            {
+                item.WorldView.gameObject.SetActive(true);
+                return item.WorldView;
+            }
+
+            var itemView = Instantiate(_itemViewPrefab);
+            itemView.sprite = meta.Sprite;
+            itemView.color = meta.Color;
+            return itemView;
         }
 
         public DungeonRoom GetRoom(DungeonRoomMeta meta)

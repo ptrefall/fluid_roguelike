@@ -54,8 +54,9 @@ namespace Fluid.Roguelike.Character
             {
                 if (Context.TrySetBumpTarget(bumpTarget))
                 {
-                    if (bumpTarget is Character c && c == Context.CurrentEnemyTarget)
+                    if (bumpTarget is Character c)
                     {
+                        Context.CurrentEnemyTarget = c; // TODO: Check alignment/friendliness
                         Context.SetState(CharacterWorldState.HasEnemyTargetInMeleeRange, true, EffectType.Permanent);
                     }
 

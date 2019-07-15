@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.State;
@@ -12,6 +13,12 @@ namespace Fluid.Roguelike.Character
     {
         private readonly List<Status> _permanentStatuses = new List<Status>();
         private readonly List<Status> _timedStatuses = new List<Status>();
+
+        public delegate void StatusEvent(Status status);
+
+        public StatusEvent OnStatusAdded { get; set; }
+        public StatusEvent OnStatusRemoved { get; set; }
+        public Action OnStatusReset { get; set; }
 
         private Status Create(CharacterStatusType statusType)
         {
@@ -68,6 +75,7 @@ namespace Fluid.Roguelike.Character
             {
                 _permanentStatuses.Add(status);
                 UpdateWorldState(statusType, true);
+                OnStatusAdded?.Invoke(status);
             }
         }
 
@@ -79,6 +87,7 @@ namespace Fluid.Roguelike.Character
                 {
                     _permanentStatuses.Remove(s);
                     UpdateWorldState(statusType, false);
+                    OnStatusRemoved?.Invoke(s);
                     return;
                 }
             }
@@ -94,6 +103,7 @@ namespace Fluid.Roguelike.Character
                     if (s.Life < numTurns)
                         s.Life = numTurns;
 
+                    OnStatusAdded?.Invoke(s);
                     return;
                 }
             }
@@ -104,6 +114,7 @@ namespace Fluid.Roguelike.Character
                 status.Life = numTurns;
                 _timedStatuses.Add(status);
                 UpdateWorldState(statusType, true);
+                OnStatusAdded?.Invoke(status);
             }
         }
 
@@ -115,6 +126,7 @@ namespace Fluid.Roguelike.Character
                 {
                     _timedStatuses.Remove(s);
                     UpdateWorldState(statusType, false);
+                    OnStatusRemoved?.Invoke(s);
                     return;
                 }
             }
@@ -135,6 +147,7 @@ namespace Fluid.Roguelike.Character
                     i--;
 
                     UpdateWorldState(s.Type, false);
+                    OnStatusRemoved?.Invoke(s);
                 }
             }
         }
@@ -143,6 +156,7 @@ namespace Fluid.Roguelike.Character
         {
             _permanentStatuses.Clear();
             _timedStatuses.Clear();
+            OnStatusReset?.Invoke();
         }
 
         public int2 Modify(int2 move, out bool consumed)

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Fluid.Roguelike.Actions;
+using Fluid.Roguelike.Character;
 using UnityEngine;
 
 namespace Fluid.Roguelike.UI
@@ -14,8 +16,65 @@ namespace Fluid.Roguelike.UI
         [SerializeField] private RectTransform _healthGroup;
         [SerializeField] private List<UnityEngine.UI.Image> _maxHearts;
         [SerializeField] private List<UnityEngine.UI.Image> _hearts;
+        [SerializeField] private RectTransform _equipmentGroup;
+        [SerializeField] private UnityEngine.UI.Image _primaryWeapon;
+
+        private readonly Dictionary<CharacterStatusType, GameObject> _statusesNeedRemoval = new Dictionary<CharacterStatusType, GameObject>();
 
         private enum HeartStages { Full, Half, Empty }
+
+        public void AddStatus(Status status)
+        {
+            if (_statusesNeedRemoval.ContainsKey(status.Type))
+                return;
+
+            if (_db.Find(status.Type, out var effect))
+            {
+                var fx = GameObject.Instantiate(effect.Effect, transform, false);
+                if (effect.NeedsRemoval)
+                {
+                    _statusesNeedRemoval.Add(effect.Type, fx);
+                }
+            }
+        }
+
+        public void RemoveStatus(Status status)
+        {
+            if (_statusesNeedRemoval.ContainsKey(status.Type))
+            {
+                var fx = _statusesNeedRemoval[status.Type];
+                GameObject.Destroy(fx);
+                _statusesNeedRemoval.Remove(status.Type);
+            }
+        }
+
+        public void ResetStatuses()
+        {
+            foreach (var kvp in _statusesNeedRemoval)
+            {
+                GameObject.Destroy(kvp.Value);
+            }
+            _statusesNeedRemoval.Clear();
+        }
+
+        public void SetPrimaryWeapon(ItemDbEntry itemMeta)
+        {
+            if (_primaryWeapon == null)
+            {
+                _primaryWeapon = GameObject.Instantiate(_db.ItemUiPrefab, _equipmentGroup, false);
+            }
+
+            if (itemMeta != null)
+            {
+                _primaryWeapon.sprite = itemMeta.Sprite;
+                _primaryWeapon.color = itemMeta.Color;
+            }
+            else
+            {
+                _primaryWeapon.sprite = null;
+                _primaryWeapon.color = Color.white;
+            }
+        }
 
         public void SetHealth(int value)
         {
