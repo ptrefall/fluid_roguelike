@@ -1,7 +1,9 @@
-﻿using Fluid.Roguelike.Ability;
+﻿using System.Collections.Generic;
+using Fluid.Roguelike.Ability;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.State;
 using Fluid.Roguelike.Database;
+using Fluid.Roguelike.Interaction;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -15,6 +17,7 @@ namespace Fluid.Roguelike.Item
         private Dungeon.Dungeon _dungeon;
         private ItemDbEntry _meta;
         private SpriteRenderer _worldView;
+        private List<IInteractible> _interactions;
 
         public ItemDbEntry Meta => _meta;
         public SpriteRenderer WorldView => _worldView;
@@ -40,6 +43,17 @@ namespace Fluid.Roguelike.Item
         {
             _dungeon = dungeon;
             _meta = meta;
+            if (meta.Interactions.Count > 0)
+            {
+                _interactions = new List<IInteractible>();
+                foreach (var iMeta in meta.Interactions)
+                {
+                    if (iMeta is IInteractibleMeta interaction)
+                    {
+                        _interactions.Add(interaction.Create(this));
+                    }
+                }
+            }
 
             if (spawnInWorld)
             {
@@ -53,6 +67,32 @@ namespace Fluid.Roguelike.Item
             {
                 GameObject.Destroy(_worldView.gameObject);
             }
+        }
+
+        public bool TryInteract(Character.Character character)
+        {
+            foreach (var interaction in _interactions)
+            {
+                if (interaction.TryInteract(character))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool Blocks(Character.Character character, out IBumpTarget bumpTarget)
+        {
+            foreach (var interaction in _interactions)
+            {
+                if (interaction is IBumpTarget bt)
+                {
+                    bumpTarget = bt;
+                    return true;
+                }
+            }
+
+            bumpTarget = null;
+            return false;
         }
 
         public void Pickup()
@@ -108,6 +148,11 @@ namespace Fluid.Roguelike.Item
             }
 
             return false;
+        }
+
+        public void Visibility(bool isVisible)
+        {
+            _worldView.gameObject.SetActive(isVisible);
         }
     }
 }

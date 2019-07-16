@@ -7,18 +7,12 @@ namespace Fluid.Roguelike.Effects
 {
     public class PlayShake : MonoBehaviour, IUIStatusUpdater
     {
+        [SerializeField] private float _shakeDuration = 0.3f;
         private CameraShake _shaker;
+
         private void Start()
         {
-            var camera = Camera.main;
-            if (camera != null)
-            {
-                _shaker = camera.GetComponent<CameraShake>();
-                if (_shaker != null)
-                {
-                    _shaker.Shake();
-                }
-            }
+            _shaker = CameraShake.ShakeStatic(_shakeDuration);
         }
 
         public void Setup(int turns)
@@ -31,7 +25,7 @@ namespace Fluid.Roguelike.Effects
             if (_shaker == null)
                 Start();
             else
-                _shaker.Shake();
+                _shaker.Shake(_shakeDuration);
         }
     }
 }

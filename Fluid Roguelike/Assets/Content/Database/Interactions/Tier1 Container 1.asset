@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Tier1 Container 1
+  m_EditorClassIdentifier: Assembly-CSharp:Fluid.Roguelike.Interaction:ContainerMeta
+  ItemDb: {fileID: 11400000, guid: afb1fdd57e199004c9ea11f77caef162, type: 2}
+  LootItems:
+  - Item: Short Sword
+    DropChance: 0.5
+    CanDropMultipleTimes: 0
+  - Item: Broken Bone
+    DropChance: 0.75
+    CanDropMultipleTimes: 0
+  AlwaysDropLootItems: []
+  MinLootDrops: 1
+  MaxLootDrops: 1

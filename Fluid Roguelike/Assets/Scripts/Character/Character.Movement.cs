@@ -49,7 +49,7 @@ namespace Fluid.Roguelike.Character
             }
 
             // Check collision in direction that should trigger interaction instead
-            var bumpTarget = Context.Dungeon.TryGetBumpTarget(targetPosition, hitPlayer: !isPlayer);
+            var bumpTarget = Context.Dungeon.TryGetBumpTarget(targetPosition, hitPlayer: !isPlayer, this);
             if (bumpTarget != null)
             {
                 if (Context.TrySetBumpTarget(bumpTarget))

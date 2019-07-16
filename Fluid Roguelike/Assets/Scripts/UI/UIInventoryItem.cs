@@ -33,7 +33,7 @@ namespace Fluid.Roguelike.UI
             _item = item;
             _db = db;
 
-            Name = item.Meta.Name;
+            Name = item.Meta.DisplayName;
             _icon.sprite = item.Meta.Sprite;
             _icon.color = item.Meta.Color;
 

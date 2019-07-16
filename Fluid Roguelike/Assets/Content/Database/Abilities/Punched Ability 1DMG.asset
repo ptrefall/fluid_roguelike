@@ -15,3 +15,8 @@ MonoBehaviour:
   _damage: 1
   _critChance: 0.05
   _attackVerb: punched
+  _hitEffectPrefab: {fileID: -4019300209289905667, guid: 560e08cf6359b2a439c4da24d05c96f9,
+    type: 3}
+  _criticalHitEffectPrefab: {fileID: -4019300209289905667, guid: ade8db6422ceb0d4893a782be2f5d9a4,
+    type: 3}
+  _missedEffectPrefab: {fileID: 0}

@@ -15,6 +15,7 @@ MonoBehaviour:
   _race: kobold
   _db:
   - Name: warrior
+    DisplayName: Kobold Warrior
     Sprite: {fileID: 6445117415765249051, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
       type: 3}
     DeathSprite: {fileID: 0}
@@ -36,3 +37,7 @@ MonoBehaviour:
     LootItems:
     - Item: Short Sword
       DropChance: 1
+      CanDropMultipleTimes: 0
+    AlwaysDropLootItems: []
+    MinLootDrops: 1
+    MaxLootDrops: 1

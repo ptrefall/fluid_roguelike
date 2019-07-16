@@ -33,9 +33,11 @@ namespace Fluid.Roguelike.Database
     public class ItemDbEntry
     {
         public string Name;
+        public string DisplayName;
         public Item.ItemType Type;
         public Item.ItemRarity Rarity;
-        public List<ScriptableObject> Abilities;
+        public List<ScriptableObject> Abilities; // IAbility
+        public List<ScriptableObject> Interactions; // IInteractibleMeta
         public int DefaultAbilityIndex = 0;
         public int ScrapsValue = 0;
 

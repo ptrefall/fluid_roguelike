@@ -44,7 +44,7 @@ namespace Fluid.Roguelike.UI
                 OnHealthChanged(health, 0);
             }
 
-            Name = character.name;
+            Name = character.Meta.DisplayName;
         }
 
         private void OnPrimaryWeaponChanged(Item.Item item, Item.Item oldItem)

@@ -3,8 +3,10 @@ using Cinemachine;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character;
 using Fluid.Roguelike.Character.State;
+using Fluid.Roguelike.Effects;
 using Fluid.Roguelike.Item;
 using Fluid.Roguelike.UI;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Fluid.Roguelike
@@ -20,7 +22,9 @@ namespace Fluid.Roguelike
         private const float keyPause = 0.15f;
 
         private string oldCharacterName;
-        private int _lastKnownEnemyCount = 0;
+        private int _lastFieldOfViewEnemyCount = 0;
+
+        private int2 _lastMoveDir = int2.zero;
 
         public void Set(UiManager uiManager)
         {
@@ -132,12 +136,22 @@ namespace Fluid.Roguelike
         {
             _uiManager?.UpdateKnownEnemies(context);
 
-            if (context.KnownEnemies.Count > _lastKnownEnemyCount)
+            int inFieldOfViewCount = 0;
+            foreach (var enemy in context.KnownEnemies)
             {
-                forceKeyDown = true;
+                if (context.FieldOfView.ContainsKey(enemy.Position))
+                {
+                    inFieldOfViewCount++;
+                }
             }
 
-            _lastKnownEnemyCount = context.KnownEnemies.Count;
+            if (inFieldOfViewCount > _lastFieldOfViewEnemyCount)
+            {
+                forceKeyDown = true;
+                CameraShake.ShakeStatic();
+            }
+
+            _lastFieldOfViewEnemyCount = inFieldOfViewCount;
         }
 
         private bool GetInventoryKeyDown(out int index)
@@ -180,9 +194,15 @@ namespace Fluid.Roguelike
             {
                 var item = dungeon.GetItemAt(Character.Position);
                 if (item == null)
-                    return;
+                {
+                    item = dungeon.GetItemAt(Character.Position + _lastMoveDir);
+                    if (item == null)
+                    {
+                        return;
+                    }
+                }
 
-                if (Character.PickupItem(item) == false)
+                if (Character.TryInteract(item) == false)
                     return;
             }
             else if (GetInventoryKeyDown(out var index))
@@ -208,6 +228,7 @@ namespace Fluid.Roguelike
                 if (dir != MoveDirection.None)
                 {
                     result = Move(dungeon, dir, true);
+                    _lastMoveDir = DirectionToVec(dir);
                 }
 
                 // We did not consume a turn
@@ -307,6 +328,18 @@ namespace Fluid.Roguelike
                     else
                     {
                         character.Visibility(false);
+                    }
+                }
+
+                foreach (var item in dungeon.WorldItems)
+                {
+                    if (Character.Context.FieldOfView.ContainsKey(item.WorldPosition))
+                    {
+                        item.Visibility(true);
+                    }
+                    else
+                    {
+                        item.Visibility(false);
                     }
                 }
             }

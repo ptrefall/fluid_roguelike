@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Fluid.Roguelike.Database;
 using Unity.Mathematics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 namespace Fluid.Roguelike.Dungeon
@@ -330,6 +331,18 @@ namespace Fluid.Roguelike.Dungeon
                         ValueMap.Add(globalKey, kvp.Value);
                     }
                 }
+
+                foreach (var kvp in decorator.ItemMap)
+                {
+                    var globalKey = new int2(kvp.Key.x + _meta.CenterX, kvp.Key.y + _meta.CenterY);
+                    dungeon.SpawnItemInWorld(kvp.Value, globalKey);
+                }
+
+                foreach (var kvp in decorator.CharacterMap)
+                {
+                    var globalKey = new int2(kvp.Key.x + _meta.CenterX, kvp.Key.y + _meta.CenterY);
+                    dungeon.SpawnAi(kvp.Value.Item1, kvp.Value.Item2, globalKey);
+                }
             }
         }
 
@@ -451,13 +464,52 @@ namespace Fluid.Roguelike.Dungeon
             }
         }
 
+        public static void WallOutTheVoid(Dungeon dungeon)
+        {
+            var map = new Dictionary<int2, Dungeon.MapValue>(dungeon.ValueMap);
+            foreach (var kvp in map)
+            {
+                if (kvp.Value.Room == null)
+                {
+                    Debug.LogError($"{kvp.Value} has no room!");
+                    continue;
+                }
+
+                TryWallOutTheVoid(dungeon, kvp.Value.Room, kvp.Key, kvp.Value, BuilderDirection.North);
+                TryWallOutTheVoid(dungeon, kvp.Value.Room, kvp.Key, kvp.Value, BuilderDirection.East);
+                TryWallOutTheVoid(dungeon, kvp.Value.Room, kvp.Key, kvp.Value, BuilderDirection.South);
+                TryWallOutTheVoid(dungeon, kvp.Value.Room, kvp.Key, kvp.Value, BuilderDirection.West);
+            }
+        }
+
+        private static void TryWallOutTheVoid(Dungeon dungeon, DungeonRoom room, int2 key, Dungeon.MapValue origin, BuilderDirection direction)
+        {
+            var value = dungeon.ValueMap[key];
+
+            var adjacentKey = GetAdjacentKey(dungeon, key, direction);
+            if (dungeon.ValueMap.ContainsKey(adjacentKey) == false)
+            {
+                var tile = new Dungeon.MapValue
+                {
+                    Theme = origin.Theme,
+                    Index = DungeonTile.Index.Wall,
+                    Room = room,
+                };
+                dungeon.ValueMap.Add(adjacentKey, tile);
+                room.ValueMap.Add(adjacentKey, value);
+            }
+        }
+
         public static void WallIn(Dungeon dungeon, DungeonTheme theme)
         {
             var map = new Dictionary<int2, Dungeon.MapValue>(dungeon.ValueMap);
             foreach (var kvp in map)
             {
                 if (kvp.Value.Room == null)
+                {
+                    Debug.LogError($"{kvp.Value} has no room!");
                     continue;
+                }
 
                 TryWallIn(dungeon, kvp.Value.Room, theme, kvp.Key, BuilderDirection.North);
                 TryWallIn(dungeon, kvp.Value.Room, theme, kvp.Key, BuilderDirection.East);

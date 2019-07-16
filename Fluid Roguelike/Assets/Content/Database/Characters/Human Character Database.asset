@@ -15,6 +15,7 @@ MonoBehaviour:
   _race: human
   _db:
   - Name: naked
+    DisplayName: Human
     Sprite: {fileID: -2498970910985527441, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
       type: 3}
     DeathSprite: {fileID: -7770711556875768801, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
@@ -34,3 +35,6 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 04ea681cd2cd4c54687c0382380a0a70, type: 2}
     Items: []
     LootItems: []
+    AlwaysDropLootItems: []
+    MinLootDrops: 0
+    MaxLootDrops: 1

@@ -79,6 +79,8 @@ namespace Fluid.Roguelike.Dungeon
             DungeonRoom.WallIn(this, DungeonTheme.Cave);
             DungeonRoom.WallIn(this, DungeonTheme.Forest);
 
+            DungeonRoom.WallOutTheVoid(this);
+
             foreach (var room in Rooms)
             {
                 var foundArea = false;
@@ -167,6 +169,12 @@ namespace Fluid.Roguelike.Dungeon
                         }
                     }
                     Rooms.Add(splitRoom);
+
+                    // Add some treasure here if possible
+                    if (splitRoom.GetValidSpawnPosition(this, out var spawnPosition))
+                    {
+                        SpawnItemInWorld("Tier1 Container 1", spawnPosition);
+                    }
                 }
             }
         }
@@ -179,7 +187,7 @@ namespace Fluid.Roguelike.Dungeon
             if (_agent.Context.PlayerSpawnMeta != null)
             {
                 _playerController =
-                    SpawnPlayer("human", "naked", _agent.Context.PlayerSpawnMeta); // player -> naked/warrior/etc
+                    SpawnPlayer("human", "naked", _agent.Context.PlayerSpawnMeta);
             }
 
             foreach (var npcMeta in _agent.Context.NpcSpawnMeta)
@@ -205,7 +213,7 @@ namespace Fluid.Roguelike.Dungeon
             _playerController?.UpdateScraps();
         }
 
-        public IBumpTarget TryGetBumpTarget(int2 position, bool hitPlayer)
+        public IBumpTarget TryGetBumpTarget(int2 position, bool hitPlayer, Character.Character character = null)
         {
             if (hitPlayer)
             {
@@ -225,6 +233,21 @@ namespace Fluid.Roguelike.Dungeon
                 if (equality.x && equality.y)
                 {
                     return ai.Character;
+                }
+            }
+
+            if (character != null)
+            {
+                foreach (var item in _worldItems)
+                {
+                    var equality = (item.WorldPosition == position);
+                    if (equality.x && equality.y)
+                    {
+                        if (item.Blocks(character, out var bumpTarget))
+                        {
+                            return bumpTarget;
+                        }
+                    }
                 }
             }
 
@@ -312,6 +335,34 @@ namespace Fluid.Roguelike.Dungeon
                 controller.Set(character);
 
                 return controller;
+            }
+
+            return null;
+        }
+
+        public Character.Character SpawnAi(string race, string name, int2 position)
+        {
+            var character = Spawn(race, name, position, out var brain);
+            if (character != null)
+            {
+                var controller = new AIController(brain);
+                controller.Set(character);
+                _aiControllers.Add(controller);
+            }
+
+            return character;
+        }
+
+        public Item.Item SpawnItemInWorld(string itemName, int2 position)
+        {
+            ItemDbEntry meta;
+            if (ItemDb.Find(itemName, out meta))
+            {
+                var item = new Item.Item();
+                item.Setup(this, meta, spawnInWorld: false);
+                DropItemIntoWorld(item, position);
+                Debug.Log($"{itemName} was spawned into the world at {position}");
+                return item;
             }
 
             return null;
@@ -506,7 +557,8 @@ namespace Fluid.Roguelike.Dungeon
 
         public void TickAI()
         {
-            foreach (var ai in _aiControllers)
+            var controllers = new List<AIController>(_aiControllers);
+            foreach (var ai in controllers)
             {
                 ai.Tick(this);
             }

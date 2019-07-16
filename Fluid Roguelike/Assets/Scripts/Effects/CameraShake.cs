@@ -33,6 +33,43 @@ namespace Fluid.Roguelike.Effects
             ShakeElapsedTime = ShakeDuration;
         }
 
+        public void Shake(float shakeDuration)
+        {
+            ShakeElapsedTime = shakeDuration;
+        }
+
+        public static CameraShake ShakeStatic()
+        {
+            var camera = Camera.main;
+            if (camera != null)
+            {
+                var shaker = camera.GetComponent<CameraShake>();
+                if (shaker != null)
+                {
+                    shaker.Shake();
+                    return shaker;
+                }
+            }
+
+            return null;
+        }
+
+        public static CameraShake ShakeStatic(float shakeDuration)
+        {
+            var camera = Camera.main;
+            if (camera != null)
+            {
+                var shaker = camera.GetComponent<CameraShake>();
+                if (shaker != null)
+                {
+                    shaker.Shake(shakeDuration);
+                    return shaker;
+                }
+            }
+
+            return null;
+        }
+
         // Update is called once per frame
         void Update()
         {

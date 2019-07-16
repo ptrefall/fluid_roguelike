@@ -75,6 +75,7 @@ namespace Fluid.Roguelike.Character
                 var value = Context.Dungeon.Destroy(item);
                 Debug.Log($"{Context.Self.name} picked up {value} scraps.");
                 Scraps += value;
+                return true;
             }
 
             foreach (var i in _inventory)
@@ -121,22 +122,64 @@ namespace Fluid.Roguelike.Character
         public List<Item.Item> SpawnLoot()
         {
             List<Item.Item> loot = new List<Item.Item>();
-            foreach (var entry in Meta.LootItems)
-            {
-                if (UnityEngine.Random.value >= entry.DropChance)
-                    continue;
+            var numToSpawn = UnityEngine.Random.Range(Meta.MinLootDrops, Meta.MaxLootDrops + 1);
 
-                ItemDbEntry meta;
-                if (this.Context.Dungeon.ItemDb.Find(entry.Item, out meta))
+            if (Meta.AlwaysDropLootItems.Count > 0)
+            {
+                numToSpawn -= Meta.AlwaysDropLootItems.Count;
+                if (Meta.AlwaysDropLootItems.Count >= Meta.MaxLootDrops && Meta.LootItems.Count > 0)
                 {
-                    var item = new Item.Item();
-                    item.Setup(Context.Dungeon, meta, spawnInWorld: true);
-                    loot.Add(item);
-                    DropItem(item);
+                    Debug.LogError("Random loot will never drop. Always drop loot takes up all the slots");
+                }
+
+                foreach (var entry in Meta.AlwaysDropLootItems)
+                {
+                    SpawnLootEntry(entry, loot);
+                }
+            }
+
+            if (numToSpawn <= 0)
+                return loot;
+
+            var lootPool = new List<LootDbEntry>(Meta.LootItems);
+            for (var i = 0; i < numToSpawn; i++)
+            {
+                var totalWeight = 0f;
+                foreach (var entry in lootPool)
+                {
+                    totalWeight += entry.DropChance;
+                }
+
+                var targetWeight = UnityEngine.Random.value * totalWeight;
+                foreach (var entry in lootPool)
+                {
+                    targetWeight -= entry.DropChance;
+                    if (targetWeight <= 0)
+                    {
+                        if (!entry.CanDropMultipleTimes)
+                        {
+                            lootPool.Remove(entry);
+                        }
+
+                        SpawnLootEntry(entry, loot);
+                        break;
+                    }
                 }
             }
 
             return loot;
+        }
+
+        private void SpawnLootEntry(LootDbEntry entry, List<Item.Item> loot)
+        {
+            ItemDbEntry meta;
+            if (this.Context.Dungeon.ItemDb.Find(entry.Item, out meta))
+            {
+                var item = new Item.Item();
+                item.Setup(Context.Dungeon, meta, spawnInWorld: true);
+                loot.Add(item);
+                DropItem(item);
+            }
         }
     }
 }

@@ -379,8 +379,42 @@ namespace Fluid.Roguelike.Dungeon
                     {
                         Debug.Log($"Spawn decoration {textAsset.name} in room {parentRoom.Id}\n");
                         var decorationMeta = new DungeonRoomDecorationMeta();
-                        decorationMeta.Generate(theme, textAsset);
+                        decorationMeta.GenerateGround(theme, textAsset);
                         parentRoom.DecorationMeta.Add(decorationMeta);
+                        return TaskStatus.Success;
+                    }
+
+                    Debug.Log($"Error! Can't spawn decoration in the void!\n");
+                    return TaskStatus.Failure;
+                });
+            }
+            End();
+
+            return this;
+        }
+
+        public DungeonDomainBuilder AddDecoration(DungeonTheme theme, DecorationInfo info)
+        {
+            if (info == null)
+                return this;
+
+            Action($"Add decoration");
+            {
+                Do((context) =>
+                {
+                    var parentRoom = context.RoomStack.Peek();
+                    if (parentRoom != null)
+                    {
+                        var decorationName = info.Ground != null ? info.Ground.name :
+                            info.Items != null ? info.Items.name :
+                            info.Characters != null ? info.Characters.name : "";
+                        Debug.Log($"Spawn decoration {decorationName} in room {parentRoom.Id}\n");
+                        
+
+                        var decorationMeta = new DungeonRoomDecorationMeta();
+                        decorationMeta.Generate(theme, info);
+                        parentRoom.DecorationMeta.Add(decorationMeta);
+
                         return TaskStatus.Success;
                     }
 

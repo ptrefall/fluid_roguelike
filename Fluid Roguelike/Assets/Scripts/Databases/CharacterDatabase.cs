@@ -35,6 +35,7 @@ namespace Fluid.Roguelike.Database
     public class CharacterDbEntry
     {
         public string Name;
+        public string DisplayName;
         public Sprite Sprite;
         public Sprite DeathSprite;
         public Color Color = UnityEngine.Color.white;
@@ -59,6 +60,9 @@ namespace Fluid.Roguelike.Database
         public List<ScriptableObject> Abilities;
         public List<string> Items;
         public List<LootDbEntry> LootItems;
+        public List<LootDbEntry> AlwaysDropLootItems;
+        public int MinLootDrops = 0;
+        public int MaxLootDrops = 1;
 
         //TODO: Extend with more data later
     }
@@ -75,6 +79,7 @@ namespace Fluid.Roguelike.Database
     {
         public string Item;
         public float DropChance = 1f;
+        public bool CanDropMultipleTimes = false;
     }
 
     [CreateAssetMenu(fileName = "Character Database Manager", menuName = "Content/Character Database Manager")]

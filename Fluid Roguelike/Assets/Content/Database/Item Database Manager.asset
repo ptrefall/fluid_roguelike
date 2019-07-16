@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp:Fluid.Roguelike.Database:ItemDatabaseManager
   _dbs:
   - {fileID: 11400000, guid: 0dc50a3a64389fc438a1bd0a91ae05a7, type: 2}
+  - {fileID: 11400000, guid: a26d3cd54ee6496498bd4a6eb97987a5, type: 2}

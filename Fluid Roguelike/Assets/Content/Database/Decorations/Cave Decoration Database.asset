@@ -14,6 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _db:
   - Type: 0
-    Assets:
+    GroundAssets:
     - Asset: {fileID: 4900000, guid: bc30ae7d476aa2a47a7934222e4d0a96, type: 3}
-      Weight: 100
+      Weight: 1
+    ItemAssets:
+    - Asset: {fileID: 4900000, guid: d51b59109eb50eb47a0b3a13943bee50, type: 3}
+      Weight: 1
+    CharacterAssets: []
