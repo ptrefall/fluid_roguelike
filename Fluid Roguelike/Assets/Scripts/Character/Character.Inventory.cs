@@ -25,6 +25,8 @@ namespace Fluid.Roguelike.Character
 
         public int Scraps { get; set; }
 
+        private List<string> _specialAlwaysDrop = new List<string>();
+
         public void SetPrimaryWeapon(Item.Item item)
         {
             var oldItem = PrimaryWeapon;
@@ -119,9 +121,39 @@ namespace Fluid.Roguelike.Character
             Debug.Log($"{Context.Self.name} drops a {item.Meta.Name}");
         }
 
+        public Item.Item FindItem(string name)
+        {
+            name = name.ToLower();
+            foreach (var item in _inventory)
+            {
+                if (item.Meta.Name.ToLower() == name)
+                {
+                    return item;
+                }
+            }
+
+            return null;
+        }
+
+        public void AddSpecialLootDrop(string itemName)
+        {
+            _specialAlwaysDrop.Add(itemName);
+        }
+
         public List<Item.Item> SpawnLoot()
         {
             List<Item.Item> loot = new List<Item.Item>();
+
+            // We always spawn these special loot drops, they don't
+            // even count into the normal spawn num meta.
+            foreach (var itemName in _specialAlwaysDrop)
+            {
+                if (Context.Dungeon.ItemDb.Find(itemName, out var entry))
+                {
+                    SpawnLootEntry(entry, loot);
+                }
+            }
+
             var numToSpawn = UnityEngine.Random.Range(Meta.MinLootDrops, Meta.MaxLootDrops + 1);
 
             if (Meta.AlwaysDropLootItems.Count > 0)
@@ -172,11 +204,18 @@ namespace Fluid.Roguelike.Character
 
         private void SpawnLootEntry(LootDbEntry entry, List<Item.Item> loot)
         {
-            ItemDbEntry meta;
-            if (this.Context.Dungeon.ItemDb.Find(entry.Item, out meta))
+            if (this.Context.Dungeon.ItemDb.Find(entry.Item, out var meta))
+            {
+                SpawnLootEntry(meta, loot);
+            }
+        }
+
+        private void SpawnLootEntry(ItemDbEntry entry, List<Item.Item> loot)
+        {
+            if (entry != null)
             {
                 var item = new Item.Item();
-                item.Setup(Context.Dungeon, meta, spawnInWorld: true);
+                item.Setup(Context.Dungeon, entry, spawnInWorld: true);
                 loot.Add(item);
                 DropItem(item);
             }

@@ -19,5 +19,26 @@ namespace Fluid.Roguelike.Character
         {
             return item.TryInteract(this);
         }
+
+        public bool AddSpecial(string special)
+        {
+            var split = special.Split(':');
+            if (split.Length < 2 || split.Length > 2)
+            {
+                Debug.LogError($"Error in syntax reading special {special} for item {Meta.Name}!");
+                return false;
+            }
+
+            var key = split[0];
+            var value = split[1];
+
+            if (key.ToLower() == "loot")
+            {
+                AddSpecialLootDrop(value);
+                return true;
+            }
+
+            return false;
+        }
     }
 }

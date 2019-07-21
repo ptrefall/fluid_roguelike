@@ -1,1 +1,1 @@
-3,3,Tier1 Container 1
+3,3,Tier1 Container 1,require:KeyA

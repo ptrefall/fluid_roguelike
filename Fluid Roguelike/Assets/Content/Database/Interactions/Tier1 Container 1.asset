@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: a95e1d185de966640b1ba8b839af44e4, type: 3}
   m_Name: Tier1 Container 1
-  m_EditorClassIdentifier: Assembly-CSharp:Fluid.Roguelike.Interaction:ContainerMeta
+  m_EditorClassIdentifier: 
   ItemDb: {fileID: 11400000, guid: afb1fdd57e199004c9ea11f77caef162, type: 2}
   LootItems:
   - Item: Short Sword

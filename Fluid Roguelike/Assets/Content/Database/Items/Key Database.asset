@@ -10,19 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e76b4d5f1637c94aa55dcb6a099b9a3, type: 3}
-  m_Name: Container Database
+  m_Name: Key Database
   m_EditorClassIdentifier: 
   _db:
-  - Name: Tier1 Container 1
-    DisplayName: Chest
+  - Name: KeyA
+    DisplayName: A simple key
     Type: 4
     Rarity: 0
     Abilities: []
     Interactions:
-    - {fileID: 11400000, guid: 46c53ae73bf0c364690e8cc945190a41, type: 2}
-    - {fileID: 11400000, guid: af31f7462ad55354aa0ade42ebf32b26, type: 2}
+    - {fileID: 11400000, guid: 49b8d02a536f500409234f3d895a03f5, type: 2}
     DefaultAbilityIndex: 0
     ScrapsValue: 0
-    Sprite: {fileID: 7877551864742137088, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+    Sprite: {fileID: -8315593427073233818, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
       type: 3}
     Color: {r: 1, g: 1, b: 1, a: 1}

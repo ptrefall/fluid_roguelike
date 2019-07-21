@@ -7,27 +7,11 @@ using Random = UnityEngine.Random;
 
 namespace Fluid.Roguelike.Interaction
 {
-    [CreateAssetMenu(fileName = "Container", menuName = "Content/Interactions/Container")]
-    public class ContainerMeta : ScriptableObject, IInteractibleMeta
-    {
-        public ItemDatabaseManager ItemDb;
-        public List<LootDbEntry> LootItems;
-        public List<LootDbEntry> AlwaysDropLootItems;
-        public int MinLootDrops = 0;
-        public int MaxLootDrops = 1;
-
-        public IInteractible Create(Item.Item item)
-        {
-            var value = new Container();
-            value.Setup(item, this);
-            return value;
-        }
-    }
-
     public class Container : IInteractible
     {
         private Item.Item _item;
         private ContainerMeta _meta;
+        private string _keyName;
 
         public void Setup(Item.Item item, IInteractibleMeta meta)
         {
@@ -37,9 +21,32 @@ namespace Fluid.Roguelike.Interaction
 
         public bool TryInteract(Character.Character character)
         {
+            if (string.IsNullOrEmpty(_keyName) == false)
+            {
+                var key = character.FindItem(_keyName);
+                if (key == null)
+                {
+                    Debug.Log($"{character.name} does not have a matching key to open {_item.Meta.DisplayName}!");
+                    return false;
+                }
+
+                character.Context.Dungeon.Destroy(key);
+            }
+
             var loot = SpawnLoot(character);
             character.Context.Dungeon.Destroy(_item);
             return true;
+        }
+
+        public bool TryApply(string key, string value)
+        {
+            if (key == "require")
+            {
+                _keyName = value;
+                return true;
+            }
+
+            return false;
         }
 
         private List<Item.Item> SpawnLoot(Character.Character character)

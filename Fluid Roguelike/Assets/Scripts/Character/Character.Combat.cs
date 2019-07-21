@@ -18,8 +18,15 @@ namespace Fluid.Roguelike.Character
 
         public Action<Character> OnDeath { get; set; }
 
+        public bool GodMode { get; set; } = false;
+
         public bool Melee(Character target)
         {
+            if (target.GodMode)
+            {
+                return true;
+            }
+
             if (PrimaryWeapon != null)
             {
                 if (PrimaryWeapon.TryUse(Context, target))

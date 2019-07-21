@@ -466,7 +466,6 @@ namespace Fluid.Roguelike.Dungeon
                     EndRepeat();
                     {
                         AddDecoration(DungeonTheme.Cave, _decorations.Find(DungeonTheme.Cave, DecorationType.Altar));
-                        TrySpawnNpc("kobold", "warrior");
                     }
                 }
             }

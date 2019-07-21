@@ -20,4 +20,6 @@ MonoBehaviour:
     ItemAssets:
     - Asset: {fileID: 4900000, guid: d51b59109eb50eb47a0b3a13943bee50, type: 3}
       Weight: 1
-    CharacterAssets: []
+    CharacterAssets:
+    - Asset: {fileID: 4900000, guid: cbb6ec6c7dffe704380a98b388737a79, type: 3}
+      Weight: 1

@@ -154,6 +154,32 @@ namespace Fluid.Roguelike.UI
             }
             else
             {
+                // First remove items no longer in the inventory
+                List<Item.Item> removeKeys = null;
+                foreach (var kvp in _inventoryInfo)
+                {
+                    if (character.Inventory.Contains(kvp.Key) == false)
+                    {
+                        if (removeKeys == null)
+                        {
+                            removeKeys = new List<Item.Item>();
+                        }
+                        
+                        removeKeys.Add(kvp.Key);
+                    }
+                }
+
+                if (removeKeys != null)
+                {
+                    foreach (var key in removeKeys)
+                    {
+                        var value = _inventoryInfo[key];
+                        _inventoryInfo.Remove(key);
+                        GameObject.Destroy(value.gameObject);
+                    }
+                }
+
+                // Then add new items in inventory to ui
                 int index = 0;
                 foreach (var item in character.Inventory)
                 {

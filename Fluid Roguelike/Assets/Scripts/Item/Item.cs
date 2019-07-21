@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using Fluid.Roguelike.Ability;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.State;
@@ -153,6 +154,30 @@ namespace Fluid.Roguelike.Item
         public void Visibility(bool isVisible)
         {
             _worldView.gameObject.SetActive(isVisible);
+        }
+
+        public bool AddSpecial(string special)
+        {
+            var split = special.Split(':');
+            if (split.Length < 2 || split.Length > 2)
+            {
+                Debug.LogError($"Error in syntax reading special {special} for item {Meta.Name}!");
+                return false;
+            }
+
+            var key = split[0].TrimStart().TrimEnd().ToString(CultureInfo.InvariantCulture);
+            var value = split[1].TrimStart().TrimEnd().ToString(CultureInfo.InvariantCulture);
+            
+            bool result = false;
+            foreach (var interaction in _interactions)
+            {
+                if (interaction.TryApply(key, value))
+                {
+                    result = true;
+                }
+            }
+
+            return result;
         }
     }
 }

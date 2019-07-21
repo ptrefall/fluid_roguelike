@@ -335,13 +335,21 @@ namespace Fluid.Roguelike.Dungeon
                 foreach (var kvp in decorator.ItemMap)
                 {
                     var globalKey = new int2(kvp.Key.x + _meta.CenterX, kvp.Key.y + _meta.CenterY);
-                    dungeon.SpawnItemInWorld(kvp.Value, globalKey);
+                    var item = dungeon.SpawnItemInWorld(kvp.Value, globalKey);
+                    if (decorator.ItemSpecialsMap.ContainsKey(kvp.Key))
+                    {
+                        item.AddSpecial(decorator.ItemSpecialsMap[kvp.Key]);
+                    }
                 }
 
                 foreach (var kvp in decorator.CharacterMap)
                 {
                     var globalKey = new int2(kvp.Key.x + _meta.CenterX, kvp.Key.y + _meta.CenterY);
-                    dungeon.SpawnAi(kvp.Value.Item1, kvp.Value.Item2, globalKey);
+                    var character = dungeon.SpawnAi(kvp.Value.Item1, kvp.Value.Item2, globalKey);
+                    if (decorator.CharacterSpecialsMap.ContainsKey(kvp.Key))
+                    {
+                        character.AddSpecial(decorator.CharacterSpecialsMap[kvp.Key]);
+                    }
                 }
             }
         }

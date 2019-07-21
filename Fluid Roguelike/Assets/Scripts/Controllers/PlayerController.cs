@@ -79,6 +79,7 @@ namespace Fluid.Roguelike
             if (!string.IsNullOrEmpty(oldCharacterName))
             {
                 character.name = oldCharacterName;
+                character.GodMode = false;
             }
             character.IsPlayerControlled = false;
             character.OnPrimaryWeaponChanged -= OnPrimaryWeaponChanged;
@@ -185,6 +186,11 @@ namespace Fluid.Roguelike
             {
                 Character.AddTimedStatus(CharacterStatusType.Stunned, 2);
                 Debug.Log($"{Character.name} got stunned!");
+                return;
+            }
+            else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                Character.GodMode = !Character.GodMode;
                 return;
             }
 

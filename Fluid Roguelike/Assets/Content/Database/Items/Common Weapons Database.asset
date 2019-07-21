@@ -20,7 +20,7 @@ MonoBehaviour:
     Abilities:
     - {fileID: 11400000, guid: 3962a112a4683c843aeacc7900361b31, type: 2}
     Interactions:
-    - {fileID: 11400000, guid: e0e5b906a53e72a4782f5d0299d3c1a9, type: 2}
+    - {fileID: 11400000, guid: 49b8d02a536f500409234f3d895a03f5, type: 2}
     DefaultAbilityIndex: 0
     ScrapsValue: 1
     Sprite: {fileID: -1966700659758146321, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
@@ -33,7 +33,7 @@ MonoBehaviour:
     Abilities:
     - {fileID: 11400000, guid: ac82df9bd4ad0384c8ac1b0b58a89e9d, type: 2}
     Interactions:
-    - {fileID: 11400000, guid: e0e5b906a53e72a4782f5d0299d3c1a9, type: 2}
+    - {fileID: 11400000, guid: 49b8d02a536f500409234f3d895a03f5, type: 2}
     DefaultAbilityIndex: 0
     ScrapsValue: 10
     Sprite: {fileID: 7532974559942832730, guid: 3054d3abb78b02f4ab6c2128d2efc75e,

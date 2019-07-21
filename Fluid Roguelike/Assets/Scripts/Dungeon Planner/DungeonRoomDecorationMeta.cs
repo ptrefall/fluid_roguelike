@@ -12,6 +12,8 @@ namespace Fluid.Roguelike.Dungeon
         public Dictionary<int2, Dungeon.MapValue> ValueMap { get; } = new Dictionary<int2, Dungeon.MapValue>();
         public Dictionary<int2, string> ItemMap { get; } = new Dictionary<int2, string>();
         public Dictionary<int2, Tuple<string, string>> CharacterMap { get; } = new Dictionary<int2, Tuple<string, string>>();
+        public Dictionary<int2, string> ItemSpecialsMap { get; } = new Dictionary<int2, string>();
+        public Dictionary<int2, string> CharacterSpecialsMap { get; } = new Dictionary<int2, string>();
 
         /// <summary>
         /// Generate a value map from a double array.
@@ -113,7 +115,7 @@ namespace Fluid.Roguelike.Dungeon
                 while ((line = reader.ReadLine()) != null)
                 {
                     var split = line.Split(',');
-                    if (split.Length < 3 || split.Length > 3)
+                    if (split.Length < 3 || split.Length > 4)
                     {
                         Debug.LogError($"Error in syntax at line {lineNum} reading item from asset {textAsset.name}!");
                         continue;
@@ -132,6 +134,12 @@ namespace Fluid.Roguelike.Dungeon
                     }
                     ItemMap.Add(pos, name);
 
+                    if (split.Length == 4 && ItemSpecialsMap.ContainsKey(pos) == false)
+                    {
+                        var special = split[3];
+                        ItemSpecialsMap.Add(pos, special);
+                    }
+
                     lineNum++;
                 }
             }
@@ -149,7 +157,7 @@ namespace Fluid.Roguelike.Dungeon
                 while ((line = reader.ReadLine()) != null)
                 {
                     var split = line.Split(',');
-                    if (split.Length < 4 || split.Length > 4)
+                    if (split.Length < 4 || split.Length > 5)
                     {
                         Debug.LogError($"Error in syntax at line {lineNum} reading character from asset {textAsset.name}!");
                         continue;
@@ -158,7 +166,7 @@ namespace Fluid.Roguelike.Dungeon
                     var x = Convert.ToInt32(split[0]);
                     var y = Convert.ToInt32(split[1]);
                     var race = split[2];
-                    var name = split[2];
+                    var name = split[3];
 
                     var pos = new int2(x, y);
 
@@ -168,6 +176,12 @@ namespace Fluid.Roguelike.Dungeon
                         continue;
                     }
                     CharacterMap.Add(pos, new Tuple<string, string>(race, name));
+
+                    if (split.Length == 5 && CharacterSpecialsMap.ContainsKey(pos) == false)
+                    {
+                        var special = split[4];
+                        CharacterSpecialsMap.Add(pos, special);
+                    }
 
                     lineNum++;
                 }
