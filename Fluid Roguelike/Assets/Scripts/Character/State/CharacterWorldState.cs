@@ -6,10 +6,13 @@
         HasBumpTarget,
         HasEnemyTarget,
         HasEnemyTargetInMeleeRange,
+        HasEnemyTargetAtSpellCastRange,
         IsStunned,
         IsConfused,
         IsDrunk,
         IsDead,
         LastMoveResult,
+        Health,
+        Mana,
     }
 }

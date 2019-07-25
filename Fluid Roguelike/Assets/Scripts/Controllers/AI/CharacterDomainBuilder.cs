@@ -83,6 +83,38 @@ namespace Fluid.Roguelike.AI
             return this;
         }
 
+        public CharacterDomainBuilder CanCastSpell()
+        {
+            var condition = new CanCastSpellCondition();
+            Pointer.AddCondition(condition);
+            return this;
+        }
+
+        public CharacterDomainBuilder CastSpellEffect(EffectType type)
+        {
+            if (Pointer is IPrimitiveTask task)
+            {
+                var effect = new CastSpellEffect(type);
+                task.AddEffect(effect);
+            }
+            return this;
+        }
+
+        public CharacterDomainBuilder CastSpellOnEnemy()
+        {
+            Action("Cast spell on enemy");
+            if (Pointer is IPrimitiveTask task)
+            {
+                HasState(CharacterWorldState.IsStunned, 0);
+                HasState(CharacterWorldState.HasEnemyTargetAtSpellCastRange);
+                CanCastSpell();
+                task.SetOperator(new CastSpellOperator(CastSpellOperator.TargetType.Enemy));
+                CastSpellEffect(EffectType.PlanOnly);
+            }
+            End();
+            return this;
+        }
+
         public CharacterDomainBuilder MoveToEnemy()
         {
             Action("Move to enemy");
@@ -142,6 +174,22 @@ namespace Fluid.Roguelike.AI
                     HasState(CharacterWorldState.HasEnemyTarget);
                     MoveAwayFromEnemy();
                     MeleeEnemy();
+                }
+                End();
+            }
+            End();
+            return this;
+        }
+
+        public CharacterDomainBuilder CastSpellKeepDistanceSequence()
+        {
+            Sequence("Cast spells and keep distance");
+            {
+                FindEnemyTarget();
+                Select("Flee or cast spells");
+                {
+                    HasState(CharacterWorldState.HasEnemyTarget);
+
                 }
                 End();
             }

@@ -2,6 +2,7 @@
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.State;
 using Fluid.Roguelike.Effects;
+using FluidHTN;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -83,6 +84,21 @@ namespace Fluid.Roguelike.Ability
         public void Use(CharacterContext context, IBumpTarget target)
         {
             Debug.Log($"Hit {target}, but it had no effect!");
+        }
+
+        public void Use(CharacterContext context, int2 position)
+        {
+            Debug.Log($"Hits nothing but air!");
+        }
+
+        public Character.Character FindDefaultTarget(CharacterContext context)
+        {
+            return context.CurrentEnemyTarget;
+        }
+
+        public void ApplyUseCost(CharacterContext context, EffectType type)
+        {
+
         }
     }
 }

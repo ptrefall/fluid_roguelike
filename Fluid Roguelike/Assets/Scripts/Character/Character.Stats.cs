@@ -37,6 +37,18 @@ namespace Fluid.Roguelike.Character
             set => SetValue(StatType.Dodge, value);
         }
 
+        public int Mana
+        {
+            get => GetStat(StatType.Mana)?.Value ?? 0;
+            set => SetValue(StatType.Mana, value);
+        }
+
+        public int MaxMana
+        {
+            get => GetStat(StatType.Mana)?.MaxValue ?? 0;
+            set => SetMaxValue(StatType.Mana, value);
+        }
+
         public void AddStat(StatType type, int value)
         {
             foreach (var stat in _stats)
@@ -98,10 +110,14 @@ namespace Fluid.Roguelike.Character
             switch (stat.Type)
             {
                 case StatType.Health:
+                    Context.SetState(CharacterWorldState.Health, (byte)stat.Value, EffectType.Permanent);
                     if (stat.Value <= 0)
                     {
                         Die();
                     }
+                    break;
+                case StatType.Mana:
+                    Context.SetState(CharacterWorldState.Mana, (byte)stat.Value, EffectType.Permanent);
                     break;
             }
         }

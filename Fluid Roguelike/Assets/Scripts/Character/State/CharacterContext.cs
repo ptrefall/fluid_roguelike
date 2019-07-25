@@ -23,6 +23,7 @@ namespace Fluid.Roguelike.Character.State
         public List<int2> DiscoveredTiles = new List<int2>();
 
         public Character CurrentEnemyTarget { get; set; }
+        public Item.Item CurrentSpell { get; set; }
 
         public CharacterContext(Character self)
         {

@@ -5,12 +5,13 @@ using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.State;
 using Fluid.Roguelike.Database;
 using Fluid.Roguelike.Interaction;
+using FluidHTN;
 using Unity.Mathematics;
 using UnityEngine;
 
 namespace Fluid.Roguelike.Item
 {
-    public enum ItemType { Weapon, Equipment, Food, Scraps, Other }
+    public enum ItemType { Weapon, Equipment, Food, Scraps, Spell, Other }
     public enum ItemRarity { Common, Uncommon, Rare, Epic, Legendary }
 
     public class Item
@@ -110,6 +111,31 @@ namespace Fluid.Roguelike.Item
             WorldPosition = position;
         }
 
+        public bool CanUse(CharacterContext context)
+        {
+            foreach (var abilityMeta in _meta.Abilities)
+            {
+                if (abilityMeta is IAbility ability && ability.CanUse(context))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void ApplyUseCost(CharacterContext context, EffectType type)
+        {
+            foreach (var abilityMeta in _meta.Abilities)
+            {
+                if (abilityMeta is IAbility ability && ability.CanUse(context))
+                {
+                    ability.ApplyUseCost(context, type);
+                    break;
+                }
+            }
+        }
+
         public bool TryUse(CharacterContext context)
         {
             switch (_meta.Type)
@@ -151,6 +177,21 @@ namespace Fluid.Roguelike.Item
             return false;
         }
 
+        public bool TryUse(CharacterContext context, int2 position)
+        {
+            //TODO: Run utility selection on abilities to pick the best rather than the first?
+            foreach (var abilityMeta in _meta.Abilities)
+            {
+                if (abilityMeta is IAbility ability && ability.CanUse(context))
+                {
+                    ability.Use(context, position);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void Visibility(bool isVisible)
         {
             _worldView.gameObject.SetActive(isVisible);
@@ -178,6 +219,19 @@ namespace Fluid.Roguelike.Item
             }
 
             return result;
+        }
+
+        public Character.Character FindDefaultTarget(CharacterContext context)
+        {
+            foreach (var abilityMeta in _meta.Abilities)
+            {
+                if (abilityMeta is IAbility ability && ability.CanUse(context))
+                {
+                    return ability.FindDefaultTarget(context);
+                }
+            }
+
+            return null;
         }
     }
 }

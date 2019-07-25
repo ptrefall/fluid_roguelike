@@ -22,6 +22,8 @@ namespace Fluid.Roguelike.Character
                     return new MeleeRangeSensor();
                 case SensorTypes.FieldOfView:
                     return new FieldOfViewSensor();
+                case SensorTypes.SpeelCastRange:
+                    return new SpellCastRangeSensor();
             }
 
             return null;

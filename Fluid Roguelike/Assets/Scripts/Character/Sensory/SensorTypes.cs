@@ -5,5 +5,6 @@
         Sight,
         MeleeRange,
         FieldOfView,
+        SpeelCastRange,
     }
 }

@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Cinemachine;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character;
@@ -13,18 +14,29 @@ namespace Fluid.Roguelike
 {
     public class PlayerController : CharacterController
     {
-        private bool forceKeyDown = false;
-        private float nextSameKeyTime = 0f;
-        private KeyCode lastKey = KeyCode.Escape;
+        private enum InputMode
+        {
+            Character,
+            TargetPosition
+        }
+
+        private InputMode _mode = InputMode.Character;
+        private bool _forceKeyDown = false;
+        private float _nextSameKeyTime = 0f;
+        private KeyCode _lastKey = KeyCode.Escape;
 
         private UiManager _uiManager;
 
-        private const float keyPause = 0.15f;
+        private const float _keyPause = 0.15f;
 
-        private string oldCharacterName;
+        private string _oldCharacterName;
         private int _lastFieldOfViewEnemyCount = 0;
 
         private int2 _lastMoveDir = int2.zero;
+
+        private int2 _targetPosition;
+        private GameObject _targetGameObject;
+        private Item.Item _itemPendingUseFromTargetPosition;
 
         public void Set(UiManager uiManager)
         {
@@ -40,7 +52,7 @@ namespace Fluid.Roguelike
 
             base.Set(character);
 
-            oldCharacterName = character.name;
+            _oldCharacterName = character.name;
             character.name = "Player";
             character.IsPlayerControlled = true;
             character.OnPrimaryWeaponChanged += OnPrimaryWeaponChanged;
@@ -76,9 +88,9 @@ namespace Fluid.Roguelike
         {
             base.Unset(character);
 
-            if (!string.IsNullOrEmpty(oldCharacterName))
+            if (!string.IsNullOrEmpty(_oldCharacterName))
             {
-                character.name = oldCharacterName;
+                character.name = _oldCharacterName;
                 character.GodMode = false;
             }
             character.IsPlayerControlled = false;
@@ -148,7 +160,7 @@ namespace Fluid.Roguelike
 
             if (inFieldOfViewCount > _lastFieldOfViewEnemyCount)
             {
-                forceKeyDown = true;
+                _forceKeyDown = true;
                 CameraShake.ShakeStatic();
             }
 
@@ -178,6 +190,59 @@ namespace Fluid.Roguelike
 
         public override void Tick(Dungeon.Dungeon dungeon)
         {
+            switch (_mode)
+            {
+                case InputMode.Character:
+                    TickCharacter(dungeon);
+                    break;
+                case InputMode.TargetPosition:
+                    TickTargetPosition(dungeon);
+                    break;
+            }
+        }
+
+        private void TickTargetPosition(Dungeon.Dungeon dungeon)
+        {
+            if (_itemPendingUseFromTargetPosition == null)
+            {
+                _mode = InputMode.Character;
+                _targetGameObject?.SetActive(false);
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                _mode = InputMode.Character;
+                _itemPendingUseFromTargetPosition = null;
+                _targetGameObject?.SetActive(false);
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                _mode = InputMode.Character;
+                if (Character.TryCastSpell(_itemPendingUseFromTargetPosition, _targetPosition))
+                {
+                    SpendTurn(dungeon);
+                }
+
+                _itemPendingUseFromTargetPosition = null;
+                _targetGameObject?.SetActive(false);
+                return;
+            }
+
+            MoveResult result = MoveResult.None;
+            MoveDirection dir = CheckMoveInput();
+            var move = DirectionToVec(dir);
+            _targetPosition += move;
+            if (_targetGameObject != null)
+            {
+                _targetGameObject.transform.position = new Vector3(_targetPosition.x, _targetPosition.y, 0);
+            }
+        }
+
+        private void TickCharacter(Dungeon.Dungeon dungeon)
+        { 
             if (Character == null || Character.IsDead)
                 return;
 
@@ -221,6 +286,17 @@ namespace Fluid.Roguelike
                 {
                     Character.SetPrimaryWeapon(item);
                 }
+                else if (item.Meta.Type == ItemType.Spell)
+                {
+                    if (Character.CanCastSpell(item) == false)
+                        return;
+
+                    _itemPendingUseFromTargetPosition = item;
+                    _mode = InputMode.TargetPosition;
+                    _targetPosition = Character.FindDefaultTargetPosition(item, _lastMoveDir);
+                    _targetGameObject?.SetActive(true);
+                    return;
+                }
                 else
                 {
                     return;
@@ -245,7 +321,7 @@ namespace Fluid.Roguelike
 
                 if (result == MoveResult.Collided)
                 {
-                    forceKeyDown = true;
+                    _forceKeyDown = true;
                     return;
                 }
 
@@ -258,7 +334,7 @@ namespace Fluid.Roguelike
                             Character.Melee(c);
                         }
 
-                        forceKeyDown = true;
+                        _forceKeyDown = true;
                     }
                     else
                     {
@@ -267,6 +343,11 @@ namespace Fluid.Roguelike
                 }
             }
 
+            SpendTurn(dungeon);
+        }
+
+        private void SpendTurn(Dungeon.Dungeon dungeon)
+        {
             // We tick the AI first, so that we're not updating status effects until NPCs have had the chance to add new ones.
             dungeon.TickAI();
 
@@ -353,7 +434,7 @@ namespace Fluid.Roguelike
 
         private MoveDirection CheckMoveInput()
         {
-            if (forceKeyDown)
+            if (_forceKeyDown)
             {
                 return CheckMoveInputKeyDown();
             }
@@ -361,50 +442,50 @@ namespace Fluid.Roguelike
             var dir = MoveDirection.None;
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
             {
-                if (lastKey == KeyCode.W)
+                if (_lastKey == KeyCode.W)
                 {
-                    if (Time.time < nextSameKeyTime)
+                    if (Time.time < _nextSameKeyTime)
                         return MoveDirection.None;
                 }
 
-                lastKey = KeyCode.W;
-                nextSameKeyTime = Time.time + keyPause;
+                _lastKey = KeyCode.W;
+                _nextSameKeyTime = Time.time + _keyPause;
                 dir = MoveDirection.N;
             }
             else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
             {
-                if (lastKey == KeyCode.D)
+                if (_lastKey == KeyCode.D)
                 {
-                    if (Time.time < nextSameKeyTime)
+                    if (Time.time < _nextSameKeyTime)
                         return MoveDirection.None;
                 }
 
-                lastKey = KeyCode.D;
-                nextSameKeyTime = Time.time + keyPause;
+                _lastKey = KeyCode.D;
+                _nextSameKeyTime = Time.time + _keyPause;
                 dir = MoveDirection.E;
             }
             else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
             {
-                if (lastKey == KeyCode.S)
+                if (_lastKey == KeyCode.S)
                 {
-                    if (Time.time < nextSameKeyTime)
+                    if (Time.time < _nextSameKeyTime)
                         return MoveDirection.None;
                 }
 
-                lastKey = KeyCode.S;
-                nextSameKeyTime = Time.time + keyPause;
+                _lastKey = KeyCode.S;
+                _nextSameKeyTime = Time.time + _keyPause;
                 dir = MoveDirection.S;
             }
             else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
             {
-                if (lastKey == KeyCode.A)
+                if (_lastKey == KeyCode.A)
                 {
-                    if (Time.time < nextSameKeyTime)
+                    if (Time.time < _nextSameKeyTime)
                         return MoveDirection.None;
                 }
 
-                lastKey = KeyCode.A;
-                nextSameKeyTime = Time.time + keyPause;
+                _lastKey = KeyCode.A;
+                _nextSameKeyTime = Time.time + _keyPause;
                 dir = MoveDirection.W;
             }
 
@@ -416,30 +497,30 @@ namespace Fluid.Roguelike
             var dir = MoveDirection.None;
             if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
             {
-                lastKey = KeyCode.W;
-                nextSameKeyTime = Time.time + keyPause;
-                forceKeyDown = false;
+                _lastKey = KeyCode.W;
+                _nextSameKeyTime = Time.time + _keyPause;
+                _forceKeyDown = false;
                 dir = MoveDirection.N;
             }
             else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
             {
-                lastKey = KeyCode.D;
-                nextSameKeyTime = Time.time + keyPause;
-                forceKeyDown = false;
+                _lastKey = KeyCode.D;
+                _nextSameKeyTime = Time.time + _keyPause;
+                _forceKeyDown = false;
                 dir = MoveDirection.E;
             }
             else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
             {
-                lastKey = KeyCode.S;
-                nextSameKeyTime = Time.time + keyPause;
-                forceKeyDown = false;
+                _lastKey = KeyCode.S;
+                _nextSameKeyTime = Time.time + _keyPause;
+                _forceKeyDown = false;
                 dir = MoveDirection.S;
             }
             else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                lastKey = KeyCode.A;
-                nextSameKeyTime = Time.time + keyPause;
-                forceKeyDown = false;
+                _lastKey = KeyCode.A;
+                _nextSameKeyTime = Time.time + _keyPause;
+                _forceKeyDown = false;
                 dir = MoveDirection.W;
             }
 

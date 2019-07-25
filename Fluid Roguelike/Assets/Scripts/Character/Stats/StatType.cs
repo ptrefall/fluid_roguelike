@@ -4,6 +4,7 @@
     {
         Health,
         Sight,
-        Dodge
+        Dodge,
+        Mana
     }
 }

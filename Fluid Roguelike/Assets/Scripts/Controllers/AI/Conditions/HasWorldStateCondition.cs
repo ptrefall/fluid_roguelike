@@ -8,7 +8,6 @@ namespace Fluid.Roguelike.AI.Conditions
     public class HasWorldStateCondition : ICondition
     {
         public string Name { get; }
-        public int Depth { get; set; }
         public CharacterWorldState State { get; }
         public byte Value { get; }
 
@@ -31,7 +30,7 @@ namespace Fluid.Roguelike.AI.Conditions
             if (ctx is CharacterContext c)
             {
                 var result = c.HasState(State, Value);
-                ctx.Log(Name, $"HasWorldStateCondition.IsValid({State}:{Value}:{result})", Depth, this);
+                ctx.Log(Name, $"HasWorldStateCondition.IsValid({State}:{Value}:{result})", ctx.CurrentDecompositionDepth, this);
                 return result;
             }
 

@@ -457,6 +457,19 @@ namespace Fluid.Roguelike.Dungeon
             return null;
         }
 
+        public Character.Character GetCharacterAt(int2 position)
+        {
+            foreach (var character in _characters)
+            {
+                if (character.Position.x == position.x && character.Position.y == position.y)
+                {
+                    return character;
+                }
+            }
+
+            return null;
+        }
+
         public DungeonRoom GetRoom(DungeonRoomMeta meta)
         {
             foreach (var room in Rooms)
