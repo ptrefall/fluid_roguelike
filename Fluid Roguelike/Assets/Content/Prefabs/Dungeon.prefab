@@ -67,3 +67,5 @@ MonoBehaviour:
   _characterDb: {fileID: 11400000, guid: ef29a709f420d5b4d8bf4dd169a8f553, type: 2}
   _itemDb: {fileID: 11400000, guid: afb1fdd57e199004c9ea11f77caef162, type: 2}
   _uiManager: {fileID: 0}
+  _targetGameObjectPrefab: {fileID: 6324110593874958280, guid: 702582b2a89c8154780be064519f5c2f,
+    type: 3}

@@ -31,9 +31,12 @@ MonoBehaviour:
       Value: 5
     - Type: 2
       Value: 10
+    - Type: 3
+      Value: 10
     Abilities:
     - {fileID: 11400000, guid: 04ea681cd2cd4c54687c0382380a0a70, type: 2}
-    Items: []
+    Items:
+    - Scroll of Fireball
     LootItems: []
     AlwaysDropLootItems: []
     MinLootDrops: 0

@@ -20,6 +20,9 @@ MonoBehaviour:
   - Item: Broken Bone
     DropChance: 0.75
     CanDropMultipleTimes: 0
-  AlwaysDropLootItems: []
+  AlwaysDropLootItems:
+  - Item: Scroll of Fireball
+    DropChance: 1
+    CanDropMultipleTimes: 0
   MinLootDrops: 1
-  MaxLootDrops: 1
+  MaxLootDrops: 2

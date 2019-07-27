@@ -1,6 +1,7 @@
 ﻿
 using System;
 using Cinemachine;
+using Fluid.Roguelike.Ability;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character;
 using Fluid.Roguelike.Character.State;
@@ -38,9 +39,12 @@ namespace Fluid.Roguelike
         private GameObject _targetGameObject;
         private Item.Item _itemPendingUseFromTargetPosition;
 
-        public void Set(UiManager uiManager)
+        private GameObject _targetGameObjectPrefab;
+
+        public void Set(UiManager uiManager, GameObject targetGameObjectPrefab)
         {
             _uiManager = uiManager;
+            _targetGameObjectPrefab = targetGameObjectPrefab;
         }
 
         public override void Set(Character.Character character)
@@ -206,7 +210,11 @@ namespace Fluid.Roguelike
             if (_itemPendingUseFromTargetPosition == null)
             {
                 _mode = InputMode.Character;
-                _targetGameObject?.SetActive(false);
+                //_targetGameObject?.SetActive(false);
+                if (_targetGameObject != null)
+                {
+                    GameObject.Destroy(_targetGameObject);
+                }
                 return;
             }
 
@@ -214,7 +222,11 @@ namespace Fluid.Roguelike
             {
                 _mode = InputMode.Character;
                 _itemPendingUseFromTargetPosition = null;
-                _targetGameObject?.SetActive(false);
+                //_targetGameObject?.SetActive(false);
+                if (_targetGameObject != null)
+                {
+                    GameObject.Destroy(_targetGameObject);
+                }
                 return;
             }
 
@@ -227,7 +239,11 @@ namespace Fluid.Roguelike
                 }
 
                 _itemPendingUseFromTargetPosition = null;
-                _targetGameObject?.SetActive(false);
+                //_targetGameObject?.SetActive(false);
+                if (_targetGameObject != null)
+                {
+                    GameObject.Destroy(_targetGameObject);
+                }
                 return;
             }
 
@@ -294,6 +310,42 @@ namespace Fluid.Roguelike
                     _itemPendingUseFromTargetPosition = item;
                     _mode = InputMode.TargetPosition;
                     _targetPosition = Character.FindDefaultTargetPosition(item, _lastMoveDir);
+
+                    _targetGameObject = GameObject.Instantiate(_targetGameObjectPrefab);
+                    _targetGameObject.SetActive(false);
+                    _targetGameObject.transform.position = new Vector3(_targetPosition.x, _targetPosition.y, 0);
+
+                    var shape = item.GetAbilityShape(Character.Context);
+                    var radius = item.GetLocalImpactRadius(Character.Context);
+                    
+                    if (radius > 0)
+                    {
+                        var sqRad = radius * radius;
+                        for (var y = -radius; y <= radius; y++)
+                        {
+                            for (var x = -radius; x <= radius; x++)
+                            {
+                                if (x == 0 && y == 0)
+                                    continue;
+
+                                var p = new int2(x, y);
+                                if (shape == AbilityShape.FilledCircle)
+                                {
+                                    var sqDist = math.distancesq(p, int2.zero);
+                                    if (sqDist > sqRad)
+                                    {
+                                        continue;
+                                    }
+                                }
+
+                                var childTarget = new GameObject("T").AddComponent<SpriteRenderer>();
+                                childTarget.sprite = _targetGameObject.GetComponent<SpriteRenderer>().sprite;
+                                childTarget.transform.SetParent(_targetGameObject.transform, false);
+                                childTarget.transform.localPosition = new Vector3(x, y, 0);
+                            }
+                        }
+                    }
+
                     _targetGameObject?.SetActive(true);
                     return;
                 }

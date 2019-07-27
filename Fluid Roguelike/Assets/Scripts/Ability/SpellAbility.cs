@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.State;
 using Fluid.Roguelike.Effects;
@@ -13,6 +14,7 @@ namespace Fluid.Roguelike.Ability
     {
         [SerializeField] private int _damage = 1;
         [SerializeField] private int _radius = 1;
+        [SerializeField] private AbilityShape _shape = AbilityShape.FilledCircle;
         [SerializeField] private int _range = 1;
         [SerializeField] private int _manaCost = 1;
         [SerializeField] private string _hitVerb = "magically touched";
@@ -21,7 +23,9 @@ namespace Fluid.Roguelike.Ability
         [SerializeField] private AbilityEffect _hitEffectPrefab;
         [SerializeField] private AbilityEffect _hitCharacterEffectPrefab;
 
-        public string Info => $"{_manaCost}mana, {_damage}dmg, {(_radius > 1 ? $"{_radius}aoe" : "")}, {_range}range";
+        public string Info => $"{_manaCost}mana, {_damage}dmg, {(_radius > 1 ? $"{_radius}aoe" : "")}";
+
+        public AbilityShape Shape => _shape;
 
         public bool CanUse(CharacterContext context)
         {
@@ -95,11 +99,23 @@ namespace Fluid.Roguelike.Ability
             }
             else
             {
+                var sqRad = _radius * _radius;
+
                 for (var y = position.y - _radius; y <= position.y + _radius; y++)
                 {
                     for (var x = position.x - _radius; x <= position.x + _radius; x++)
                     {
-                        var character = context.Dungeon.GetCharacterAt(new int2(x,y));
+                        var p = new int2(x, y);
+                        if (Shape == AbilityShape.FilledCircle)
+                        {
+                            var sqDist = math.distancesq(p, position);
+                            if (sqDist > sqRad)
+                            {
+                                continue;
+                            }
+                        }
+
+                        var character = context.Dungeon.GetCharacterAt(p);
                         if (character != null)
                         {
                             Use(context, character);
@@ -129,6 +145,9 @@ namespace Fluid.Roguelike.Ability
 
             foreach (var character in context.Dungeon.Characters)
             {
+                if (character == context.Self)
+                    continue;
+
                 if (context.FieldOfView.ContainsKey(character.Position))
                 {
                     var sqDist = math.distancesq(character.Position, context.Self.Position);
@@ -140,7 +159,12 @@ namespace Fluid.Roguelike.Ability
                 }
             }
 
-            return bestCharacter;
+            if (bestCharacter != null)
+            {
+                return bestCharacter;
+            }
+
+            return context.Self;
         }
 
         public void ApplyUseCost(CharacterContext context, EffectType type)
@@ -162,6 +186,11 @@ namespace Fluid.Roguelike.Ability
             {
                 context.Self.Mana -= _manaCost;
             }
+        }
+
+        public int GetLocalImpactRadius(CharacterContext context)
+        {
+            return _radius;
         }
     }
 }

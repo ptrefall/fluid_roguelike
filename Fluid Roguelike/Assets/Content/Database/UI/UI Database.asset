@@ -138,3 +138,4 @@ MonoBehaviour:
     type: 3}
   InventoryItemPrefab: {fileID: 746856181868456848, guid: 8924a5294b5456d47b6c1b2a5b4ce526,
     type: 3}
+  LogPrefab: {fileID: 0}

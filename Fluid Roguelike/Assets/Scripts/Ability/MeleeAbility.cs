@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Fluid.Roguelike.Actions;
 using Fluid.Roguelike.Character.State;
 using Fluid.Roguelike.Effects;
@@ -19,6 +20,8 @@ namespace Fluid.Roguelike.Ability
         [SerializeField] private AbilityEffect _missedEffectPrefab;
 
         public string Info => $"{_damage}dmg";
+
+        public AbilityShape Shape => AbilityShape.Line;
 
         public bool CanUse(CharacterContext context)
         {
@@ -99,6 +102,11 @@ namespace Fluid.Roguelike.Ability
         public void ApplyUseCost(CharacterContext context, EffectType type)
         {
 
+        }
+
+        public int GetLocalImpactRadius(CharacterContext context)
+        {
+            return 0;
         }
     }
 }

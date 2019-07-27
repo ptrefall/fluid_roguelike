@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 634e9dc26c964b040b48ed47ea3c20d2, type: 3}
+  m_Name: Fireball Spell
+  m_EditorClassIdentifier: 
+  _damage: 3
+  _radius: 2
+  _shape: 5
+  _range: 10
+  _manaCost: 2
+  _hitVerb: magically enflamed
+  _chargeVerb: starts mumbling strange incantations
+  _chargeEffectPrefab: {fileID: 0}
+  _hitEffectPrefab: {fileID: 7619044957957206110, guid: e693a67244a23d845a3324a0fa987079,
+    type: 3}
+  _hitCharacterEffectPrefab: {fileID: 0}

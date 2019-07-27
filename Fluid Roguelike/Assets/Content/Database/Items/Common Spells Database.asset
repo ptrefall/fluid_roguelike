@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e76b4d5f1637c94aa55dcb6a099b9a3, type: 3}
+  m_Name: Common Spells Database
+  m_EditorClassIdentifier: 
+  _db:
+  - Name: Scroll of Fireball
+    DisplayName: Scroll of Fireball
+    Type: 4
+    Rarity: 0
+    Abilities:
+    - {fileID: 11400000, guid: 0e5cb426e758dad4bb9690ad72349dfe, type: 2}
+    Interactions:
+    - {fileID: 11400000, guid: 49b8d02a536f500409234f3d895a03f5, type: 2}
+    DefaultAbilityIndex: 0
+    ScrapsValue: 10
+    Sprite: {fileID: -4098995367788955064, guid: 3054d3abb78b02f4ab6c2128d2efc75e,
+      type: 3}
+    Color: {r: 1, g: 1, b: 1, a: 1}

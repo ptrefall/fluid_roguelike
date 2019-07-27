@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Fluid.Roguelike.Ability;
 using Fluid.Roguelike.Actions;
@@ -232,6 +233,32 @@ namespace Fluid.Roguelike.Item
             }
 
             return null;
+        }
+
+        public int GetLocalImpactRadius(CharacterContext context)
+        {
+            foreach (var abilityMeta in _meta.Abilities)
+            {
+                if (abilityMeta is IAbility ability && ability.CanUse(context))
+                {
+                    return ability.GetLocalImpactRadius(context);
+                }
+            }
+
+            return 0;
+        }
+
+        public AbilityShape GetAbilityShape(CharacterContext context)
+        {
+            foreach (var abilityMeta in _meta.Abilities)
+            {
+                if (abilityMeta is IAbility ability && ability.CanUse(context))
+                {
+                    return ability.Shape;
+                }
+            }
+
+            return AbilityShape.None;
         }
     }
 }

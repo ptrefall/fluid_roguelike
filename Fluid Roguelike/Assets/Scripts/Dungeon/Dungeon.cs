@@ -28,6 +28,7 @@ namespace Fluid.Roguelike.Dungeon
         [SerializeField] private CharacterDatabaseManager _characterDb;
         [SerializeField] private ItemDatabaseManager _itemDb;
         [SerializeField] private UiManager _uiManager;
+        [SerializeField] private GameObject _targetGameObjectPrefab;
 
         private PlayerController _playerController;
         private readonly List<AIController> _aiControllers = new List<AIController>();
@@ -310,7 +311,7 @@ namespace Fluid.Roguelike.Dungeon
             if (character != null)
             {
                 var controller = new PlayerController();
-                controller.Set(_uiManager);
+                controller.Set(_uiManager, _targetGameObjectPrefab);
                 controller.Set(character);
 
                 return controller;
