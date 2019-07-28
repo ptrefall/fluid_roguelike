@@ -75,6 +75,16 @@ namespace Fluid.Roguelike
                 OnHealthChanged(health, 0);
             }
 
+            var mana = character.GetStat(Roguelike.Character.Stats.StatType.Mana);
+            if (mana != null)
+            {
+                mana.OnValueChanged += OnManaChanged;
+                mana.OnMaxValueChanged += OnMaxManaChanged;
+
+                OnMaxManaChanged(mana, 0);
+                OnManaChanged(mana, 0);
+            }
+
             if (Character.PrimaryWeapon != null)
             {
                 OnPrimaryWeaponChanged(Character.PrimaryWeapon, null);
@@ -111,6 +121,13 @@ namespace Fluid.Roguelike
                 health.OnMaxValueChanged -= OnMaxHealthChanged;
             }
 
+            var mana = character.GetStat(Roguelike.Character.Stats.StatType.Mana);
+            if (mana != null)
+            {
+                mana.OnValueChanged -= OnManaChanged;
+                mana.OnMaxValueChanged -= OnMaxManaChanged;
+            }
+
             var cameraBrain = Camera.main.GetComponent<CinemachineBrain>();
             if (cameraBrain != null && cameraBrain.ActiveVirtualCamera != null)
             {
@@ -127,6 +144,16 @@ namespace Fluid.Roguelike
         private void OnMaxHealthChanged(Character.Stats.Stat health, int oldMaxHealth)
         {
             _uiManager?.SetMaxHealth(health.MaxValue);
+        }
+
+        private void OnManaChanged(Character.Stats.Stat health, int oldHealth)
+        {
+            _uiManager?.SetMana(health.Value);
+        }
+
+        private void OnMaxManaChanged(Character.Stats.Stat health, int oldMaxHealth)
+        {
+            _uiManager?.SetMaxMana(health.MaxValue);
         }
 
         private void OnPrimaryWeaponChanged(Item.Item item, Item.Item oldItem)
@@ -482,6 +509,14 @@ namespace Fluid.Roguelike
                     }
                 }
             }
+        }
+
+        public bool IsInFieldOfView(int2 position)
+        {
+            if (Character == null || Character.Context == null)
+                return false;
+
+            return Character.Context.FieldOfView.ContainsKey(position);
         }
 
         private MoveDirection CheckMoveInput()

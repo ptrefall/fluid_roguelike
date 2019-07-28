@@ -58,14 +58,48 @@ namespace Fluid.Roguelike.AI
             return this;
         }
 
+        public CharacterDomainBuilder IncrementState(CharacterWorldState state, EffectType type)
+        {
+            if (Pointer is IPrimitiveTask task)
+            {
+                var effect = new IncrementWorldStateEffect(state, type);
+                task.AddEffect(effect);
+            }
+            return this;
+        }
+
+        public CharacterDomainBuilder IncrementState(CharacterWorldState state, byte value, EffectType type)
+        {
+            if (Pointer is IPrimitiveTask task)
+            {
+                var effect = new IncrementWorldStateEffect(state, value, type);
+                task.AddEffect(effect);
+            }
+            return this;
+        }
+
         public CharacterDomainBuilder FindEnemyTarget()
         {
             Action("Find enemy target");
             if (Pointer is IPrimitiveTask task)
             {
                 task.SetOperator(new FindEnemyTargetOperator());
-                SetState(CharacterWorldState.HasEnemyTarget, true, EffectType.PlanOnly);
+                SetState(CharacterWorldState.HasEnemyTarget, true, EffectType.PlanAndExecute);
             }
+            End();
+            return this;
+        }
+
+        public CharacterDomainBuilder FindSpellToCast()
+        {
+            Action("Find spell to cast");
+            if (Pointer is IPrimitiveTask task)
+            {
+                CanCastAnySpell();
+                task.SetOperator(new FindSpellToCastOperator());
+                SetState(CharacterWorldState.HasSpellToCast, true, EffectType.PlanAndExecute);
+            }
+
             End();
             return this;
         }
@@ -86,6 +120,13 @@ namespace Fluid.Roguelike.AI
         public CharacterDomainBuilder CanCastSpell()
         {
             var condition = new CanCastSpellCondition();
+            Pointer.AddCondition(condition);
+            return this;
+        }
+
+        public CharacterDomainBuilder CanCastAnySpell()
+        {
+            var condition = new CanCastAnySpellCondition();
             Pointer.AddCondition(condition);
             return this;
         }
@@ -186,10 +227,13 @@ namespace Fluid.Roguelike.AI
             Sequence("Cast spells and keep distance");
             {
                 FindEnemyTarget();
+                FindSpellToCast();
                 Select("Flee or cast spells");
                 {
                     HasState(CharacterWorldState.HasEnemyTarget);
-
+                    HasState(CharacterWorldState.HasSpellToCast);
+                    CastSpellOnEnemy();
+                    MoveAwayFromEnemy();
                 }
                 End();
             }

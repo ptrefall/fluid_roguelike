@@ -23,7 +23,7 @@ namespace Fluid.Roguelike.AI.Effects
                 if (c.CurrentSpell != null)
                 {
                     c.CurrentSpell.ApplyUseCost(c, Type);
-                    ctx.Log(Name, $"CastSpellEffect.Apply({Type})", ctx.CurrentDecompositionDepth, this);
+                    if (ctx.LogDecomposition) ctx.Log(Name, $"CastSpellEffect.Apply({Type})", ctx.CurrentDecompositionDepth, this);
                 }
 
                 return;

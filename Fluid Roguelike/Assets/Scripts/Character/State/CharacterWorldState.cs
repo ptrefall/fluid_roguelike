@@ -7,6 +7,7 @@
         HasEnemyTarget,
         HasEnemyTargetInMeleeRange,
         HasEnemyTargetAtSpellCastRange,
+        HasSpellToCast,
         IsStunned,
         IsConfused,
         IsDrunk,

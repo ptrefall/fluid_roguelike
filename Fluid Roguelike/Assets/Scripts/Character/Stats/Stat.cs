@@ -8,6 +8,7 @@ namespace Fluid.Roguelike.Character.Stats
     {
         private int _value;
         private int _maxValue;
+        private int _regenRate;
 
         public StatType Type { get; private set; }
 
@@ -46,13 +47,18 @@ namespace Fluid.Roguelike.Character.Stats
             
         }
 
+        public int RegenRate => _regenRate;
+        public int NextRegenCountdown { get; set; }
+
         public float Fraction => Value / (float) MaxValue;
 
-        public Stat(StatType type, int value)
+        public Stat(StatType type, int value, int maxValue, int regenRate)
         {
             Type = type;
             _value = value;
-            _maxValue = value;
+            _maxValue = maxValue;
+            _regenRate = regenRate;
+            NextRegenCountdown = _regenRate;
         }
     }
 }

@@ -22,6 +22,9 @@ namespace Fluid.Roguelike.Character
         public Character Init()
         {
             Context = new CharacterContext(this);
+            Context.LogDecompositionBool = true;
+            Context.Init();
+            Context.LogDecompositionBool = false;
             return this;
         }
 
@@ -41,6 +44,15 @@ namespace Fluid.Roguelike.Character
         public void Visibility(bool isVisible)
         {
             View.gameObject.SetActive(isVisible);
+        }
+
+        [ContextMenu("Toggle Debugging")]
+        public void ToggleDebugging()
+        {
+            if (Context != null)
+            {
+                Context.LogDecompositionBool = !Context.LogDecompositionBool;
+            }
         }
     }
 }

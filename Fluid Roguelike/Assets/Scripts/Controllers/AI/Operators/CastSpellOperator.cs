@@ -22,6 +22,9 @@ namespace Fluid.Roguelike.AI.Operators
         {
             if (ctx is CharacterContext c)
             {
+                if (!c.Dungeon.IsInFieldOfView(c.Self.Position))
+                    return TaskStatus.Failure;
+
                 if (_type == TargetType.Enemy)
                 {
                     if (c.CurrentSpell != null && c.CurrentEnemyTarget != null &&

@@ -72,6 +72,8 @@ namespace Fluid.Roguelike.Database
     {
         public StatType Type;
         public int Value;
+        public int StartValue = -1;
+        public int RegenRate;
     }
 
     [Serializable]

@@ -11,6 +11,7 @@ namespace Fluid.Roguelike.AI
         public override Domain<CharacterContext> Create()
         {
             return new CharacterDomainBuilder("Kobold")
+                .CastSpellKeepDistanceSequence()
                 .EngageEnemyMeleeSequence()
                 .Build();
         }

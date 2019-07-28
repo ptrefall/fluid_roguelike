@@ -280,7 +280,7 @@ namespace Fluid.Roguelike.Dungeon
 
                     foreach (var stat in data.Stats)
                     {
-                        character.AddStat(stat.Type, stat.Value);
+                        character.AddStat(stat.Type, stat.Value, stat.StartValue, stat.RegenRate);
                     }
 
                     foreach (var item in character.Meta.Items)
@@ -469,6 +469,14 @@ namespace Fluid.Roguelike.Dungeon
             }
 
             return null;
+        }
+
+        public bool IsInFieldOfView(int2 position)
+        {
+            if (_playerController == null)
+                return false;
+
+            return _playerController.IsInFieldOfView(position);
         }
 
         public DungeonRoom GetRoom(DungeonRoomMeta meta)

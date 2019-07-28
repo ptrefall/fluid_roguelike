@@ -22,18 +22,29 @@ MonoBehaviour:
     Color: {r: 1, g: 1, b: 1, a: 1}
     DeathColor: {r: 1, g: 1, b: 1, a: 1}
     Brain: {fileID: 11400000, guid: 6226edd0546a8e44a82145be758d7338, type: 2}
-    Sensors: 0000000001000000
+    Sensors: 000000000100000003000000
     Stats:
     - Type: 0
       Value: 4
+      StartValue: -1
+      RegenRate: 0
     - Type: 1
       Value: 6
+      StartValue: -1
+      RegenRate: 0
     - Type: 2
       Value: 1
+      StartValue: -1
+      RegenRate: 0
+    - Type: 3
+      Value: 2
+      StartValue: 0
+      RegenRate: 3
     Abilities:
     - {fileID: 11400000, guid: 04ea681cd2cd4c54687c0382380a0a70, type: 2}
     Items:
     - Short Sword
+    - Scroll of Fireball
     LootItems:
     - Item: Short Sword
       DropChance: 1

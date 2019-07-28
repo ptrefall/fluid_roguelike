@@ -30,7 +30,7 @@ namespace Fluid.Roguelike.AI.Conditions
             if (ctx is CharacterContext c)
             {
                 var result = c.HasState(State, Value);
-                ctx.Log(Name, $"HasWorldStateCondition.IsValid({State}:{Value}:{result})", ctx.CurrentDecompositionDepth, this);
+                if (ctx.LogDecomposition) ctx.Log(Name, $"HasWorldStateCondition.IsValid({State}:{Value}:{result})", ctx.CurrentDecompositionDepth, this);
                 return result;
             }
 

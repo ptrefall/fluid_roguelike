@@ -49,7 +49,7 @@ namespace Fluid.Roguelike.Character
             set => SetMaxValue(StatType.Mana, value);
         }
 
-        public void AddStat(StatType type, int value)
+        public void AddStat(StatType type, int value, int startValue, int regenRate)
         {
             foreach (var stat in _stats)
             {
@@ -59,9 +59,10 @@ namespace Fluid.Roguelike.Character
                 }
             }
 
-            var s = new Stat(type, value);
+            var s = new Stat(type, startValue >= 0 ? startValue : value, value, regenRate);
             s.OnValueChanged += OnStatChanged;
             _stats.Add(s);
+            OnStatChanged(s, value);
         }
 
         public bool SetValue(StatType type, int value)
@@ -103,6 +104,25 @@ namespace Fluid.Roguelike.Character
             }
 
             return null;
+        }
+
+        public void Tick_StatRegen()
+        {
+            foreach (var stat in _stats)
+            {
+                if (stat.RegenRate > 0 && stat.Value < stat.MaxValue)
+                {
+                    if (stat.NextRegenCountdown <= 0)
+                    {
+                        stat.Value++;
+                        stat.NextRegenCountdown = stat.RegenRate;
+                    }
+                    else
+                    {
+                        stat.NextRegenCountdown--;
+                    }
+                }
+            }
         }
 
         private void OnStatChanged(Stat stat, int oldValue)

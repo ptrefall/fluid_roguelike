@@ -12,7 +12,8 @@ namespace Fluid.Roguelike.Character.State
         public override List<string> LastMTRDebug { get; set; } = new List<string>();
         public override bool DebugMTR { get; } = true;
         public override Queue<FluidHTN.Debug.IBaseDecompositionLogEntry> DecompositionLog { get; set; }
-        public override bool LogDecomposition { get; } = true;
+        public override bool LogDecomposition => LogDecompositionBool;
+        public bool LogDecompositionBool { get; set; } = false;
 
         public override byte[] WorldState { get; } = new byte[Enum.GetValues(typeof(CharacterWorldState)).Length];
 
@@ -38,7 +39,19 @@ namespace Fluid.Roguelike.Character.State
 
         public void SetState(CharacterWorldState state, byte value, EffectType type)
         {
+            var oldValue = WorldState[(int) state];
             SetState((int)state, value, true, type);
+
+            // We do some special handling here that we can support changing certain stats through planner effects.
+            if (ContextState == ContextState.Executing && Self != null && oldValue != value)
+            {
+                switch (state)
+                {
+                    case CharacterWorldState.Mana:
+                        Self.Mana = value;
+                        break;
+                }
+            }
         }
 
         public void SetState(CharacterWorldState state, int value, EffectType type)

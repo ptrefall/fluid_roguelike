@@ -11,7 +11,9 @@ namespace Fluid.Roguelike.AI.Operators
         {
             if (ctx is CharacterContext c)
             {
+                var lastTarget = c.CurrentEnemyTarget;
                 bool hasTarget = c.CurrentEnemyTarget != null;
+
                 c.CurrentEnemyTarget = null;
 
                 if (c.KnownEnemies.Count == 0)
@@ -25,6 +27,12 @@ namespace Fluid.Roguelike.AI.Operators
                 {
                     if (enemy.IsDead)
                         continue;
+
+                    if (hasTarget == false || lastTarget != enemy)
+                    {
+                        if (!c.Dungeon.IsInFieldOfView(enemy.Position))
+                            continue;
+                    }
 
                     var distance = math.length(enemy.Position - c.Self.Position);
                     if (distance < bestDistance)

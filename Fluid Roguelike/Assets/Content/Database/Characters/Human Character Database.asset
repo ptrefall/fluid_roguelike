@@ -27,16 +27,23 @@ MonoBehaviour:
     Stats:
     - Type: 0
       Value: 10
+      StartValue: -1
+      RegenRate: 0
     - Type: 1
       Value: 5
+      StartValue: -1
+      RegenRate: 0
     - Type: 2
       Value: 10
+      StartValue: -1
+      RegenRate: 0
     - Type: 3
       Value: 10
+      StartValue: -1
+      RegenRate: 0
     Abilities:
     - {fileID: 11400000, guid: 04ea681cd2cd4c54687c0382380a0a70, type: 2}
-    Items:
-    - Scroll of Fireball
+    Items: []
     LootItems: []
     AlwaysDropLootItems: []
     MinLootDrops: 0

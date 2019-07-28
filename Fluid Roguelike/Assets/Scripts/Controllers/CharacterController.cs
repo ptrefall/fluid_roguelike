@@ -33,6 +33,7 @@ namespace Fluid.Roguelike
             if (_character != null)
             {
                 _character.TickTurn_Status();
+                _character.Tick_StatRegen();
             }
         }
 

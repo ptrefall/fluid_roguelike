@@ -26,7 +26,7 @@ namespace Fluid.Roguelike.AI.Operators
             if (ctx is CharacterContext c)
             {
                 //TODO: Replace with A*
-                UnityEngine.Debug.Log("Move to target!");
+                //UnityEngine.Debug.Log("Move to target!");
                 var dir = c.CurrentEnemyTarget.Position - c.Self.Position;
                 if (UnityEngine.Mathf.Abs(dir.x) > UnityEngine.Mathf.Abs(dir.y))
                 {

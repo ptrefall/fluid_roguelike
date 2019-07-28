@@ -19,6 +19,12 @@ MonoBehaviour:
     - {fileID: 7206947443643174578, guid: 3054d3abb78b02f4ab6c2128d2efc75e, type: 3}
     - {fileID: 4301568362033745594, guid: 3054d3abb78b02f4ab6c2128d2efc75e, type: 3}
     Prefab: {fileID: 711223748049980222, guid: 2425b36e654d8be4991296ac43416550, type: 3}
+  - Type: 3
+    Sprites:
+    - {fileID: 344775561124938408, guid: 3054d3abb78b02f4ab6c2128d2efc75e, type: 3}
+    - {fileID: 1079136379597539763, guid: 3054d3abb78b02f4ab6c2128d2efc75e, type: 3}
+    - {fileID: 3041317885200033608, guid: 3054d3abb78b02f4ab6c2128d2efc75e, type: 3}
+    Prefab: {fileID: 711223748049980222, guid: 1c482d5e86fb89044bec592277c45a8e, type: 3}
   _statusEffectDb:
   - Type: 0
     Effect: {fileID: 787546592855156624, guid: 3bce098e04424a544bcb82d71d291554, type: 3}

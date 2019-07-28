@@ -18,6 +18,9 @@ namespace Fluid.Roguelike.AI.Conditions
         {
             if (ctx is CharacterContext c)
             {
+                if (!c.Dungeon.IsInFieldOfView(c.Self.Position))
+                    return false;
+
                 bool result = false;
                 if (c.CurrentSpell != null)
                 {
@@ -27,7 +30,7 @@ namespace Fluid.Roguelike.AI.Conditions
                     c.Self.Mana = tempMana;
                 }
 
-                ctx.Log(Name, $"CanCastSpellCondition.IsValid({result})", ctx.CurrentDecompositionDepth, this);
+                if (ctx.LogDecomposition) ctx.Log(Name, $"CanCastSpellCondition.IsValid({result})", ctx.CurrentDecompositionDepth, this);
                 return result;
             }
 
