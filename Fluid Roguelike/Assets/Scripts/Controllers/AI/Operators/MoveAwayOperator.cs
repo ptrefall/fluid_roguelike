@@ -72,5 +72,9 @@ namespace Fluid.Roguelike.AI.Operators
         public void Stop(IContext ctx)
         {
         }
+
+        public void Aborted(IContext ctx)
+        {
+        }
     }
 }
